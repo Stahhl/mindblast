@@ -1,0 +1,40 @@
+name: Daily Quiz Generation
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: quiz-forge-daily
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate daily quiz
+        run: python scripts/generate_quiz.py
+
+      - name: Commit and push if new quiz was created
+        run: |
+          if [ -z "$(git status --porcelain -- quizzes)" ]; then
+            echo "No changes in quizzes/"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add quizzes
+          git commit -m "quiz-forge: add quiz for $(date -u +%F)"
+          git push
