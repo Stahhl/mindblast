@@ -38,3 +38,33 @@ jobs:
           git add quizzes
           git commit -m "quiz-forge: add quiz for $(date -u +%F)"
           git push
+
+      - name: Send Discord status notification
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          JOB_STATUS: ${{ job.status }}
+          REPO: ${{ github.repository }}
+          WORKFLOW: ${{ github.workflow }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "DISCORD_WEBHOOK_URL is not set; skipping Discord notification."
+            exit 0
+          fi
+
+          STATUS_TEXT="SUCCESS"
+          if [ "${JOB_STATUS}" != "success" ]; then
+            STATUS_TEXT="FAILURE"
+          fi
+
+          MESSAGE="$(printf 'mindblast quiz-forge daily job: %s\nrepo: %s\nworkflow: %s\nrun: %s' \
+            "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
+
+          PAYLOAD="$(MESSAGE="${MESSAGE}" python3 -c 'import json,os; print(json.dumps({\"content\": os.environ[\"MESSAGE\"]}))')"
+
+          if ! curl -sS -X POST "${DISCORD_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            --data "${PAYLOAD}"; then
+            echo "Failed to send Discord notification."
+          fi
