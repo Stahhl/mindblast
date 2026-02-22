@@ -103,3 +103,12 @@ pnpm dev
 
 Required repository secrets:
 - `FIREBASE_SERVICE_ACCOUNT_STAGING`: service account JSON for Firebase Hosting deploy
+
+## Production Deploy (GitHub Actions)
+
+- Workflow: `.github/workflows/deploy-frontend-production.yml`
+- Trigger: push to `main` when frontend, Firebase config, or `quizzes/` content changes
+- Target project/site: `mindblast-prod` (via `.firebaserc` hosting target `production`)
+
+Required repository secrets:
+- `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: service account JSON for Firebase Hosting deploy

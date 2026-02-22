@@ -56,6 +56,7 @@ Deliverables:
   - deploy on merge to `main` -> `staging`
   - promote/tag-based deploy -> `production`
 - Current staging workflow: `.github/workflows/deploy-frontend-staging.yml`
+- Current production workflow: `.github/workflows/deploy-frontend-production.yml`
 - Add pre-deploy checks:
   - frontend build
   - quiz JSON contract validation
@@ -67,6 +68,9 @@ Acceptance criteria:
 
 Current staging workflow prerequisites:
 - Repository secret `FIREBASE_SERVICE_ACCOUNT_STAGING`
+
+Current production workflow prerequisites:
+- Repository secret `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`
 
 ### Phase H2: Backend-Ready Baseline (No Mandatory Cutover)
 Deliverables:

@@ -6,9 +6,43 @@ import type { QuizPayload, QuizType } from "./lib/types";
 
 type Status = "loading" | "ready" | "error";
 type AnswerMap = Partial<Record<QuizType, string>>;
+type AppEnvironment = "staging" | "production" | "local" | "unknown";
 
 function makeStorageKey(date: string): string {
   return `mindblast:answers:${date}`;
+}
+
+function detectEnvironment(): AppEnvironment {
+  const raw = String(import.meta.env.VITE_APP_ENV ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (!raw) {
+    return "local";
+  }
+
+  if (raw === "prod" || raw === "production") {
+    return "production";
+  }
+
+  if (raw === "staging" || raw === "stage") {
+    return "staging";
+  }
+
+  return "unknown";
+}
+
+function environmentLabel(environment: AppEnvironment): string {
+  if (environment === "production") {
+    return "Production";
+  }
+  if (environment === "staging") {
+    return "Staging";
+  }
+  if (environment === "local") {
+    return "Local";
+  }
+  return "Unknown";
 }
 
 export default function App() {
@@ -18,6 +52,9 @@ export default function App() {
   const [errorsByType, setErrorsByType] = useState<Map<string, string>>(new Map());
   const [fatalError, setFatalError] = useState<string>("");
   const [answers, setAnswers] = useState<AnswerMap>({});
+  const appEnvironment = useMemo(() => detectEnvironment(), []);
+  const envLabel = useMemo(() => environmentLabel(appEnvironment), [appEnvironment]);
+  const envClass = `env-${appEnvironment}`;
 
   const score = useMemo(() => {
     if (!quizzes.length) {
@@ -107,13 +144,14 @@ export default function App() {
   }
 
   return (
-    <main className="page-shell">
+    <main className={`page-shell ${envClass}`}>
       <div className="background-orb orb-one" aria-hidden="true" />
       <div className="background-orb orb-two" aria-hidden="true" />
 
       <header className="top-bar">
         <div>
           <p className="eyebrow">Mindblast Daily</p>
+          <p className={`environment-pill ${envClass}`}>Environment: {envLabel}</p>
           <h1>History Challenge</h1>
           <p className="subtitle">Load order: latest -&gt; daily index -&gt; quiz payloads.</p>
         </div>

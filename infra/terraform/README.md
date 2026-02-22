@@ -91,8 +91,14 @@ Use `/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh` to:
 - grant `roles/iam.workloadIdentityUser` on the deploy service account,
 - set GitHub repo secrets for a custom WIF-based deploy workflow.
 
-Note: the current staging workflow uses Firebase's official Hosting action with
-`FIREBASE_SERVICE_ACCOUNT_STAGING` instead of WIF.
+Note: the current staging/production workflows use Firebase's official Hosting
+action with:
+- `FIREBASE_SERVICE_ACCOUNT_STAGING`
+- `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`
+
+Legacy compatibility:
+- The workflows also accept secrets with a trailing underscore
+  (`..._STAGING_`, `..._PRODUCTION_`) from earlier script output.
 
 Use `/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh`
 to generate a service-account JSON key and set the environment-specific GitHub secret.
@@ -111,13 +117,13 @@ Example (production, standard project naming):
   --environment production
 ```
 
-Example (production, custom project id and additional legacy secret name):
+Example (production, custom project id and optional additional legacy secret name):
 
 ```zsh
 /Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
   --environment production \
   --project-id mindblast-prod \
-  --also-set-secret FIREBASE_SERVICE_ACCOUNT
+  --also-set-secret FIREBASE_SERVICE_ACCOUNT_PRODUCTION_
 ```
 
 Example (staging):

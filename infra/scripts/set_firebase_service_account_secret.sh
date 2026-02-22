@@ -130,7 +130,7 @@ require_cmd git
 require_cmd gcloud
 require_cmd gh
 
-lower_env="$(echo "$ENVIRONMENT" | tr '[:upper:]' '[:lower:]')"
+lower_env="$(printf '%s' "$ENVIRONMENT" | tr '[:upper:]' '[:lower:]')"
 project_env_suffix="$lower_env"
 if [[ "$lower_env" == "production" ]]; then
   project_env_suffix="prod"
@@ -140,7 +140,13 @@ if [[ -z "$PROJECT_ID" ]]; then
   PROJECT_ID="${PROJECT_PREFIX}-${project_env_suffix}"
 fi
 
-upper_env="$(echo "$lower_env" | tr '[:lower:]' '[:upper:]' | tr -c 'A-Z0-9' '_')"
+upper_env="$(printf '%s' "$lower_env" | tr '[:lower:]' '[:upper:]' | tr -c 'A-Z0-9' '_')"
+while [[ "$upper_env" == _* ]]; do
+  upper_env="${upper_env#_}"
+done
+while [[ "$upper_env" == *_ ]]; do
+  upper_env="${upper_env%_}"
+done
 SECRET_NAME="${SECRET_PREFIX}_${upper_env}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -198,4 +204,3 @@ echo "Secret name: $SECRET_NAME"
 if [[ -n "$ALSO_SET_SECRET" ]]; then
   echo "Additional secret: $ALSO_SET_SECRET"
 fi
-

@@ -1,11 +1,11 @@
-name: Deploy Frontend Staging
+name: Deploy Frontend Production
 
 on:
   push:
     branches:
       - main
     paths:
-      - ".github/workflows/deploy-frontend-staging.yml"
+      - ".github/workflows/deploy-frontend-production.yml"
       - ".firebaserc"
       - "firebase.json"
       - "src/apps/frontend/**"
@@ -16,16 +16,16 @@ permissions:
   contents: read
 
 concurrency:
-  group: frontend-staging-deploy
+  group: frontend-production-deploy
   cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      FIREBASE_PROJECT_ID: mindblast-staging
-      FIREBASE_HOSTING_TARGET: staging
-      VITE_APP_ENV: staging
+      FIREBASE_PROJECT_ID: mindblast-prod
+      FIREBASE_HOSTING_TARGET: production
+      VITE_APP_ENV: production
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,22 +50,22 @@ jobs:
 
       - name: Assemble hosting artifact
         run: |
-          rm -rf .firebase/staging
-          mkdir -p .firebase/staging
-          cp -R src/apps/frontend/dist/. .firebase/staging/
-          mkdir -p .firebase/staging/quizzes
-          cp -R quizzes/. .firebase/staging/quizzes/
+          rm -rf .firebase/production
+          mkdir -p .firebase/production
+          cp -R src/apps/frontend/dist/. .firebase/production/
+          mkdir -p .firebase/production/quizzes
+          cp -R quizzes/. .firebase/production/quizzes/
 
       - name: Validate hosting artifact
         run: |
-          test -f .firebase/staging/index.html
-          test -f .firebase/staging/quizzes/latest.json
+          test -f .firebase/production/index.html
+          test -f .firebase/production/quizzes/latest.json
 
-      - name: Deploy to Firebase Hosting (staging)
+      - name: Deploy to Firebase Hosting (production)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING != '' && secrets.FIREBASE_SERVICE_ACCOUNT_STAGING || secrets.FIREBASE_SERVICE_ACCOUNT_STAGING_ }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION != '' && secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION || secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION_ }}
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
           target: ${{ env.FIREBASE_HOSTING_TARGET }}
           channelId: live

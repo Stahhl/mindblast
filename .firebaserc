@@ -1,6 +1,7 @@
 {
   "projects": {
-    "staging": "mindblast-staging"
+    "staging": "mindblast-staging",
+    "production": "mindblast-prod"
   },
   "targets": {
     "mindblast-staging": {
@@ -9,7 +10,13 @@
           "mindblast-staging"
         ]
       }
+    },
+    "mindblast-prod": {
+      "hosting": {
+        "production": [
+          "mindblast-prod"
+        ]
+      }
     }
   }
 }
-
