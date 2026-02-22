@@ -3,6 +3,7 @@
 Thumbs.db
 .idea/
 .vscode/
+LOCAL_DEV_NOTES.md
 
 # Python
 __pycache__/
