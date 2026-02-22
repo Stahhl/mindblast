@@ -118,9 +118,11 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 
 ## Evolution Path
 1. Stabilize Phase 1 multi-type generation (`which_came_first`, `history_mcq_4`).
-2. Add ratings feedback signal from the `Mindblast` app.
-3. Add category expansion and difficulty levels.
-4. Add leaderboards, achievements, and streak logic.
+2. Add Phase 1.5 discovery artifacts for static clients (`quizzes/latest.json` + daily index files).
+3. Ship Phase 2 frontend app that consumes static discovery + quiz files.
+4. Add ratings feedback signal from the `Mindblast` app.
+5. Add category expansion and difficulty levels.
+6. Add leaderboards, achievements, and streak logic.
 
 ## Open Decisions
 - Keep pure rule-based generation or add optional LLM refinement later.

@@ -10,6 +10,7 @@
 ## Source of Truth
 
 - Phase scope and contract: `docs/PHASE1.md`
+- Next phase planning: `docs/PHASE1_5.md`, `docs/PHASE2.md`
 - System design and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
 - Planned future features: `docs/FUTURE_FEATURES.md`
 - Domain and naming checklist: `docs/DOMAIN_PREPURCHASE_CHECKLIST.md`

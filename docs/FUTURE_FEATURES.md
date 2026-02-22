@@ -37,6 +37,8 @@ Track potential future quiz formats and product features after Phase 1.
 
 ## Suggested Evolution Order
 1. Keep Phase 1 stable (`which_came_first` + `history_mcq_4`, one question per type/day).
-2. Add ratings and lightweight analytics.
-3. Add categories and difficulty controls.
-4. Add leaderboard/achievement/streak systems.
+2. Add Phase 1.5 discovery artifacts (`quizzes/latest.json` + daily index files).
+3. Ship Phase 2 static frontend app using discovery artifacts.
+4. Add ratings and lightweight analytics.
+5. Add categories and difficulty controls.
+6. Add leaderboard/achievement/streak systems.

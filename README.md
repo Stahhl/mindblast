@@ -21,6 +21,8 @@ Phase 1 focuses only on `quiz-forge`:
 │   └── daily-quiz.yml
 ├── docs/
 │   ├── PHASE1.md
+│   ├── PHASE1_5.md
+│   ├── PHASE2.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
 │   └── DOMAIN_PREPURCHASE_CHECKLIST.md
@@ -33,6 +35,8 @@ Phase 1 focuses only on `quiz-forge`:
 ## Key Docs
 
 - Phase 1 scope: `docs/PHASE1.md`
+- Phase 1.5 discovery layer: `docs/PHASE1_5.md`
+- Phase 2 frontend scope: `docs/PHASE2.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
 - Future roadmap ideas: `docs/FUTURE_FEATURES.md`
 - Domain/brand pre-purchase checks: `docs/DOMAIN_PREPURCHASE_CHECKLIST.md`
@@ -45,7 +49,6 @@ Phase 1 focuses only on `quiz-forge`:
 
 ## Next Steps
 
-1. Push this repository to GitHub and enable Actions for the repo.
-2. Add repository secret `DISCORD_WEBHOOK_URL` for workflow status notifications.
-3. Confirm the scheduled workflow runs and creates `quizzes/<uuid>.json` files for each enabled type.
-4. Review the first generated quiz file and tune prompt wording or selection rules if needed.
+1. Implement Phase 1.5 discovery artifacts in `docs/PHASE1_5.md`.
+2. Build and deploy the static frontend in `docs/PHASE2.md`.
+3. Re-evaluate backend API need after Phase 2 against the decision gate in `docs/PHASE2.md`.
