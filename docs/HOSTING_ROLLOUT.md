@@ -55,6 +55,7 @@ Deliverables:
 - Add GitHub Actions deploy workflows:
   - deploy on merge to `main` -> `staging`
   - promote/tag-based deploy -> `production`
+- Current staging workflow: `.github/workflows/deploy-frontend-staging.yml`
 - Add pre-deploy checks:
   - frontend build
   - quiz JSON contract validation
@@ -63,6 +64,10 @@ Deliverables:
 Acceptance criteria:
 - Any failed build/validation blocks deploy.
 - One-command or one-workflow rollback to previous release.
+
+Current staging workflow prerequisites:
+- Repository secret `GCP_WIF_PROVIDER`
+- Repository secret `GCP_DEPLOY_SERVICE_ACCOUNT`
 
 ### Phase H2: Backend-Ready Baseline (No Mandatory Cutover)
 Deliverables:

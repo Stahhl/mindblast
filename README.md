@@ -94,3 +94,13 @@ cd src/apps/frontend
 pnpm install
 pnpm dev
 ```
+
+## Staging Deploy (GitHub Actions)
+
+- Workflow: `.github/workflows/deploy-frontend-staging.yml`
+- Trigger: push to `main` when frontend, Firebase config, or `quizzes/` content changes
+- Target project/site: `mindblast-staging` (via `.firebaserc` hosting target `staging`)
+
+Required repository secrets:
+- `GCP_WIF_PROVIDER`: Workload Identity Provider resource name
+- `GCP_DEPLOY_SERVICE_ACCOUNT`: service account email allowed to deploy hosting

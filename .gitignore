@@ -38,6 +38,7 @@ pnpm-debug.log*
 .pnpm-store/
 .npm/
 .yarn/
+.firebase/
 .next/
 .nuxt/
 .svelte-kit/

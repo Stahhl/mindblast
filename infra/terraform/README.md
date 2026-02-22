@@ -83,3 +83,31 @@ terraform import 'module.firebase_foundation.google_firebase_hosting_site.defaul
 ## CI Authentication Recommendation
 - Use GitHub OIDC Workload Identity Federation for deploy/auth.
 - Avoid long-lived JSON service account keys.
+
+## Helper Script: GitHub WIF + Secrets
+
+Use `/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh` to:
+- create/update workload identity pool + provider,
+- grant `roles/iam.workloadIdentityUser` on the deploy service account,
+- set GitHub repo secrets used by the staging deploy workflow.
+
+Example (staging):
+
+```zsh
+/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh --project-id mindblast-staging
+```
+
+Example (production):
+
+```zsh
+/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh --project-id mindblast-prod
+```
+
+Optional override when auto-detect does not match:
+
+```zsh
+/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh \
+  --project-id mindblast-staging \
+  --service-account mindblast-staging-gha@mindblast-staging.iam.gserviceaccount.com \
+  --repo owner/repo
+```

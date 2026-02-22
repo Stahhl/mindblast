@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "staging": "mindblast-staging"
+  },
+  "targets": {
+    "mindblast-staging": {
+      "hosting": {
+        "staging": [
+          "mindblast-staging"
+        ]
+      }
+    }
+  }
+}
+

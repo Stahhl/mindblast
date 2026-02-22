@@ -1,0 +1,75 @@
+name: Deploy Frontend Staging
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/deploy-frontend-staging.yml"
+      - ".firebaserc"
+      - "firebase.json"
+      - "src/apps/frontend/**"
+      - "quizzes/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: frontend-staging-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_PROJECT_ID: mindblast-staging
+      FIREBASE_HOSTING_TARGET: staging
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: src/apps/frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: pnpm --dir src/apps/frontend install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm --dir src/apps/frontend build
+
+      - name: Assemble hosting artifact
+        run: |
+          rm -rf .firebase/staging
+          mkdir -p .firebase/staging
+          cp -R src/apps/frontend/dist/. .firebase/staging/
+          mkdir -p .firebase/staging/quizzes
+          cp -R quizzes/. .firebase/staging/quizzes/
+
+      - name: Validate hosting artifact
+        run: |
+          test -f .firebase/staging/index.html
+          test -f .firebase/staging/quizzes/latest.json
+
+      - name: Authenticate to Google Cloud (OIDC)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Firebase Hosting (staging)
+        run: |
+          npx --yes firebase-tools@13 deploy \
+            --project "${FIREBASE_PROJECT_ID}" \
+            --only "hosting:${FIREBASE_HOSTING_TARGET}" \
+            --non-interactive
