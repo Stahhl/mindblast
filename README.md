@@ -47,5 +47,5 @@ Phase 1 focuses only on `quiz-forge`:
 
 1. Push this repository to GitHub and enable Actions for the repo.
 2. Add repository secret `DISCORD_WEBHOOK_URL` for workflow status notifications.
-3. Confirm the scheduled workflow runs and creates `quizzes/YYYY-MM-DD.json`.
+3. Confirm the scheduled workflow runs and creates `quizzes/<uuid>.json`.
 4. Review the first generated quiz file and tune prompt wording or selection rules if needed.

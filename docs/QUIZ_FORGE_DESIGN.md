@@ -23,7 +23,7 @@ In Phase 1, it produces one history question of type `which_came_first`.
 ## System Context
 - `quiz-forge` runs on GitHub Actions using a daily schedule.
 - It fetches source data from Wikimedia On This Day.
-- It writes one file at `quizzes/YYYY-MM-DD.json`.
+- It writes one file at `quizzes/<uuid>.json` using a deterministic UUIDv5 derived from the UTC date.
 - The `Mindblast` app consumes this file later.
 
 ## Proposed Tech Stack
@@ -41,7 +41,7 @@ In Phase 1, it produces one history question of type `which_came_first`.
 
 ## Execution Flow (Daily Job)
 1. Determine current UTC date.
-2. Build output path `quizzes/YYYY-MM-DD.json`.
+2. Build output path `quizzes/<uuid>.json` from a deterministic UUIDv5 for that date.
 3. Exit early if file already exists (idempotency).
 4. Call Wikimedia On This Day endpoint for current month/day.
 5. Filter events to valid candidates:

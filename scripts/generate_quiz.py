@@ -10,6 +10,7 @@ import json
 import os
 import tempfile
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 from urllib import error, request
@@ -17,6 +18,7 @@ from urllib import error, request
 
 API_URL_TEMPLATE = "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/{month}/{day}"
 QUESTION_TEXT = "Which event happened earlier?"
+QUIZ_FILENAME_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "mindblast.quiz-forge.daily.v1")
 
 
 def parse_args() -> argparse.Namespace:
@@ -57,6 +59,22 @@ def parse_target_date(value: str | None) -> dt.date:
 
 def build_api_url(target_date: dt.date) -> str:
     return API_URL_TEMPLATE.format(month=target_date.month, day=target_date.day)
+
+
+def build_output_path(output_dir: str, target_date: dt.date) -> Path:
+    quiz_id = uuid.uuid5(QUIZ_FILENAME_NAMESPACE, target_date.isoformat())
+    return Path(output_dir) / f"{quiz_id}.json"
+
+
+def find_existing_quiz_path(output_path: Path, target_date: dt.date) -> Path | None:
+    if output_path.exists():
+        return output_path
+
+    legacy_path = output_path.parent / f"{target_date.isoformat()}.json"
+    if legacy_path.exists():
+        return legacy_path
+
+    return None
 
 
 def fetch_json(url: str, timeout: int, retries: int) -> dict[str, Any]:
@@ -301,10 +319,11 @@ def write_quiz_file(path: Path, quiz: dict[str, Any]) -> None:
 def main() -> int:
     args = parse_args()
     target_date = parse_target_date(args.date)
-    output_path = Path(args.output_dir) / f"{target_date.isoformat()}.json"
+    output_path = build_output_path(args.output_dir, target_date)
 
-    if output_path.exists():
-        print(f"Quiz already exists: {output_path}")
+    existing_path = find_existing_quiz_path(output_path, target_date)
+    if existing_path is not None:
+        print(f"Quiz already exists: {existing_path}")
         return 0
 
     retrieval_time = dt.datetime.now(dt.timezone.utc)

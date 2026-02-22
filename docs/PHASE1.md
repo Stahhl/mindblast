@@ -35,7 +35,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates **one** dail
 
 ## Output Format
 - Store one JSON file per day:
-  - `quizzes/YYYY-MM-DD.json`
+  - `quizzes/<uuid>.json` where `<uuid>` is a deterministic UUIDv5 derived from the UTC date.
 - If today's file already exists, do not create duplicates.
 - Commit only when a new file is created.
 
@@ -90,7 +90,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates **one** dail
 - `correct_choice_id` must match one of the choice `id` values.
 - `year` values must not be equal (no tie questions in Phase 1).
 - `question` must be non-empty.
-- `date` must match file date (`YYYY-MM-DD`).
+- `date` must match the target UTC generation date (`YYYY-MM-DD`).
 
 ## Reliability and Safety
 - If generation fails, exit with non-zero status and do not commit partial output.
@@ -107,7 +107,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates **one** dail
 
 ## Acceptance Criteria
 - A scheduled workflow runs once per day.
-- One new file is created at `quizzes/YYYY-MM-DD.json`.
+- One new file is created at `quizzes/<uuid>.json` (UUIDv5 derived from date).
 - File contains one valid `which_came_first` history question with exactly two choices and one correct answer.
 - Workflow commits and pushes the new file.
 - Re-running on the same day does not create a duplicate file or unnecessary commit.

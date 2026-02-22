@@ -26,7 +26,7 @@ If there is any conflict, follow `docs/PHASE1.md` for current implementation beh
 ## Phase 1 Functional Contract
 
 - Generate exactly 1 quiz file per UTC day.
-- Output path must be `quizzes/YYYY-MM-DD.json`.
+- Output path must be `quizzes/<uuid>.json` (deterministic UUIDv5 derived from UTC date).
 - Quiz type must be `which_came_first`.
 - Exactly 2 choices with distinct years.
 - Exactly 1 correct choice.
