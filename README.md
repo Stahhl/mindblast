@@ -20,6 +20,12 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 .
 ├── .github/workflows/
 │   └── daily-quiz.yml
+├── infra/
+│   └── terraform/
+│       ├── modules/
+│       └── envs/
+│           ├── staging/
+│           └── production/
 ├── src/
 │   └── apps/
 │       └── frontend/
@@ -53,6 +59,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 1.5 discovery layer: `docs/PHASE1_5.md`
 - Phase 2 frontend scope: `docs/PHASE2.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
+- Terraform IaC setup: `infra/terraform/README.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
 - Future roadmap ideas: `docs/FUTURE_FEATURES.md`
 - Domain/brand pre-purchase checks: `docs/DOMAIN_PREPURCHASE_CHECKLIST.md`

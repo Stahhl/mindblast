@@ -1,0 +1,3 @@
+bucket = "mindblast-terraform-state"
+prefix = "mindblast/production"
+

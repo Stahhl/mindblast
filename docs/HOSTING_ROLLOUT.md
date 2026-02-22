@@ -26,6 +26,7 @@ Why this fits current and future needs:
 - `GitHub` remains source of truth for quiz JSON and frontend code.
 - `GitHub Actions` builds/deploys frontend to `Firebase Hosting`.
 - `quizzes/` JSON remains statically served with cache-control rules.
+- Terraform IaC scaffold lives in `infra/terraform/`.
 - Two environments:
   - `staging`: preview and smoke checks.
   - `production`: public site.
@@ -118,11 +119,13 @@ Trigger backend API work when one or more conditions are true:
 
 ## Initial Implementation Checklist
 1. Create Firebase project and hosting targets.
-2. Add Firebase config files to repo.
-3. Add staging deploy workflow.
-4. Add production promotion workflow.
-5. Validate static quiz discovery/files in deployed environment.
-6. Document rollback and on-call basics.
+2. Apply Terraform foundation in `infra/terraform/envs/staging`.
+3. Apply Terraform foundation in `infra/terraform/envs/production`.
+4. Add Firebase config files to repo.
+5. Add staging deploy workflow.
+6. Add production promotion workflow.
+7. Validate static quiz discovery/files in deployed environment.
+8. Document rollback and on-call basics.
 
 ## Risks and Mitigations
 - Risk: Vendor lock-in concerns.
@@ -136,4 +139,3 @@ Trigger backend API work when one or more conditions are true:
 - Platform/hosting setup: project maintainers.
 - Quiz content pipeline correctness: `quiz-forge` maintainers.
 - Frontend deploy reliability: frontend maintainers.
-

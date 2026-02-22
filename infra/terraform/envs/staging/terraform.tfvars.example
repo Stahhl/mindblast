@@ -1,0 +1,15 @@
+project_id   = "mindblast-staging"
+project_name = "Mindblast Staging"
+
+# Set to true only if Terraform should create a brand-new project.
+create_project     = false
+billing_account_id = "000000-000000-000000"
+org_id             = null
+folder_id          = null
+
+region          = "us-central1"
+hosting_site_id = "mindblast-staging"
+
+create_github_actions_service_account = true
+github_actions_service_account_id     = "mindblast-staging-gha"
+
