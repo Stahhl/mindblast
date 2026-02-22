@@ -3,6 +3,7 @@ name: Daily Quiz Generation
 on:
   schedule:
     - cron: "0 6 * * *"
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 permissions:
   contents: write
@@ -61,7 +62,7 @@ jobs:
           MESSAGE="$(printf 'mindblast quiz-forge daily job: %s\nrepo: %s\nworkflow: %s\nrun: %s' \
             "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
 
-          PAYLOAD="$(MESSAGE="${MESSAGE}" python3 -c 'import json,os; print(json.dumps({\"content\": os.environ[\"MESSAGE\"]}))')"
+          PAYLOAD="$(MESSAGE="${MESSAGE}" python3 -c 'import json,os; print(json.dumps({"content": os.environ["MESSAGE"]}))')"
 
           if ! curl -sS -X POST "${DISCORD_WEBHOOK_URL}" \
             -H "Content-Type: application/json" \
