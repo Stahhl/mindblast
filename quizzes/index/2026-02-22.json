@@ -1,10 +1,12 @@
 {
   "date": "2026-02-22",
   "quiz_files": {
-    "which_came_first": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json"
+    "which_came_first": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json",
+    "history_mcq_4": "quizzes/105a2ad2-2d37-59df-81f9-666ddb3b48cc.json"
   },
   "available_types": [
-    "which_came_first"
+    "which_came_first",
+    "history_mcq_4"
   ],
   "metadata": {
     "version": 1,
