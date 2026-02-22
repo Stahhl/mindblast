@@ -14,7 +14,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: frontend-staging-deploy
@@ -61,26 +60,11 @@ jobs:
           test -f .firebase/staging/index.html
           test -f .firebase/staging/quizzes/latest.json
 
-      - name: Authenticate to Google Cloud (OIDC)
-        id: auth
-        uses: google-github-actions/auth@v3
-        with:
-          project_id: ${{ env.FIREBASE_PROJECT_ID }}
-          create_credentials_file: true
-          export_environment_variables: true
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
-
-      - name: Verify ADC credential file
-        run: |
-          test -n "${{ steps.auth.outputs.credentials_file_path }}"
-          test -f "${{ steps.auth.outputs.credentials_file_path }}"
-
       - name: Deploy to Firebase Hosting (staging)
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
-        run: |
-          npx --yes firebase-tools@14 deploy \
-            --project "${FIREBASE_PROJECT_ID}" \
-            --only "hosting:${FIREBASE_HOSTING_TARGET}" \
-            --non-interactive
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          target: ${{ env.FIREBASE_HOSTING_TARGET }}
+          channelId: live

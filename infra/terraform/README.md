@@ -89,7 +89,36 @@ terraform import 'module.firebase_foundation.google_firebase_hosting_site.defaul
 Use `/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh` to:
 - create/update workload identity pool + provider,
 - grant `roles/iam.workloadIdentityUser` on the deploy service account,
-- set GitHub repo secrets used by the staging deploy workflow.
+- set GitHub repo secrets for a custom WIF-based deploy workflow.
+
+Note: the current staging workflow uses Firebase's official Hosting action with
+`FIREBASE_SERVICE_ACCOUNT_STAGING` instead of WIF.
+
+Use `/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh`
+to generate a service-account JSON key and set the environment-specific GitHub secret.
+
+Example (staging):
+
+```zsh
+/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
+  --environment staging
+```
+
+Example (production, standard project naming):
+
+```zsh
+/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
+  --environment production
+```
+
+Example (production, custom project id and additional legacy secret name):
+
+```zsh
+/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
+  --environment production \
+  --project-id mindblast-prod \
+  --also-set-secret FIREBASE_SERVICE_ACCOUNT
+```
 
 Example (staging):
 

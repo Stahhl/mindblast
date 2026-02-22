@@ -66,8 +66,7 @@ Acceptance criteria:
 - One-command or one-workflow rollback to previous release.
 
 Current staging workflow prerequisites:
-- Repository secret `GCP_WIF_PROVIDER`
-- Repository secret `GCP_DEPLOY_SERVICE_ACCOUNT`
+- Repository secret `FIREBASE_SERVICE_ACCOUNT_STAGING`
 
 ### Phase H2: Backend-Ready Baseline (No Mandatory Cutover)
 Deliverables:
