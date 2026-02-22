@@ -1,0 +1,41 @@
+{
+  "date": "2026-02-22",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+      "year": 1770
+    },
+    {
+      "id": "B",
+      "label": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
+      "year": 1288
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/22",
+    "retrieved_at": "2026-02-22T06:10:45Z",
+    "events_used": [
+      {
+        "text": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+        "year": 1770,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/North_End%2C_Boston"
+      },
+      {
+        "text": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
+        "year": 1288,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Franciscans"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}
