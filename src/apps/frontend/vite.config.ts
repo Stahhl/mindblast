@@ -9,14 +9,14 @@ const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "../../..");
 const QUIZZES_DIR = path.resolve(REPO_ROOT, "quizzes");
 
-function getContentType(filePath) {
+function getContentType(filePath: string): string {
   if (filePath.endsWith(".json")) {
     return "application/json; charset=utf-8";
   }
   return "text/plain; charset=utf-8";
 }
 
-function resolveQuizFile(urlPath) {
+function resolveQuizFile(urlPath: string): string | null {
   const relative = decodeURIComponent(urlPath.slice("/quizzes/".length));
   const targetPath = path.resolve(QUIZZES_DIR, relative);
   const safePrefix = `${QUIZZES_DIR}${path.sep}`;
@@ -63,10 +63,10 @@ function quizzesPlugin() {
   const middleware = createQuizStaticMiddleware();
   return {
     name: "mindblast-quizzes-static",
-    configureServer(server) {
+    configureServer(server: { middlewares: { use: (mw: ReturnType<typeof createQuizStaticMiddleware>) => void } }) {
       server.middlewares.use(middleware);
     },
-    configurePreviewServer(server) {
+    configurePreviewServer(server: { middlewares: { use: (mw: ReturnType<typeof createQuizStaticMiddleware>) => void } }) {
       server.middlewares.use(middleware);
     }
   };

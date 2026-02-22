@@ -1,25 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 
-import QuizCard from "./components/QuizCard.jsx";
-import { loadDailyQuizzes } from "./lib/quizApi.js";
+import QuizCard from "./components/QuizCard";
+import { loadDailyQuizzes } from "./lib/quizApi";
+import type { QuizPayload, QuizType } from "./lib/types";
 
-const STATUS = {
-  LOADING: "loading",
-  READY: "ready",
-  ERROR: "error"
-};
+type Status = "loading" | "ready" | "error";
+type AnswerMap = Partial<Record<QuizType, string>>;
 
-function makeStorageKey(date) {
+function makeStorageKey(date: string): string {
   return `mindblast:answers:${date}`;
 }
 
 export default function App() {
-  const [status, setStatus] = useState(STATUS.LOADING);
-  const [date, setDate] = useState("");
-  const [quizzes, setQuizzes] = useState([]);
-  const [errorsByType, setErrorsByType] = useState(new Map());
-  const [fatalError, setFatalError] = useState("");
-  const [answers, setAnswers] = useState({});
+  const [status, setStatus] = useState<Status>("loading");
+  const [date, setDate] = useState<string>("");
+  const [quizzes, setQuizzes] = useState<QuizPayload[]>([]);
+  const [errorsByType, setErrorsByType] = useState<Map<string, string>>(new Map());
+  const [fatalError, setFatalError] = useState<string>("");
+  const [answers, setAnswers] = useState<AnswerMap>({});
 
   const score = useMemo(() => {
     if (!quizzes.length) {
@@ -48,12 +46,18 @@ export default function App() {
     }
 
     try {
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw) as unknown;
       if (!parsed || typeof parsed !== "object") {
         setAnswers({});
         return;
       }
-      setAnswers(parsed);
+
+      const answerEntries = Object.entries(parsed as Record<string, unknown>).filter(
+        ([quizType, choiceId]) =>
+          (quizType === "which_came_first" || quizType === "history_mcq_4") && typeof choiceId === "string"
+      ) as Array<[QuizType, string]>;
+
+      setAnswers(Object.fromEntries(answerEntries) as AnswerMap);
     } catch {
       setAnswers({});
     }
@@ -66,8 +70,8 @@ export default function App() {
     localStorage.setItem(makeStorageKey(date), JSON.stringify(answers));
   }, [answers, date]);
 
-  async function refresh() {
-    setStatus(STATUS.LOADING);
+  async function refresh(): Promise<void> {
+    setStatus("loading");
     setFatalError("");
 
     try {
@@ -77,14 +81,14 @@ export default function App() {
       setErrorsByType(result.errorsByType);
 
       if (!result.quizzes.length) {
-        setStatus(STATUS.ERROR);
+        setStatus("error");
         setFatalError("No valid quizzes were loaded for this date.");
         return;
       }
 
-      setStatus(STATUS.READY);
+      setStatus("ready");
     } catch (error) {
-      setStatus(STATUS.ERROR);
+      setStatus("error");
       setFatalError(error instanceof Error ? error.message : String(error));
     }
   }
@@ -93,7 +97,7 @@ export default function App() {
     refresh();
   }, []);
 
-  function onSelectChoice(quizType, choiceId) {
+  function onSelectChoice(quizType: QuizType, choiceId: string): void {
     setAnswers((previous) => {
       if (previous[quizType]) {
         return previous;
@@ -111,11 +115,11 @@ export default function App() {
         <div>
           <p className="eyebrow">Mindblast Daily</p>
           <h1>History Challenge</h1>
-          <p className="subtitle">Load order: latest -> daily index -> quiz payloads.</p>
+          <p className="subtitle">Load order: latest -&gt; daily index -&gt; quiz payloads.</p>
         </div>
 
-        <button type="button" className="refresh-button" onClick={refresh} disabled={status === STATUS.LOADING}>
-          {status === STATUS.LOADING ? "Loading..." : "Retry"}
+        <button type="button" className="refresh-button" onClick={refresh} disabled={status === "loading"}>
+          {status === "loading" ? "Loading..." : "Retry"}
         </button>
       </header>
 
@@ -130,9 +134,9 @@ export default function App() {
         </section>
       ) : null}
 
-      {status === STATUS.LOADING ? <p className="state-banner">Fetching quizzes...</p> : null}
+      {status === "loading" ? <p className="state-banner">Fetching quizzes...</p> : null}
 
-      {status === STATUS.ERROR ? (
+      {status === "error" ? (
         <section className="state-banner error">
           <p>Could not load quizzes.</p>
           {fatalError ? <p className="error-detail">{fatalError}</p> : null}
@@ -154,7 +158,11 @@ export default function App() {
 
       <section className="quiz-grid">
         {quizzes.map((quiz, idx) => (
-          <div className="quiz-wrap" key={quiz.type} style={{ "--stagger": `${idx * 80}ms` }}>
+          <div
+            className="quiz-wrap"
+            key={quiz.type}
+            style={{ "--stagger": `${idx * 80}ms` } as Record<string, string>}
+          >
             <QuizCard quiz={quiz} selectedChoiceId={answers[quiz.type]} onSelectChoice={onSelectChoice} />
           </div>
         ))}

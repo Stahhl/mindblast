@@ -1,8 +1,16 @@
-function answerTone(isCorrect) {
+import type { QuizPayload, QuizType } from "../lib/types";
+
+interface QuizCardProps {
+  quiz: QuizPayload;
+  selectedChoiceId: string | undefined;
+  onSelectChoice: (quizType: QuizType, choiceId: string) => void;
+}
+
+function answerTone(isCorrect: boolean): "correct" | "wrong" {
   return isCorrect ? "correct" : "wrong";
 }
 
-function formatQuizType(type) {
+function formatQuizType(type: QuizType): string {
   if (type === "which_came_first") {
     return "Which Came First";
   }
@@ -12,7 +20,7 @@ function formatQuizType(type) {
   return type;
 }
 
-export default function QuizCard({ quiz, selectedChoiceId, onSelectChoice }) {
+export default function QuizCard({ quiz, selectedChoiceId, onSelectChoice }: QuizCardProps) {
   const hasAnswered = Boolean(selectedChoiceId);
   const correctChoice = quiz.choices.find((choice) => choice.id === quiz.correct_choice_id);
   const isCorrect = selectedChoiceId === quiz.correct_choice_id;

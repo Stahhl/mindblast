@@ -1,0 +1,76 @@
+export type QuizType = "which_came_first" | "history_mcq_4";
+
+export interface LatestPayload {
+  date: string;
+  index_file: string;
+  available_types: QuizType[];
+  metadata: {
+    version: 1;
+    updated_at: string;
+  };
+}
+
+export interface IndexPayload {
+  date: string;
+  quiz_files: Record<QuizType, string> | Record<string, string>;
+  available_types: QuizType[];
+  metadata: {
+    version: 1;
+    generated_at: string;
+  };
+}
+
+export interface QuizSourceEvent {
+  text: string;
+  year: number;
+  wikipedia_url: string;
+}
+
+export interface QuizSource {
+  name: string;
+  url: string;
+  retrieved_at: string;
+  events_used: QuizSourceEvent[];
+}
+
+interface QuizBase {
+  date: string;
+  topics: string[];
+  type: QuizType;
+  question: string;
+  correct_choice_id: string;
+  source: QuizSource;
+  metadata: {
+    version: 1;
+  };
+}
+
+export interface WhichCameFirstChoice {
+  id: string;
+  label: string;
+  year: number;
+}
+
+export interface HistoryMcqChoice {
+  id: string;
+  label: string;
+}
+
+export interface WhichCameFirstQuiz extends QuizBase {
+  type: "which_came_first";
+  choices: WhichCameFirstChoice[];
+}
+
+export interface HistoryMcqQuiz extends QuizBase {
+  type: "history_mcq_4";
+  choices: HistoryMcqChoice[];
+}
+
+export type QuizPayload = WhichCameFirstQuiz | HistoryMcqQuiz;
+
+export interface DailyQuizLoadResult {
+  date: string;
+  availableTypes: QuizType[];
+  quizzes: QuizPayload[];
+  errorsByType: Map<string, string>;
+}

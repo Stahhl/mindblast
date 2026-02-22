@@ -26,11 +26,12 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │           ├── src/
 │           │   ├── components/
 │           │   ├── lib/
-│           │   ├── App.jsx
-│           │   ├── main.jsx
+│           │   ├── App.tsx
+│           │   ├── main.tsx
 │           │   └── styles.css
 │           ├── package.json
-│           ├── vite.config.js
+│           ├── vite.config.ts
+│           ├── tsconfig.json
 │           └── index.html
 ├── docs/
 │   ├── PHASE1.md

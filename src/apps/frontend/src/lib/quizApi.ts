@@ -1,6 +1,7 @@
-import { validateIndexPayload, validateLatestPayload, validateQuizPayload } from "./validation.js";
+import { validateIndexPayload, validateLatestPayload, validateQuizPayload } from "./validation";
+import type { DailyQuizLoadResult, QuizPayload } from "./types";
 
-function toAbsolutePath(path) {
+function toAbsolutePath(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
@@ -10,7 +11,7 @@ function toAbsolutePath(path) {
   return `/${path}`;
 }
 
-async function fetchJson(path) {
+async function fetchJson(path: string): Promise<unknown> {
   const response = await fetch(toAbsolutePath(path));
   if (!response.ok) {
     throw new Error(`Request failed (${response.status}) for ${path}`);
@@ -18,7 +19,7 @@ async function fetchJson(path) {
   return response.json();
 }
 
-export async function loadDailyQuizzes() {
+export async function loadDailyQuizzes(): Promise<DailyQuizLoadResult> {
   const latest = validateLatestPayload(await fetchJson("/quizzes/latest.json"));
   const index = validateIndexPayload(await fetchJson(latest.index_file));
 
@@ -28,12 +29,12 @@ export async function loadDailyQuizzes() {
       if (quiz.type !== quizType) {
         throw new Error(`Quiz type mismatch for ${quizType}`);
       }
-      return [quizType, quiz];
+      return [quizType, quiz] as const;
     })
   );
 
-  const quizzesByType = new Map();
-  const errorsByType = new Map();
+  const quizzesByType = new Map<string, QuizPayload>();
+  const errorsByType = new Map<string, string>();
 
   quizResults.forEach((result, idx) => {
     const quizType = index.available_types[idx];
@@ -49,7 +50,7 @@ export async function loadDailyQuizzes() {
 
   const quizzes = index.available_types
     .map((quizType) => quizzesByType.get(quizType))
-    .filter(Boolean);
+    .filter((quiz): quiz is QuizPayload => Boolean(quiz));
 
   return {
     date: index.date,
