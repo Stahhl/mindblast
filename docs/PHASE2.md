@@ -50,6 +50,7 @@ Required behavior:
 - Static frontend stack (example: React + Vite).
 - Host as static site (GitHub Pages, Netlify, or Vercel static output).
 - No server runtime required in Phase 2.
+- Keep app files isolated under `src/apps/<app-name>/` to support multiple apps in this repo.
 
 ## Quality and Reliability
 - Strict runtime validation of loaded JSON shape before rendering.
@@ -68,4 +69,3 @@ Introduce a backend API only if one or more become required:
 - User can complete all available quiz types for the day.
 - Frontend works on current desktop and mobile browsers.
 - No always-on backend service is required for normal play.
-

@@ -20,6 +20,18 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 .
 ├── .github/workflows/
 │   └── daily-quiz.yml
+├── src/
+│   └── apps/
+│       └── frontend/
+│           ├── src/
+│           │   ├── components/
+│           │   ├── lib/
+│           │   ├── App.jsx
+│           │   ├── main.jsx
+│           │   └── styles.css
+│           ├── package.json
+│           ├── vite.config.js
+│           └── index.html
 ├── docs/
 │   ├── PHASE1.md
 │   ├── PHASE1_5.md
@@ -28,9 +40,9 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── FUTURE_FEATURES.md
 │   └── DOMAIN_PREPURCHASE_CHECKLIST.md
 ├── scripts/
-│   └── generate_quiz.py
+│   ├── generate_quiz.py
+│   └── quiz_forge/
 └── quizzes/
-    └── .gitkeep
 ```
 
 ## Key Docs
@@ -50,6 +62,25 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 
 ## Next Steps
 
-1. Backfill discovery artifacts for any legacy quiz dates that predate Phase 1.5.
-2. Build and deploy the static frontend in `docs/PHASE2.md`.
+1. Run the local frontend and validate quiz UX on desktop/mobile.
+2. Backfill discovery artifacts for any legacy quiz dates that predate Phase 1.5.
 3. Re-evaluate backend API need after Phase 2 against the decision gate in `docs/PHASE2.md`.
+
+## Local Frontend Run
+
+Use your Node + pnpm bootstrap in this shell:
+
+```zsh
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+nvm use default
+export PATH="$HOME/Library/pnpm:$PATH"
+```
+
+Then install and run:
+
+```zsh
+cd src/apps/frontend
+pnpm install
+pnpm dev
+```
