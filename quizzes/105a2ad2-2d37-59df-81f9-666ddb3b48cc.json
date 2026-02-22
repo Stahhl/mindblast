@@ -1,0 +1,57 @@
+{
+  "date": "2026-02-22",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "question": "Which event happened in 1770?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution."
+    },
+    {
+      "id": "B",
+      "label": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states."
+    },
+    {
+      "id": "C",
+      "label": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans."
+    },
+    {
+      "id": "D",
+      "label": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908."
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/22",
+    "retrieved_at": "2026-02-22T08:25:55Z",
+    "events_used": [
+      {
+        "text": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+        "year": 1770,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/North_End%2C_Boston"
+      },
+      {
+        "text": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states.",
+        "year": 1889,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/President_of_the_United_States"
+      },
+      {
+        "text": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans.",
+        "year": 1899,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Philippine_Revolutionary_Army"
+      },
+      {
+        "text": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908.",
+        "year": 1904,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/South_Orkney_Islands"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}
