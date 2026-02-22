@@ -24,6 +24,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - `quiz-forge` runs on GitHub Actions using a daily schedule.
 - It fetches source data from Wikimedia On This Day.
 - It writes one file at `quizzes/<uuid>.json` per enabled type using a deterministic UUIDv5 derived from UTC date + quiz type.
+- It writes discovery artifacts at `quizzes/index/YYYY-MM-DD.json` and `quizzes/latest.json`.
 - The `Mindblast` app consumes this file later.
 
 ## Proposed Tech Stack
@@ -52,7 +53,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 7. Generate payloads through a quiz-type registry (one builder per type).
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
-10. Commit and push only when new files are created.
+10. Write/update discovery artifacts for static client lookup.
+11. Commit and push only when new files are created.
 
 ## Data Contract Ownership
 - Contract lives in `/Users/stahl/dev/mindblast/docs/PHASE1.md`.

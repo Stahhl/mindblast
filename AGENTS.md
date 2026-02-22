@@ -5,7 +5,7 @@
 - Project name: `Mindblast`
 - User-facing app name: `Mindblast`
 - Backend generator service: `quiz-forge`
-- Current active phase: Phase 1 (daily history quiz generation with extensible quiz types)
+- Current active phase: Phase 1.5 (daily quiz generation + static discovery artifacts)
 
 ## Source of Truth
 

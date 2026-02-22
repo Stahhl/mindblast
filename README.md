@@ -7,10 +7,11 @@ Mindblast is a quiz project built to evolve over time.
 
 ## Current Status
 
-Phase 1 focuses only on `quiz-forge`:
+Phase 1.5 focuses on `quiz-forge` + static discovery:
 - one scheduled GitHub Actions run per day
 - one history question per enabled quiz type per day
 - enabled types: `which_came_first`, `history_mcq_4`
+- discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
 - output committed as JSON to this repository
 
 ## Repository Structure
@@ -49,6 +50,6 @@ Phase 1 focuses only on `quiz-forge`:
 
 ## Next Steps
 
-1. Implement Phase 1.5 discovery artifacts in `docs/PHASE1_5.md`.
+1. Backfill discovery artifacts for any legacy quiz dates that predate Phase 1.5.
 2. Build and deploy the static frontend in `docs/PHASE2.md`.
 3. Re-evaluate backend API need after Phase 2 against the decision gate in `docs/PHASE2.md`.

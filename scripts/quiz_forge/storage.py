@@ -40,18 +40,32 @@ def find_existing_quiz_path(output_path: Path, target_date: dt.date, quiz_type: 
     return None
 
 
-def write_quiz_file(path: Path, quiz: dict[str, Any]) -> None:
+def load_json_file(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    with path.open("r", encoding="utf-8") as file_obj:
+        payload = json.load(file_obj)
+    if not isinstance(payload, dict):
+        return None
+    return payload
+
+
+def write_json_file(path: Path, payload: dict[str, Any], prefix: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    body = json.dumps(quiz, ensure_ascii=True, indent=2) + "\n"
+    body = json.dumps(payload, ensure_ascii=True, indent=2) + "\n"
 
     with tempfile.NamedTemporaryFile(
         mode="w",
         encoding="utf-8",
         dir=path.parent,
-        prefix=".tmp-quiz-",
+        prefix=prefix,
         delete=False,
     ) as temp_file:
         temp_file.write(body)
         temp_path = Path(temp_file.name)
 
     os.replace(temp_path, path)
+
+
+def write_quiz_file(path: Path, quiz: dict[str, Any]) -> None:
+    write_json_file(path, quiz, prefix=".tmp-quiz-")

@@ -1,0 +1,13 @@
+{
+  "date": "2026-02-22",
+  "quiz_files": {
+    "which_came_first": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json"
+  },
+  "available_types": [
+    "which_came_first"
+  ],
+  "metadata": {
+    "version": 1,
+    "generated_at": "2026-02-22T08:54:14Z"
+  }
+}
