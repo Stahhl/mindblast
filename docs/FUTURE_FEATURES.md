@@ -10,12 +10,11 @@ Track potential future quiz formats and product features after Phase 1.
 
 ## Quiz Modes
 
-### Original Idea (Future Phase)
-- Daily history multiple-choice question (4 options, 1 correct answer).
-- Can run as an additional mode alongside `which_came_first`.
+### Implemented in Phase 1
+- `which_came_first`: two events, choose the earlier one.
+- `history_mcq_4`: four options, choose the event that matches a target year.
 
 ### Additional Quiz Formats
-- `which_came_first`: two events, choose the earlier one (Phase 1 baseline).
 - Geography quiz: country/capital/flag/timezone prompts.
 - Science myth-or-fact: classify a statement and show explanation.
 - News context quiz: current event with background question.
@@ -37,8 +36,7 @@ Track potential future quiz formats and product features after Phase 1.
 - Sharing and social challenge links.
 
 ## Suggested Evolution Order
-1. Keep Phase 1 stable (`which_came_first`, one question/day).
+1. Keep Phase 1 stable (`which_came_first` + `history_mcq_4`, one question per type/day).
 2. Add ratings and lightweight analytics.
-3. Add original 4-option MCQ mode.
-4. Add categories and difficulty controls.
-5. Add leaderboard/achievement/streak systems.
+3. Add categories and difficulty controls.
+4. Add leaderboard/achievement/streak systems.

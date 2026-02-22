@@ -9,8 +9,8 @@ Mindblast is a quiz project built to evolve over time.
 
 Phase 1 focuses only on `quiz-forge`:
 - one scheduled GitHub Actions run per day
-- one history question per day
-- question type: `which_came_first`
+- one history question per enabled quiz type per day
+- enabled types: `which_came_first`, `history_mcq_4`
 - output committed as JSON to this repository
 
 ## Repository Structure
@@ -47,5 +47,5 @@ Phase 1 focuses only on `quiz-forge`:
 
 1. Push this repository to GitHub and enable Actions for the repo.
 2. Add repository secret `DISCORD_WEBHOOK_URL` for workflow status notifications.
-3. Confirm the scheduled workflow runs and creates `quizzes/<uuid>.json`.
+3. Confirm the scheduled workflow runs and creates `quizzes/<uuid>.json` files for each enabled type.
 4. Review the first generated quiz file and tune prompt wording or selection rules if needed.

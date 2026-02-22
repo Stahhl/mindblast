@@ -1,8 +1,8 @@
 # quiz-forge Design Doc
 
 ## Purpose
-`quiz-forge` is the backend generator that creates one daily quiz payload and commits it to this repository.  
-In Phase 1, it produces one history question of type `which_came_first`.
+`quiz-forge` is the backend generator that creates daily quiz payloads and commits them to this repository.  
+In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `history_mcq_4`).
 
 ## Naming
 - Project name: `Mindblast`.
@@ -23,7 +23,7 @@ In Phase 1, it produces one history question of type `which_came_first`.
 ## System Context
 - `quiz-forge` runs on GitHub Actions using a daily schedule.
 - It fetches source data from Wikimedia On This Day.
-- It writes one file at `quizzes/<uuid>.json` using a deterministic UUIDv5 derived from the UTC date.
+- It writes one file at `quizzes/<uuid>.json` per enabled type using a deterministic UUIDv5 derived from UTC date + quiz type.
 - The `Mindblast` app consumes this file later.
 
 ## Proposed Tech Stack
@@ -41,21 +41,21 @@ In Phase 1, it produces one history question of type `which_came_first`.
 
 ## Execution Flow (Daily Job)
 1. Determine current UTC date.
-2. Build output path `quizzes/<uuid>.json` from a deterministic UUIDv5 for that date.
-3. Exit early if file already exists (idempotency).
-4. Call Wikimedia On This Day endpoint for current month/day.
-5. Filter events to valid candidates:
+2. Determine enabled quiz types.
+3. Build output path `quizzes/<uuid>.json` for each type from deterministic UUIDv5(date + type).
+4. Skip only the types whose output file already exists (idempotency).
+5. Call Wikimedia On This Day endpoint for current month/day.
+6. Filter events to valid candidates:
    - has year
    - has readable text
    - has at least one Wikipedia page URL
-6. Pick two events with distinct years.
-7. Construct `which_came_first` JSON payload.
-8. Run contract validation.
-9. Write JSON to disk.
-10. Commit and push only when a new file is created.
+7. Generate payloads through a quiz-type registry (one builder per type).
+8. Run shared + type-specific contract validation.
+9. Write JSON files to disk.
+10. Commit and push only when new files are created.
 
 ## Data Contract Ownership
-- Contract lives in `/Users/stahl/dev/vajb_engine/docs/PHASE1.md`.
+- Contract lives in `/Users/stahl/dev/mindblast/docs/PHASE1.md`.
 - `quiz-forge` script must enforce all validation rules before commit.
 - Schema version starts at `metadata.version = 1`.
 
@@ -89,8 +89,8 @@ In Phase 1, it produces one history question of type `which_came_first`.
 - Sanitize/log only non-sensitive data.
 
 ## CI/CD Design
-- Trigger: `schedule` only.
-- No push/PR/manual triggers in Phase 1.
+- Trigger: `schedule` (manual dispatch allowed for operational reruns).
+- No push/PR triggers in Phase 1.
 - Workflow steps:
   1. checkout
   2. setup python
@@ -117,11 +117,10 @@ In Phase 1, it produces one history question of type `which_came_first`.
 - Optional later improvement: backfill command for missing dates.
 
 ## Evolution Path
-1. Stabilize Phase 1 (`which_came_first`, one question/day).
+1. Stabilize Phase 1 multi-type generation (`which_came_first`, `history_mcq_4`).
 2. Add ratings feedback signal from the `Mindblast` app.
-3. Add MCQ mode (original 4-option plan).
-4. Add category expansion and difficulty levels.
-5. Add leaderboards, achievements, and streak logic.
+3. Add category expansion and difficulty levels.
+4. Add leaderboards, achievements, and streak logic.
 
 ## Open Decisions
 - Keep pure rule-based generation or add optional LLM refinement later.

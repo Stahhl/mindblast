@@ -5,7 +5,7 @@
 - Project name: `Mindblast`
 - User-facing app name: `Mindblast`
 - Backend generator service: `quiz-forge`
-- Current active phase: Phase 1 (`which_came_first` daily history quiz generation)
+- Current active phase: Phase 1 (daily history quiz generation with extensible quiz types)
 
 ## Source of Truth
 
@@ -25,10 +25,11 @@ If there is any conflict, follow `docs/PHASE1.md` for current implementation beh
 
 ## Phase 1 Functional Contract
 
-- Generate exactly 1 quiz file per UTC day.
-- Output path must be `quizzes/<uuid>.json` (deterministic UUIDv5 derived from UTC date).
-- Quiz type must be `which_came_first`.
-- Exactly 2 choices with distinct years.
+- Generate exactly 1 quiz file per enabled quiz type per UTC day.
+- Output path must be `quizzes/<uuid>.json` (deterministic UUIDv5 derived from UTC date + quiz type).
+- Enabled quiz types are currently `which_came_first` and `history_mcq_4`.
+- `which_came_first` must have exactly 2 choices with distinct years.
+- `history_mcq_4` must have exactly 4 choices with exactly 1 correct answer.
 - Exactly 1 correct choice.
 - Use Wikipedia On This Day endpoint as source.
 - Commit/push only when a new daily file is created.
