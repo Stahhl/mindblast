@@ -1,0 +1,57 @@
+{
+  "date": "2026-02-23",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "question": "Which event happened in 1887?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Berbice slave uprising in Guyana: The first major slave revolt in South America."
+    },
+    {
+      "id": "B",
+      "label": "J. S. Bach leads his Tafel-Music Shepherd Cantata for the birthday of Christian, Duke of Saxe-Weissenfels."
+    },
+    {
+      "id": "C",
+      "label": "American Revolutionary War: Baron von Steuben arrives at Valley Forge, Pennsylvania, to help train the Continental Army."
+    },
+    {
+      "id": "D",
+      "label": "The French Riviera is hit by a large earthquake, killing around 2,000."
+    }
+  ],
+  "correct_choice_id": "D",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/23",
+    "retrieved_at": "2026-02-23T06:17:44Z",
+    "events_used": [
+      {
+        "text": "Berbice slave uprising in Guyana: The first major slave revolt in South America.",
+        "year": 1763,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Berbice_Rebellion"
+      },
+      {
+        "text": "J. S. Bach leads his Tafel-Music Shepherd Cantata for the birthday of Christian, Duke of Saxe-Weissenfels.",
+        "year": 1725,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Johann_Sebastian_Bach"
+      },
+      {
+        "text": "American Revolutionary War: Baron von Steuben arrives at Valley Forge, Pennsylvania, to help train the Continental Army.",
+        "year": 1778,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/American_Revolutionary_War"
+      },
+      {
+        "text": "The French Riviera is hit by a large earthquake, killing around 2,000.",
+        "year": 1887,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/French_Riviera"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}

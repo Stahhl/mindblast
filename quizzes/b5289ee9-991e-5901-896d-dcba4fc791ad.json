@@ -1,0 +1,41 @@
+{
+  "date": "2026-02-23",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Saddam Hussein begins the Anfal genocide against Kurds and Assyrians in northern Iraq.",
+      "year": 1988
+    },
+    {
+      "id": "B",
+      "label": "Iran hostage crisis: Supreme Leader Ayatollah Ruhollah Khomeini states that Iran's parliament will decide the fate of the American embassy hostages.",
+      "year": 1980
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/23",
+    "retrieved_at": "2026-02-23T06:17:44Z",
+    "events_used": [
+      {
+        "text": "Saddam Hussein begins the Anfal genocide against Kurds and Assyrians in northern Iraq.",
+        "year": 1988,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Anfal_campaign"
+      },
+      {
+        "text": "Iran hostage crisis: Supreme Leader Ayatollah Ruhollah Khomeini states that Iran's parliament will decide the fate of the American embassy hostages.",
+        "year": 1980,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Iran_hostage_crisis"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}
