@@ -57,12 +57,14 @@ jobs:
           fi
 
           STATUS_TEXT="SUCCESS"
+          STATUS_EMOJI="✅"
           if [ "${JOB_STATUS}" != "success" ]; then
             STATUS_TEXT="FAILURE"
+            STATUS_EMOJI="❌"
           fi
 
-          MESSAGE="$(printf 'mindblast quiz-forge daily job: %s\nrepo: %s\nworkflow: %s\nrun: %s' \
-            "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
+          MESSAGE="$(printf '%s mindblast quiz-forge daily job: %s\nrepo: %s\nworkflow: %s\nrun: %s' \
+            "${STATUS_EMOJI}" "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
 
           PAYLOAD="$(MESSAGE="${MESSAGE}" python3 -c 'import json,os; print(json.dumps({"content": os.environ["MESSAGE"]}))')"
 

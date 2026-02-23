@@ -10,6 +10,13 @@ on:
       - "firebase.json"
       - "src/apps/frontend/**"
       - "quizzes/**"
+  workflow_run:
+    workflows:
+      - Daily Quiz Generation
+    types:
+      - completed
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -21,6 +28,9 @@ concurrency:
 
 jobs:
   deploy:
+    if: |
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
       FIREBASE_PROJECT_ID: mindblast-staging
