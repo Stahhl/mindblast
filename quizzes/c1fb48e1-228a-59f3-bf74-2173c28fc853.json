@@ -1,0 +1,57 @@
+{
+  "date": "2026-02-24",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "question": "Which event happened in 1916?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Nancy Astor becomes the first woman to speak in the House of Commons of the United Kingdom following her election as a Member of Parliament (MP) three months earlier."
+    },
+    {
+      "id": "B",
+      "label": "The Governor-General of Korea establishes a clinic called Jahyewon in Sorokdo to segregate Hansen's disease patients."
+    },
+    {
+      "id": "C",
+      "label": "Estonian Declaration of Independence."
+    },
+    {
+      "id": "D",
+      "label": "Seven hundred ninety-one Romanian Jewish refugees and crew members are killed after the MV Struma is torpedoed by the Soviet Navy."
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/24",
+    "retrieved_at": "2026-02-24T06:16:32Z",
+    "events_used": [
+      {
+        "text": "Nancy Astor becomes the first woman to speak in the House of Commons of the United Kingdom following her election as a Member of Parliament (MP) three months earlier.",
+        "year": 1920,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Nancy_Astor%2C_Viscountess_Astor"
+      },
+      {
+        "text": "The Governor-General of Korea establishes a clinic called Jahyewon in Sorokdo to segregate Hansen's disease patients.",
+        "year": 1916,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Governor-General_of_Ch%C5%8Dsen"
+      },
+      {
+        "text": "Estonian Declaration of Independence.",
+        "year": 1918,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Estonian_Declaration_of_Independence"
+      },
+      {
+        "text": "Seven hundred ninety-one Romanian Jewish refugees and crew members are killed after the MV Struma is torpedoed by the Soviet Navy.",
+        "year": 1942,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/History_of_the_Jews_in_Romania"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}

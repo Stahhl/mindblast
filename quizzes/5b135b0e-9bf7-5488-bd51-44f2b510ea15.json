@@ -1,0 +1,41 @@
+{
+  "date": "2026-02-24",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
+      "year": 1607
+    },
+    {
+      "id": "B",
+      "label": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
+      "year": 1597
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/24",
+    "retrieved_at": "2026-02-24T06:16:32Z",
+    "events_used": [
+      {
+        "text": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
+        "year": 1607,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/L'Orfeo"
+      },
+      {
+        "text": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
+        "year": 1597,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Cudgel_War"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}
