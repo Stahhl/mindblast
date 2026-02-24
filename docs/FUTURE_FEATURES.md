@@ -29,6 +29,7 @@ Track potential future quiz formats and product features after Phase 1.
 - Ratings on each generated question.
 - Improvement loop using ratings to tune generation quality.
 - Category expansion beyond history.
+- Music quiz mode (blocked until rights-cleared catalog and platform-compliant playback model are documented in `docs/CONTENT_COMPLIANCE_POLICY.md`).
 - Difficulty levels.
 - Leaderboards.
 - Achievements.

@@ -2,6 +2,8 @@
 
 Last reviewed: 2026-02-23 (UTC)
 
+Policy anchor: `docs/CONTENT_COMPLIANCE_POLICY.md`
+
 ## Purpose
 Identify quiz datasets/APIs (trivia + board-game-relevant content) that Mindblast could:
 - use directly in product content,

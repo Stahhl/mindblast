@@ -12,6 +12,7 @@
 - Phase scope and contract: `docs/PHASE1.md`
 - Next phase planning: `docs/PHASE1_5.md`, `docs/PHASE2.md`
 - System design and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
+- Content/compliance guardrails: `docs/CONTENT_COMPLIANCE_POLICY.md`, `docs/QUIZ_CONTENT_SOURCES.md`
 - Planned future features: `docs/FUTURE_FEATURES.md`
 - Domain and naming checklist: `docs/DOMAIN_PREPURCHASE_CHECKLIST.md`
 
@@ -23,6 +24,16 @@ If there is any conflict, follow `docs/PHASE1.md` for current implementation beh
 2. Prefer deterministic, rule-based generation in Phase 1.
 3. Avoid introducing paid AI API dependencies unless explicitly requested.
 4. Preserve idempotency and safe re-runs in scheduled jobs.
+5. Prioritize legal/compliance safety over feature breadth.
+
+## Legal and Compliance Guardrails
+
+1. Use only sources with clear usage rights for the intended use case.
+2. Do not rely on "short clip" assumptions or fair-use assumptions for product behavior.
+3. Do not add integrations that violate platform policies/terms.
+4. Music quiz features are blocked by default unless the catalog is rights-cleared and documented in `docs/CONTENT_COMPLIANCE_POLICY.md`.
+5. For any new source, document terms URL, review date, obligations, and risk rating in docs before shipping.
+6. If rights are unclear, fail closed: do not implement and document the blocker.
 
 ## Phase 1 Functional Contract
 
