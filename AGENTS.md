@@ -10,7 +10,7 @@
 ## Source of Truth
 
 - Phase scope and contract: `docs/PHASE1.md`
-- Next phase planning: `docs/PHASE1_5.md`, `docs/PHASE2.md`
+- Next phase planning: `docs/PHASE1_5.md`, `docs/PHASE2.md`, `docs/PHASE3.md`
 - System design and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
 - Content/compliance guardrails: `docs/CONTENT_COMPLIANCE_POLICY.md`, `docs/QUIZ_CONTENT_SOURCES.md`
 - Planned future features: `docs/FUTURE_FEATURES.md`
@@ -34,6 +34,7 @@ If there is any conflict, follow `docs/PHASE1.md` for current implementation beh
 4. Music quiz features are blocked by default unless the catalog is rights-cleared and documented in `docs/CONTENT_COMPLIANCE_POLICY.md`.
 5. For any new source, document terms URL, review date, obligations, and risk rating in docs before shipping.
 6. If rights are unclear, fail closed: do not implement and document the blocker.
+7. Never present synthetic/generated content as sourced facts; synthetic content must be explicitly labeled in data and UI.
 
 ## Phase 1 Functional Contract
 

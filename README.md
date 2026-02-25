@@ -44,6 +44,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── PHASE1.md
 │   ├── PHASE1_5.md
 │   ├── PHASE2.md
+│   ├── PHASE3.md
 │   ├── HOSTING_ROLLOUT.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
@@ -59,6 +60,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 1 scope: `docs/PHASE1.md`
 - Phase 1.5 discovery layer: `docs/PHASE1_5.md`
 - Phase 2 frontend scope: `docs/PHASE2.md`
+- Phase 3 AI workflow scope: `docs/PHASE3.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
 - Terraform IaC setup: `infra/terraform/README.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`

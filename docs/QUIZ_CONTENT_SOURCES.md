@@ -46,6 +46,9 @@ This document focuses on licensing and terms risk, not content quality.
 - Best low-risk path for direct question delivery:
   - CC0/contracted sources first,
   - CC BY-SA sources only if we implement attribution and downstream compliance.
+- AI-generated content is not a source:
+  - never attach fabricated citations to generated items,
+  - keep generated items explicitly labeled as synthetic when/if introduced.
 - Avoid using scraped/redistributed trivia dumps with unclear provenance for production or model training.
 
 ## Validation Checklist Before Integrating Any New Source

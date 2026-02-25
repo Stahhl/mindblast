@@ -26,6 +26,8 @@ Track potential future quiz formats and product features after Phase 1.
 - Prediction question: pick an outcome that resolves in the future.
 
 ## Product Features
+- AI-assisted distractor ranking for MCQ quality (Phase 3 candidate).
+- Optional synthetic distractors for experiments only after explicit provenance/labeling contract is implemented.
 - Ratings on each generated question.
 - Improvement loop using ratings to tune generation quality.
 - Category expansion beyond history.
@@ -40,6 +42,7 @@ Track potential future quiz formats and product features after Phase 1.
 1. Keep Phase 1 stable (`which_came_first` + `history_mcq_4`, one question per type/day).
 2. Add Phase 1.5 discovery artifacts (`quizzes/latest.json` + daily index files).
 3. Ship Phase 2 static frontend app using discovery artifacts.
-4. Add ratings and lightweight analytics.
-5. Add categories and difficulty controls.
-6. Add leaderboard/achievement/streak systems.
+4. Add Phase 3 AI-assisted distractor reranking with strict budget/fallback controls.
+5. Add ratings and lightweight analytics.
+6. Add categories and difficulty controls.
+7. Add leaderboard/achievement/streak systems.

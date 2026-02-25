@@ -19,6 +19,9 @@ This policy is intentionally conservative: if rights are not clear, we do not sh
    - If an API/SDK policy disallows quiz/game usage patterns, do not implement those patterns.
 5. Documentation required before rollout.
    - Record source terms URL, review date, usage obligations, and risk level.
+6. No fabricated attribution.
+   - AI-generated text/content must never be presented as if it came from a real third-party source.
+   - If content is synthetic, it must be explicitly labeled as synthetic in data and UI.
 
 ## Approved Source Posture (Current)
 
@@ -39,6 +42,21 @@ Not allowed now:
 - Spotify-powered quiz gameplay/content usage that conflicts with Spotify policy.
 - YouTube content extraction/isolation patterns that violate YouTube developer policies.
 - Any catalog ingestion or playback flow without explicit rights for the intended use.
+
+## Synthetic/AI-Generated Content Policy
+
+Status: **Allowed for internal experimentation with strict labeling and provenance controls**.
+
+Required:
+- Clearly mark synthetic content in machine-readable fields and user-visible UI.
+- Keep provenance explicit (provider/model/date/version where applicable).
+- Keep synthetic entries separate from sourced attribution lists.
+- Ensure synthetic entries do not include fake citation URLs.
+
+Not allowed:
+- Presenting generated distractors as sourced facts when they are not.
+- Inventing or inferring source links to make synthetic content appear authoritative.
+- Using ambiguous wording that hides whether an item is sourced or generated.
 
 ## Platform-Specific Guardrails (Music)
 

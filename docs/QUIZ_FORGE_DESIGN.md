@@ -72,6 +72,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
   - hard daily budget env var (example: `MAX_DAILY_SPEND_USD=5`)
   - max token/request cap per run
   - fail-closed behavior when budget is exceeded
+  - deterministic fallback path when AI is unavailable
 
 ### Quality Guardrails
 - No tie years in Phase 1 questions.
@@ -79,6 +80,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - Non-empty text fields only.
 - Source attribution must be present in output.
 - If input data quality is insufficient, fail job instead of writing weak output.
+- Do not fabricate source attributions for generated/synthetic content.
+- If synthetic content is introduced later, it must be explicitly labeled and excluded from sourced event attribution.
 
 ### Reliability Guardrails
 - Single-run concurrency group in GitHub Actions (avoid duplicate runs).
@@ -124,9 +127,10 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 1. Stabilize Phase 1 multi-type generation (`which_came_first`, `history_mcq_4`).
 2. Add Phase 1.5 discovery artifacts for static clients (`quizzes/latest.json` + daily index files).
 3. Ship Phase 2 frontend app that consumes static discovery + quiz files.
-4. Add ratings feedback signal from the `Mindblast` app.
-5. Add category expansion and difficulty levels.
-6. Add leaderboards, achievements, and streak logic.
+4. Add Phase 3 AI-assisted distractor reranking with budget-limited provider abstraction.
+5. Add ratings feedback signal from the `Mindblast` app.
+6. Add category expansion and difficulty levels.
+7. Add leaderboards, achievements, and streak logic.
 
 ## Open Decisions
 - Keep pure rule-based generation or add optional LLM refinement later.
