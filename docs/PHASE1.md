@@ -15,6 +15,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 - Enabled types:
   - `which_came_first`
   - `history_mcq_4`
+- Use a normalized question/answer-fact model so answer facts are reusable across question generation.
 - Each quiz has exactly **1** correct answer.
 - Output is committed and pushed back to the repo as JSON.
 
@@ -42,28 +43,152 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 - If a file for a date/type already exists, do not create duplicates.
 - Commit only when at least one new file is created.
 
-### JSON Contract (v1)
+### JSON Contract (v2)
 Common fields for all types:
 - `date`: `YYYY-MM-DD` UTC date.
 - `topics`: exactly `['history']`.
 - `type`: quiz type identifier.
-- `question`: non-empty string.
-- `choices`: non-empty array.
-- `correct_choice_id`: one of the choice ids.
+- `questions`: array containing exactly 1 question object.
+- `answer_facts`: non-empty reusable answer-fact array.
+- `question`: non-empty string (legacy compatibility mirror of `questions[0].prompt`).
+- `choices`: non-empty array (legacy compatibility view).
+- `correct_choice_id`: one of the choice ids (legacy compatibility view).
 - `source.name`, `source.url`, `source.retrieved_at`: non-empty strings.
-- `source.events_used`: array of source events (`text`, `year`, `wikipedia_url`).
-- `metadata.version`: `1`.
+- `source.events_used`: array of source events (`event_id`, `text`, `year`, `wikipedia_url`).
+- `metadata.version`: `2`.
+- `metadata.normalized_model`: `question_answer_facts_v1`.
+
+`questions[0]` requirements:
+- `id`: non-empty deterministic UUID string.
+- `type`: equals top-level quiz `type`.
+- `prompt`: non-empty string and equal to top-level `question`.
+- `answer_fact_ids`: ordered list of fact ids used by the question.
+- `correct_answer_fact_id`: one entry from `answer_fact_ids`.
+- `tags`: non-empty list of strings.
+- `facets`: object.
+- `selection_rules`: object.
+
+`answer_facts` requirements:
+- Each fact includes `id`, `label`, integer `year`, `tags`, `facets`, `match`, `vector_metadata`.
+- `vector_metadata.text_for_embedding` and `vector_metadata.embedding_status` must be non-empty strings.
+- Fact ids must be unique.
+- `questions[0].answer_fact_ids` must reference existing fact ids.
+
+### JSON Contract Example (v2)
+```json
+{
+  "date": "2026-02-25",
+  "topics": ["history"],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "33b21f44-4fab-5a57-88dd-c7ed41b5126f",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d",
+        "5f9bc15e-1614-5278-b166-6d4f2964f823"
+      ],
+      "correct_answer_fact_id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d",
+      "tags": ["history", "which_came_first"],
+      "facets": { "topic": "history", "difficulty_band": "baseline" },
+      "selection_rules": { "distractor_same_year_allowed": false }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d",
+      "label": "The RMS Titanic sinks in the Atlantic Ocean.",
+      "year": 1912,
+      "tags": ["history", "history_mcq_4", "role:correct", "20th-century", "1910s"],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1910s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1912,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1910s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The RMS Titanic sinks in the Atlantic Ocean.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "5f9bc15e-1614-5278-b166-6d4f2964f823",
+      "label": "Apollo 11 lands on the Moon.",
+      "year": 1969,
+      "tags": ["history", "which_came_first", "role:distractor", "20th-century", "1960s"],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1969,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Apollo 11 lands on the Moon.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    { "id": "A", "label": "The RMS Titanic sinks in the Atlantic Ocean.", "year": 1912, "answer_fact_id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d" },
+    { "id": "B", "label": "Apollo 11 lands on the Moon.", "year": 1969, "answer_fact_id": "5f9bc15e-1614-5278-b166-6d4f2964f823" }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/25",
+    "retrieved_at": "2026-02-25T06:00:00Z",
+    "events_used": [
+      {
+        "event_id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d",
+        "text": "The RMS Titanic sinks in the Atlantic Ocean.",
+        "year": 1912,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/RMS_Titanic"
+      },
+      {
+        "event_id": "5f9bc15e-1614-5278-b166-6d4f2964f823",
+        "text": "Apollo 11 lands on the Moon.",
+        "year": 1969,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Apollo_11"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
+```
+
+Migration note:
+- Existing historical files may still have `metadata.version = 1`.
+- New generation output must use the v2 contract above.
 
 `which_came_first` requirements:
 - Exactly 2 choices.
-- Each choice includes `id`, `label`, and integer `year`.
+- Each choice includes `id`, `label`, integer `year`, and `answer_fact_id`.
 - Choice years must be distinct.
 - `question` must be: `Which event happened earlier?`
 - `source.events_used` must contain exactly 2 entries.
 
 `history_mcq_4` requirements:
 - Exactly 4 choices.
-- Each choice includes `id` and `label`.
+- Each choice includes `id`, `label`, and `answer_fact_id`.
 - Choices must not include `year`.
 - `question` must follow: `Which event happened in <year>?`
 - `source.events_used` must contain exactly 4 entries.
@@ -75,8 +200,10 @@ Common fields for all types:
 - Choice ids must be unique and non-empty.
 - Choice labels must be non-empty.
 - `correct_choice_id` must match one of the choice ids.
+- `choices[*].answer_fact_id` must be non-empty and aligned with `questions[0].answer_fact_ids` order.
 - Source attribution must be present and non-empty.
-- `source.events_used` entries must include non-empty `text`, integer `year`, and non-empty `wikipedia_url`.
+- `source.events_used` entries must include non-empty `event_id`, `text`, integer `year`, and non-empty `wikipedia_url`.
+- `questions[0].correct_answer_fact_id` must match the fact linked by `correct_choice_id`.
 
 ## Reliability and Safety
 - If generation fails, exit with non-zero status and do not commit partial output.

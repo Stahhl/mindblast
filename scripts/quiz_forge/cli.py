@@ -38,13 +38,65 @@ def main() -> int:
         source_url = build_api_url(target_date)
         source_payload = fetch_json(source_url, timeout=args.timeout, retries=args.retries)
         candidates = extract_candidates(source_payload)
+        reusable_correct_events: list[dict[str, Any]] = []
 
         for quiz_type, output_path in pending:
             builder = QUIZ_BUILDERS[quiz_type]
             seed = build_seed(target_date, quiz_type)
-            quiz = builder(target_date, retrieval_time, source_url, candidates, seed)
+            quiz = builder(
+                target_date,
+                retrieval_time,
+                source_url,
+                candidates,
+                seed,
+                preferred_distractor_events=reusable_correct_events,
+            )
             validate_quiz(quiz, target_date)
             generated.append((quiz_type, output_path, quiz))
+
+            questions = quiz.get("questions")
+            answer_facts = quiz.get("answer_facts")
+            if not isinstance(questions, list) or not questions:
+                continue
+            if not isinstance(answer_facts, list) or not answer_facts:
+                continue
+
+            question = questions[0]
+            if not isinstance(question, dict):
+                continue
+            correct_answer_fact_id = question.get("correct_answer_fact_id")
+            if not isinstance(correct_answer_fact_id, str):
+                continue
+
+            correct_fact = next(
+                (
+                    fact
+                    for fact in answer_facts
+                    if isinstance(fact, dict) and fact.get("id") == correct_answer_fact_id
+                ),
+                None,
+            )
+            if correct_fact is None:
+                continue
+
+            label = correct_fact.get("label")
+            year = correct_fact.get("year")
+            source_url_for_fact = next(
+                (
+                    source_event.get("wikipedia_url")
+                    for source_event in quiz.get("source", {}).get("events_used", [])
+                    if isinstance(source_event, dict) and source_event.get("event_id") == correct_answer_fact_id
+                ),
+                None,
+            )
+            if isinstance(label, str) and isinstance(year, int) and isinstance(source_url_for_fact, str):
+                reusable_correct_events.append(
+                    {
+                        "text": label,
+                        "year": year,
+                        "wikipedia_url": source_url_for_fact,
+                    }
+                )
 
     for quiz_type, output_path, quiz in generated:
         write_quiz_file(output_path, quiz)

@@ -64,6 +64,7 @@ Example:
 - Update `quizzes/latest.json` only when the target date is newer than the currently referenced date.
 - If a rerun is for the same date and content is unchanged, do not create an unnecessary commit.
 - Fail closed if index files would reference missing quiz files.
+- During schema migration, index files may reference a mix of quiz payload versions (`metadata.version` 1 and 2).
 
 ## CI/CD Behavior
 - Continue using the current scheduled GitHub Actions workflow.
@@ -84,4 +85,3 @@ Example:
   1. `quizzes/latest.json`
   2. the referenced daily index
   3. referenced quiz files
-

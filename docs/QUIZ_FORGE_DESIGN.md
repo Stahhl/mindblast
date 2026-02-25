@@ -51,6 +51,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
    - has readable text
    - has at least one Wikipedia page URL
 7. Generate payloads through a quiz-type registry (one builder per type).
+   - payloads include normalized `questions` + `answer_facts` plus compatibility fields.
+   - previously selected correct answer-facts are eligible distractors for subsequent quiz types when valid.
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
 10. Write/update discovery artifacts for static client lookup.
@@ -59,7 +61,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 ## Data Contract Ownership
 - Contract lives in `/Users/stahl/dev/mindblast/docs/PHASE1.md`.
 - `quiz-forge` script must enforce all validation rules before commit.
-- Schema version starts at `metadata.version = 1`.
+- Current schema version is `metadata.version = 2`.
 
 ## Guardrails
 

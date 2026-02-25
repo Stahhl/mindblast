@@ -33,6 +33,7 @@ Frontend load order:
 Required behavior:
 - If any fetch fails, show a clear fallback UI with retry action.
 - If one quiz type fails to load, show available types that did load.
+- Frontend must accept quiz payload `metadata.version` values `1` and `2` during migration.
 
 ## Product Requirements
 - Display one question card per quiz type for the selected date.

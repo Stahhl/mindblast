@@ -35,6 +35,7 @@ def pick_two_events(candidates: list[dict[str, Any]], seed: int) -> tuple[dict[s
 def pick_history_mcq_events(
     candidates: list[dict[str, Any]],
     seed: int,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     if len(candidates) < 4:
         raise ValueError("Not enough valid events to build a 4-option history MCQ.")
@@ -46,6 +47,31 @@ def pick_history_mcq_events(
     step = (seed % (len(ordered) - 1)) + 1
     distractors: list[dict[str, Any]] = []
     distractor_years: set[int] = set()
+    by_key = {
+        (event["text"], event["year"], event["wikipedia_url"]): event
+        for event in ordered
+    }
+
+    if preferred_distractor_events:
+        preferred_ordered = sorted(
+            preferred_distractor_events,
+            key=lambda item: (item["year"], item["text"], item["wikipedia_url"]),
+        )
+        for preferred in preferred_ordered:
+            candidate = by_key.get((preferred["text"], preferred["year"], preferred["wikipedia_url"]))
+            if candidate is None:
+                continue
+            if candidate["year"] == correct["year"]:
+                continue
+            if candidate["year"] in distractor_years:
+                continue
+            if candidate is correct:
+                continue
+
+            distractors.append(candidate)
+            distractor_years.add(candidate["year"])
+            if len(distractors) == 3:
+                break
 
     for offset in range(len(ordered) - 1):
         idx = (correct_idx + step + offset) % len(ordered)
@@ -53,6 +79,8 @@ def pick_history_mcq_events(
             continue
 
         event = ordered[idx]
+        if event in distractors:
+            continue
         if event["year"] == correct["year"]:
             continue
         if event["year"] in distractor_years:

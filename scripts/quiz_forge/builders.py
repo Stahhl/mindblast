@@ -6,9 +6,17 @@ import datetime as dt
 from typing import Any
 
 from .constants import (
+    NORMALIZED_MODEL_VERSION,
+    QUIZ_SCHEMA_VERSION,
     QUIZ_TYPE_HISTORY_MCQ_4,
     QUIZ_TYPE_WHICH_CAME_FIRST,
     WHICH_CAME_FIRST_QUESTION,
+)
+from .model import (
+    build_answer_fact,
+    build_answer_fact_id,
+    build_question_id,
+    build_question_object,
 )
 from .selection import pick_history_mcq_events, pick_two_events
 
@@ -24,6 +32,7 @@ def build_source(
         "retrieved_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "events_used": [
             {
+                "event_id": build_answer_fact_id(event),
                 "text": event["text"],
                 "year": event["year"],
                 "wikipedia_url": event["wikipedia_url"],
@@ -39,22 +48,62 @@ def build_which_came_first_quiz(
     source_url: str,
     candidates: list[dict[str, Any]],
     seed: int,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    del preferred_distractor_events
     first, second = pick_two_events(candidates, seed)
-    correct_choice_id = "A" if first["year"] < second["year"] else "B"
+    options = [first, second]
+    correct_event = first if first["year"] < second["year"] else second
+
+    question_id = build_question_id(target_date, QUIZ_TYPE_WHICH_CAME_FIRST)
+    answer_facts = [
+        build_answer_fact(
+            first,
+            quiz_type=QUIZ_TYPE_WHICH_CAME_FIRST,
+            role="correct" if first is correct_event else "distractor",
+        ),
+        build_answer_fact(
+            second,
+            quiz_type=QUIZ_TYPE_WHICH_CAME_FIRST,
+            role="correct" if second is correct_event else "distractor",
+        ),
+    ]
+    answer_fact_ids = [fact["id"] for fact in answer_facts]
+    correct_answer_fact_id = build_answer_fact_id(correct_event)
+    question_object = build_question_object(
+        question_id=question_id,
+        prompt=WHICH_CAME_FIRST_QUESTION,
+        quiz_type=QUIZ_TYPE_WHICH_CAME_FIRST,
+        answer_fact_ids=answer_fact_ids,
+        correct_answer_fact_id=correct_answer_fact_id,
+    )
+
+    legacy_choice_ids = ("A", "B")
+    choices: list[dict[str, Any]] = []
+    correct_choice_id: str | None = None
+    for choice_id, event in zip(legacy_choice_ids, options):
+        fact_id = build_answer_fact_id(event)
+        choices.append({"id": choice_id, "label": event["text"], "year": event["year"], "answer_fact_id": fact_id})
+        if fact_id == correct_answer_fact_id:
+            correct_choice_id = choice_id
+
+    if correct_choice_id is None:
+        raise ValueError("Could not determine correct choice id for which_came_first.")
 
     return {
         "date": target_date.isoformat(),
         "topics": ["history"],
         "type": QUIZ_TYPE_WHICH_CAME_FIRST,
+        "questions": [question_object],
+        "answer_facts": answer_facts,
         "question": WHICH_CAME_FIRST_QUESTION,
-        "choices": [
-            {"id": "A", "label": first["text"], "year": first["year"]},
-            {"id": "B", "label": second["text"], "year": second["year"]},
-        ],
+        "choices": choices,
         "correct_choice_id": correct_choice_id,
         "source": build_source(retrieval_time, source_url, [first, second]),
-        "metadata": {"version": 1},
+        "metadata": {
+            "version": QUIZ_SCHEMA_VERSION,
+            "normalized_model": NORMALIZED_MODEL_VERSION,
+        },
     }
 
 
@@ -64,30 +113,54 @@ def build_history_mcq_4_quiz(
     source_url: str,
     candidates: list[dict[str, Any]],
     seed: int,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    correct, _, options = pick_history_mcq_events(candidates, seed)
+    correct, _, options = pick_history_mcq_events(
+        candidates,
+        seed,
+        preferred_distractor_events=preferred_distractor_events,
+    )
+    question_text = f"Which event happened in {correct['year']}?"
 
     choice_ids = ("A", "B", "C", "D")
     choices: list[dict[str, Any]] = []
     correct_choice_id: str | None = None
+    answer_facts: list[dict[str, Any]] = []
 
     for choice_id, option in zip(choice_ids, options):
-        choices.append({"id": choice_id, "label": option["text"]})
+        role = "correct" if option is correct else "distractor"
+        fact = build_answer_fact(option, quiz_type=QUIZ_TYPE_HISTORY_MCQ_4, role=role)
+        answer_facts.append(fact)
+        choices.append({"id": choice_id, "label": option["text"], "answer_fact_id": fact["id"]})
         if option is correct:
             correct_choice_id = choice_id
 
     if correct_choice_id is None:
         raise ValueError("Could not determine correct choice id for history_mcq_4.")
 
+    question_object = build_question_object(
+        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_MCQ_4),
+        prompt=question_text,
+        quiz_type=QUIZ_TYPE_HISTORY_MCQ_4,
+        answer_fact_ids=[fact["id"] for fact in answer_facts],
+        correct_answer_fact_id=build_answer_fact_id(correct),
+        target_year=correct["year"],
+    )
+
     return {
         "date": target_date.isoformat(),
         "topics": ["history"],
         "type": QUIZ_TYPE_HISTORY_MCQ_4,
-        "question": f"Which event happened in {correct['year']}?",
+        "questions": [question_object],
+        "answer_facts": answer_facts,
+        "question": question_text,
         "choices": choices,
         "correct_choice_id": correct_choice_id,
         "source": build_source(retrieval_time, source_url, options),
-        "metadata": {"version": 1},
+        "metadata": {
+            "version": QUIZ_SCHEMA_VERSION,
+            "normalized_model": NORMALIZED_MODEL_VERSION,
+        },
     }
 
 

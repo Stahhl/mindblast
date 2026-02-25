@@ -71,7 +71,105 @@ function validateCommonQuizShape(quiz: unknown): asserts quiz is QuizPayload {
 
   assert(quizValue.metadata && typeof quizValue.metadata === "object", "quiz.metadata must be an object");
   const metadata = quizValue.metadata as Record<string, unknown>;
-  assert(metadata.version === 1, "quiz.metadata.version must be 1");
+  assert(metadata.version === 1 || metadata.version === 2, "quiz.metadata.version must be 1 or 2");
+
+  if (metadata.version === 2) {
+    assert(
+      isNonEmptyString(metadata.normalized_model),
+      "quiz.metadata.normalized_model must be a non-empty string when version is 2"
+    );
+    validateNormalizedModel(quizValue);
+  }
+}
+
+function validateNormalizedModel(quizValue: Record<string, unknown>): void {
+  assert(Array.isArray(quizValue.answer_facts), "quiz.answer_facts must be an array for schema v2");
+  assert(quizValue.answer_facts.length > 0, "quiz.answer_facts must not be empty for schema v2");
+
+  const answerFacts = quizValue.answer_facts as Array<Record<string, unknown>>;
+  const factIds = new Set<string>();
+  answerFacts.forEach((fact, idx) => {
+    assert(fact && typeof fact === "object", `quiz.answer_facts[${idx}] must be an object`);
+    assert(isNonEmptyString(fact.id), `quiz.answer_facts[${idx}].id must be a non-empty string`);
+    assert(isNonEmptyString(fact.label), `quiz.answer_facts[${idx}].label must be a non-empty string`);
+    assert(Number.isInteger(fact.year), `quiz.answer_facts[${idx}].year must be an integer`);
+    assert(Array.isArray(fact.tags), `quiz.answer_facts[${idx}].tags must be an array`);
+    assert(fact.tags.length > 0, `quiz.answer_facts[${idx}].tags must not be empty`);
+    assert(
+      fact.tags.every((tag) => isNonEmptyString(tag)),
+      `quiz.answer_facts[${idx}].tags entries must be non-empty strings`
+    );
+    assert(fact.facets && typeof fact.facets === "object", `quiz.answer_facts[${idx}].facets must be an object`);
+    assert(fact.match && typeof fact.match === "object", `quiz.answer_facts[${idx}].match must be an object`);
+    assert(
+      fact.vector_metadata && typeof fact.vector_metadata === "object",
+      `quiz.answer_facts[${idx}].vector_metadata must be an object`
+    );
+    const vectorMetadata = fact.vector_metadata as Record<string, unknown>;
+    assert(
+      isNonEmptyString(vectorMetadata.text_for_embedding),
+      `quiz.answer_facts[${idx}].vector_metadata.text_for_embedding must be a non-empty string`
+    );
+    assert(
+      isNonEmptyString(vectorMetadata.embedding_status),
+      `quiz.answer_facts[${idx}].vector_metadata.embedding_status must be a non-empty string`
+    );
+    factIds.add(fact.id as string);
+  });
+
+  assert(Array.isArray(quizValue.questions), "quiz.questions must be an array for schema v2");
+  assert(quizValue.questions.length === 1, "quiz.questions must contain exactly one item for schema v2");
+
+  const question = quizValue.questions[0] as Record<string, unknown>;
+  assert(question && typeof question === "object", "quiz.questions[0] must be an object");
+  assert(isNonEmptyString(question.id), "quiz.questions[0].id must be a non-empty string");
+  assert(isQuizType(question.type), "quiz.questions[0].type must be a known quiz type");
+  assert(isNonEmptyString(question.prompt), "quiz.questions[0].prompt must be a non-empty string");
+  assert(
+    question.prompt === quizValue.question,
+    "quiz.questions[0].prompt must match the legacy quiz.question field"
+  );
+  assert(Array.isArray(question.answer_fact_ids), "quiz.questions[0].answer_fact_ids must be an array");
+  assert(question.answer_fact_ids.length > 0, "quiz.questions[0].answer_fact_ids must not be empty");
+  assert(
+    question.answer_fact_ids.every((value) => isNonEmptyString(value)),
+    "quiz.questions[0].answer_fact_ids entries must be non-empty strings"
+  );
+  question.answer_fact_ids.forEach((factId, idx) => {
+    assert(factIds.has(factId as string), `quiz.questions[0].answer_fact_ids[${idx}] must reference answer_facts`);
+  });
+  assert(
+    isNonEmptyString(question.correct_answer_fact_id),
+    "quiz.questions[0].correct_answer_fact_id must be a non-empty string"
+  );
+  assert(
+    (question.answer_fact_ids as string[]).includes(question.correct_answer_fact_id as string),
+    "quiz.questions[0].correct_answer_fact_id must be in answer_fact_ids"
+  );
+  assert(Array.isArray(question.tags), "quiz.questions[0].tags must be an array");
+  assert(question.tags.length > 0, "quiz.questions[0].tags must not be empty");
+  assert(
+    question.tags.every((tag) => isNonEmptyString(tag)),
+    "quiz.questions[0].tags entries must be non-empty strings"
+  );
+  assert(question.facets && typeof question.facets === "object", "quiz.questions[0].facets must be an object");
+  assert(
+    question.selection_rules && typeof question.selection_rules === "object",
+    "quiz.questions[0].selection_rules must be an object"
+  );
+
+  const choiceAnswerFactIds = (quizValue.choices as Array<Record<string, unknown>>).map((choice, idx) => {
+    assert(
+      isNonEmptyString(choice.answer_fact_id),
+      `quiz.choices[${idx}].answer_fact_id must be a non-empty string for schema v2`
+    );
+    return choice.answer_fact_id as string;
+  });
+
+  assert(
+    JSON.stringify(choiceAnswerFactIds) === JSON.stringify(question.answer_fact_ids),
+    "quiz.choices[*].answer_fact_id order must match quiz.questions[0].answer_fact_ids"
+  );
 }
 
 function validateWhichCameFirst(quiz: QuizPayload): void {

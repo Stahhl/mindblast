@@ -6,6 +6,8 @@ import datetime as dt
 from typing import Any
 
 from .constants import (
+    NORMALIZED_MODEL_VERSION,
+    QUIZ_SCHEMA_VERSION,
     QUIZ_TYPE_HISTORY_MCQ_4,
     QUIZ_TYPE_WHICH_CAME_FIRST,
     SUPPORTED_QUIZ_TYPES,
@@ -44,6 +46,9 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
             raise ValueError("choice id must be a non-empty string.")
         if not isinstance(label, str) or not label.strip():
             raise ValueError("choice label must be a non-empty string.")
+        answer_fact_id = choice.get("answer_fact_id")
+        if not isinstance(answer_fact_id, str) or not answer_fact_id.strip():
+            raise ValueError("choice.answer_fact_id must be a non-empty string.")
 
         ids.append(choice_id)
 
@@ -70,9 +75,12 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
     for event in events_used:
         if not isinstance(event, dict):
             raise ValueError("source.events_used entries must be objects.")
+        event_id = event.get("event_id")
         text = event.get("text")
         year = event.get("year")
         wikipedia_url = event.get("wikipedia_url")
+        if not isinstance(event_id, str) or not event_id.strip():
+            raise ValueError("source.events_used.event_id must be a non-empty string.")
         if not isinstance(text, str) or not text.strip():
             raise ValueError("source.events_used.text must be a non-empty string.")
         if not isinstance(year, int):
@@ -81,10 +89,141 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
             raise ValueError("source.events_used.wikipedia_url must be a non-empty string.")
 
     metadata = quiz.get("metadata")
-    if not isinstance(metadata, dict) or metadata.get("version") != 1:
-        raise ValueError("metadata.version must be 1.")
+    if not isinstance(metadata, dict) or metadata.get("version") != QUIZ_SCHEMA_VERSION:
+        raise ValueError(f"metadata.version must be {QUIZ_SCHEMA_VERSION}.")
+    normalized_model = metadata.get("normalized_model")
+    if normalized_model != NORMALIZED_MODEL_VERSION:
+        raise ValueError(f"metadata.normalized_model must be {NORMALIZED_MODEL_VERSION}.")
 
     return quiz_type, choices
+
+
+def _validate_answer_facts(quiz: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    answer_facts = quiz.get("answer_facts")
+    if not isinstance(answer_facts, list) or not answer_facts:
+        raise ValueError("answer_facts must be a non-empty list.")
+
+    facts_by_id: dict[str, dict[str, Any]] = {}
+    for idx, fact in enumerate(answer_facts):
+        if not isinstance(fact, dict):
+            raise ValueError(f"answer_facts[{idx}] must be an object.")
+
+        fact_id = fact.get("id")
+        label = fact.get("label")
+        year = fact.get("year")
+
+        if not isinstance(fact_id, str) or not fact_id.strip():
+            raise ValueError(f"answer_facts[{idx}].id must be a non-empty string.")
+        if fact_id in facts_by_id:
+            raise ValueError("answer_facts ids must be unique.")
+        if not isinstance(label, str) or not label.strip():
+            raise ValueError(f"answer_facts[{idx}].label must be a non-empty string.")
+        if not isinstance(year, int):
+            raise ValueError(f"answer_facts[{idx}].year must be an integer.")
+
+        tags = fact.get("tags")
+        if not isinstance(tags, list) or not tags or not all(isinstance(tag, str) and tag.strip() for tag in tags):
+            raise ValueError(f"answer_facts[{idx}].tags must be a non-empty string list.")
+
+        facets = fact.get("facets")
+        if not isinstance(facets, dict):
+            raise ValueError(f"answer_facts[{idx}].facets must be an object.")
+
+        match = fact.get("match")
+        if not isinstance(match, dict):
+            raise ValueError(f"answer_facts[{idx}].match must be an object.")
+
+        vector_metadata = fact.get("vector_metadata")
+        if not isinstance(vector_metadata, dict):
+            raise ValueError(f"answer_facts[{idx}].vector_metadata must be an object.")
+        embedding_text = vector_metadata.get("text_for_embedding")
+        embedding_status = vector_metadata.get("embedding_status")
+        if not isinstance(embedding_text, str) or not embedding_text.strip():
+            raise ValueError(
+                f"answer_facts[{idx}].vector_metadata.text_for_embedding must be a non-empty string."
+            )
+        if not isinstance(embedding_status, str) or not embedding_status.strip():
+            raise ValueError(
+                f"answer_facts[{idx}].vector_metadata.embedding_status must be a non-empty string."
+            )
+
+        facts_by_id[fact_id] = fact
+
+    return facts_by_id
+
+
+def _validate_questions(
+    quiz: dict[str, Any],
+    quiz_type: str,
+    facts_by_id: dict[str, dict[str, Any]],
+    legacy_choices: list[dict[str, Any]],
+) -> None:
+    source = quiz.get("source")
+    source_events = source.get("events_used") if isinstance(source, dict) else None
+    if not isinstance(source_events, list):
+        raise ValueError("source.events_used must be a list.")
+    source_event_ids = [event.get("event_id") for event in source_events if isinstance(event, dict)]
+    if any(not isinstance(event_id, str) or event_id not in facts_by_id for event_id in source_event_ids):
+        raise ValueError("source.events_used.event_id must reference existing answer_facts.")
+
+    questions = quiz.get("questions")
+    if not isinstance(questions, list) or len(questions) != 1:
+        raise ValueError("questions must contain exactly one entry.")
+
+    question = questions[0]
+    if not isinstance(question, dict):
+        raise ValueError("questions[0] must be an object.")
+
+    question_id = question.get("id")
+    prompt = question.get("prompt")
+    question_type = question.get("type")
+    answer_fact_ids = question.get("answer_fact_ids")
+    correct_answer_fact_id = question.get("correct_answer_fact_id")
+
+    if not isinstance(question_id, str) or not question_id.strip():
+        raise ValueError("questions[0].id must be a non-empty string.")
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("questions[0].prompt must be a non-empty string.")
+    if question_type != quiz_type:
+        raise ValueError("questions[0].type must match quiz.type.")
+    if not isinstance(answer_fact_ids, list) or not answer_fact_ids:
+        raise ValueError("questions[0].answer_fact_ids must be a non-empty list.")
+    if not all(isinstance(item, str) and item.strip() for item in answer_fact_ids):
+        raise ValueError("questions[0].answer_fact_ids entries must be non-empty strings.")
+    if len(set(answer_fact_ids)) != len(answer_fact_ids):
+        raise ValueError("questions[0].answer_fact_ids must be unique.")
+    if not isinstance(correct_answer_fact_id, str) or not correct_answer_fact_id.strip():
+        raise ValueError("questions[0].correct_answer_fact_id must be a non-empty string.")
+    if correct_answer_fact_id not in answer_fact_ids:
+        raise ValueError("questions[0].correct_answer_fact_id must be in answer_fact_ids.")
+    if any(answer_fact_id not in facts_by_id for answer_fact_id in answer_fact_ids):
+        raise ValueError("questions[0].answer_fact_ids must reference existing answer_facts.")
+    if set(source_event_ids) != set(answer_fact_ids):
+        raise ValueError("questions[0].answer_fact_ids must match source.events_used.event_id set.")
+
+    if prompt != quiz.get("question"):
+        raise ValueError("questions[0].prompt must match legacy question field.")
+
+    legacy_answer_fact_ids = [choice["answer_fact_id"] for choice in legacy_choices]
+    if answer_fact_ids != legacy_answer_fact_ids:
+        raise ValueError("questions[0].answer_fact_ids must match legacy choices order.")
+
+    correct_choice_id = quiz.get("correct_choice_id")
+    correct_choice = next((choice for choice in legacy_choices if choice["id"] == correct_choice_id), None)
+    if correct_choice is None:
+        raise ValueError("correct_choice_id must match one of the legacy choices.")
+    if correct_choice["answer_fact_id"] != correct_answer_fact_id:
+        raise ValueError("questions[0].correct_answer_fact_id must match legacy correct choice.")
+
+    tags = question.get("tags")
+    if not isinstance(tags, list) or not tags or not all(isinstance(tag, str) and tag.strip() for tag in tags):
+        raise ValueError("questions[0].tags must be a non-empty string list.")
+    facets = question.get("facets")
+    if not isinstance(facets, dict):
+        raise ValueError("questions[0].facets must be an object.")
+    selection_rules = question.get("selection_rules")
+    if not isinstance(selection_rules, dict):
+        raise ValueError("questions[0].selection_rules must be an object.")
 
 
 def validate_which_came_first_quiz(choices: list[dict[str, Any]], quiz: dict[str, Any]) -> None:
@@ -128,6 +267,8 @@ def validate_history_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dict[str, A
 
 def validate_quiz(quiz: dict[str, Any], target_date: dt.date) -> None:
     quiz_type, choices = validate_common_fields(quiz, target_date)
+    facts_by_id = _validate_answer_facts(quiz)
+    _validate_questions(quiz, quiz_type, facts_by_id, choices)
 
     if quiz_type == QUIZ_TYPE_WHICH_CAME_FIRST:
         validate_which_came_first_quiz(choices, quiz)
