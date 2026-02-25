@@ -112,3 +112,26 @@ Required repository secrets:
 
 Required repository secrets:
 - `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: service account JSON for Firebase Hosting deploy
+
+## Secret Guardrails
+
+Local guardrails:
+- Git hooks: `.githooks/pre-commit` and `.githooks/pre-push`
+- Hook bootstrap: `scripts/setup_git_hooks.sh`
+
+Setup:
+
+```zsh
+brew install gitleaks
+./scripts/setup_git_hooks.sh
+```
+
+CI guardrail:
+- Workflow: `.github/workflows/secret-scan.yml` (gitleaks scan on PRs and `main` pushes)
+
+Review guardrail:
+- Code owners file: `.github/CODEOWNERS`
+- Enable branch protection in GitHub and require:
+  - at least 1 pull-request review
+  - code owner review
+  - required status check: `Secret Scan / Gitleaks`

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-push blocked: gitleaks is not installed." >&2
+  echo "Install: brew install gitleaks" >&2
+  exit 1
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+echo "Running gitleaks pre-push scan..."
+
+if ! gitleaks git --help >/dev/null 2>&1; then
+  echo "Falling back to gitleaks detect scan (tool version does not support git scan)." >&2
+  gitleaks detect --source . --no-git --redact
+  exit 0
+fi
+
+ranges_found=0
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  # Ignore branch deletes.
+  if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
+    continue
+  fi
+
+  ranges_found=1
+
+  if [[ "$remote_sha" == "0000000000000000000000000000000000000000" ]]; then
+    log_range="$local_sha"
+  else
+    log_range="${remote_sha}..${local_sha}"
+  fi
+
+  echo "Scanning pushed commit range: $local_ref ($log_range)"
+  gitleaks git --redact --log-opts="$log_range"
+done
+
+if [[ "$ranges_found" -eq 0 ]]; then
+  echo "No refs to push; skipping gitleaks commit-range scan."
+fi

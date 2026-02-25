@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit blocked: gitleaks is not installed." >&2
+  echo "Install: brew install gitleaks" >&2
+  exit 1
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+echo "Running gitleaks pre-commit scan..."
+
+if gitleaks protect --help >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --verbose
+  exit 0
+fi
+
+if gitleaks git --help 2>&1 | grep -q -- "--staged"; then
+  gitleaks git --staged --redact
+  exit 0
+fi
+
+echo "Falling back to gitleaks detect scan (tool version does not support staged scan)." >&2
+gitleaks detect --source . --no-git --redact

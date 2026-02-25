@@ -1,0 +1,8 @@
+# Default owner
+* @Stahhl
+
+# Security-sensitive paths
+/.github/workflows/ @Stahhl
+/infra/ @Stahhl
+/firebase.json @Stahhl
+/.firebaserc @Stahhl
