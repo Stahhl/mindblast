@@ -33,6 +33,9 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - HTTP client: Python standard library (`urllib`) or `requests`
 - Validation: built-in checks in Python (optionally add `jsonschema` later)
 - Storage: Git repository JSON files (Phase 1 source of truth)
+- Phase 3 AI providers (intended):
+  - external: OpenAI API
+  - local: Ollama
 
 ## Why This Stack
 - No dedicated server required.
@@ -53,6 +56,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 7. Generate payloads through a quiz-type registry (one builder per type).
    - payloads include normalized `questions` + `answer_facts` plus compatibility fields.
    - previously selected correct answer-facts are eligible distractors for subsequent quiz types when valid.
+   - in Phase 3 for `history_mcq_4`, optionally make one AI rerank call for distractor ordering and fallback deterministically on any failure.
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
 10. Write/update discovery artifacts for static client lookup.
@@ -69,10 +73,12 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - Phase 1 uses Wikimedia data only and no paid AI calls.
 - Expected daily infra cost: $0.
 - If paid AI is introduced later, add:
-  - hard daily budget env var (example: `MAX_DAILY_SPEND_USD=5`)
+  - hard daily budget env var (`AI_MAX_DAILY_USD`, Phase 3 default `1.00`)
+  - hard monthly budget env var (`AI_MAX_MONTHLY_USD`, Phase 3 default `5.00`)
   - max token/request cap per run
   - fail-closed behavior when budget is exceeded
   - deterministic fallback path when AI is unavailable
+  - daily pipeline usage reporting (calls/tokens/spend/fallback summary)
 
 ### Quality Guardrails
 - No tie years in Phase 1 questions.
@@ -94,6 +100,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
   - `contents: write` only (needed for commit/push)
 - No secrets required in Phase 1.
 - Sanitize/log only non-sensitive data.
+- In Phase 3, provider credentials are required for external AI mode and must be stored in CI secrets (never in repo).
+- Human operation should be limited to key generation/rotation, environment config updates, and daily report review.
 
 ## CI/CD Design
 - Trigger: `schedule` (manual dispatch allowed for operational reruns).
@@ -102,7 +110,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
   1. checkout
   2. setup python
   3. run generator
-  4. git add/commit/push if changes exist
+  4. emit operational summary report to Discord (including AI usage when enabled)
+  5. git add/commit/push if changes exist
 - Bot commit message format:
   - `quiz-forge: add quiz for YYYY-MM-DD`
 

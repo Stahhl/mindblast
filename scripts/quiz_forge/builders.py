@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 from typing import Any
 
 from .constants import (
@@ -18,7 +19,7 @@ from .model import (
     build_question_id,
     build_question_object,
 )
-from .selection import pick_history_mcq_events, pick_two_events
+from .selection import pick_history_mcq_distractor_pool, pick_two_events
 
 
 def build_source(
@@ -49,8 +50,10 @@ def build_which_came_first_quiz(
     candidates: list[dict[str, Any]],
     seed: int,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
+    ai_ranked_distractor_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     del preferred_distractor_events
+    del ai_ranked_distractor_ids
     first, second = pick_two_events(candidates, seed)
     options = [first, second]
     correct_event = first if first["year"] < second["year"] else second
@@ -114,11 +117,32 @@ def build_history_mcq_4_quiz(
     candidates: list[dict[str, Any]],
     seed: int,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
+    ai_ranked_distractor_ids: list[str] | None = None,
 ) -> dict[str, Any]:
-    correct, _, options = pick_history_mcq_events(
+    correct, distractor_pool = pick_history_mcq_distractor_pool(
         candidates,
         seed,
         preferred_distractor_events=preferred_distractor_events,
+        max_distractors=8,
+    )
+    selected_distractors = distractor_pool[:3]
+    if ai_ranked_distractor_ids:
+        by_fact_id = {build_answer_fact_id(item): item for item in distractor_pool}
+        ranked_selection: list[dict[str, Any]] = []
+        for fact_id in ai_ranked_distractor_ids:
+            candidate = by_fact_id.get(fact_id)
+            if candidate is None:
+                ranked_selection = []
+                break
+            ranked_selection.append(candidate)
+        if len(ranked_selection) == 3 and len({item["year"] for item in ranked_selection}) == 3:
+            selected_distractors = ranked_selection
+
+    options = [correct, *selected_distractors]
+    options.sort(
+        key=lambda item: hashlib.sha256(
+            f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
+        ).hexdigest()
     )
     question_text = f"Which event happened in {correct['year']}?"
 

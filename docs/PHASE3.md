@@ -23,6 +23,7 @@ Phase 3 starts with `history_mcq_4` only.
   - external API provider
 - Add strict spending and usage limits with fail-closed + fallback behavior.
 - Add shadow-mode operation to compare AI choices without changing published output.
+- Add daily pipeline reporting for AI usage (calls/tokens/spend).
 
 ## Out of Scope (Phase 3)
 - Synthetic/fabricated answer options in production output.
@@ -57,6 +58,36 @@ Phase 3 starts with `history_mcq_4` only.
    - use deterministic distractor selector.
 6. Continue normal schema validation and write flow.
 
+## Planned AI API Call Pattern
+Phase 3 uses a single reranking call per `history_mcq_4` quiz generation attempt.
+
+Request shape (provider-agnostic, JSON):
+- `task`: `rerank_distractors`
+- `quiz_type`: `history_mcq_4`
+- `question_prompt`: string
+- `correct_answer_fact_id`: string
+- `correct_answer`: object with `id`, `label`, `year`, `tags`, `facets`
+- `distractor_candidates`: array of candidate objects with `id`, `label`, `year`, `tags`, `facets`
+- `constraints`:
+  - `max_returned`: `3`
+  - `must_use_candidate_ids_only`: `true`
+  - `allow_generated_text`: `false`
+  - `distinct_year_from_correct`: `true`
+  - `distinct_years_between_distractors`: `true`
+
+Response shape (provider-agnostic, JSON):
+- `ranked_distractor_ids`: ordered array of exactly 3 candidate IDs
+- `reason_codes`: optional short list (for diagnostics only)
+- `provider`: string
+- `model`: string
+- `usage`:
+  - `input_tokens`
+  - `output_tokens`
+  - `estimated_cost_usd`
+
+Validation rule:
+- Any response that does not strictly satisfy contract + constraints is rejected and deterministic fallback is used.
+
 ## AI Runtime Modes
 - `AI_MODE=off`
   - AI path disabled, deterministic only.
@@ -66,6 +97,30 @@ Phase 3 starts with `history_mcq_4` only.
   - validated AI ranking is used for published distractors.
 
 Default for initial rollout: `off` in production, `shadow` in staging.
+
+## Intended Providers (Phase 3)
+Primary external provider:
+- `openai` (default external provider for Phase 3).
+- Intended use:
+  - staging: `shadow` first, then optional `on`
+  - production: start `off`, then controlled rollout to `on`
+- Why:
+  - reliable structured JSON output support for constrained reranking responses.
+
+Secondary/local provider:
+- `ollama` (local/on-device path for development and provider-abstraction testing).
+- Intended use:
+  - local development in `shadow` and `on` experiments
+  - optional staging shadow validation
+- Why:
+  - low incremental cost and easy local iteration.
+
+Provider selection/config contract:
+- `AI_PROVIDER` (`openai` | `ollama` | `noop`)
+- `AI_MODEL`
+- `AI_TIMEOUT_MS`
+- external provider credentials via environment secret(s)
+- local provider endpoint/model via environment config
 
 ## Provider Architecture Contract
 Define task/provider interfaces under `scripts/quiz_forge/ai/`:
@@ -84,7 +139,8 @@ Provider response contract (minimum):
 
 ## Budget and Safety Controls
 Environment-controlled hard limits:
-- `AI_MAX_DAILY_USD`
+- `AI_MAX_DAILY_USD` (default: `1.00`)
+- `AI_MAX_MONTHLY_USD` (default: `5.00`)
 - `AI_MAX_CALLS_PER_RUN`
 - `AI_MAX_INPUT_TOKENS`
 - `AI_MAX_OUTPUT_TOKENS`
@@ -94,6 +150,7 @@ Rules:
 - If any limit is exceeded, do not publish AI-influenced output.
 - Log budget/fallback reason and continue deterministic path.
 - Never block daily quiz generation solely due to AI unavailability.
+- Monthly cap is enforced across all runs in the current UTC month (scheduled + manual).
 
 ## Observability
 For each run, record concise AI telemetry in logs:
@@ -101,6 +158,51 @@ For each run, record concise AI telemetry in logs:
 
 Optional (recommended) artifact in CI:
 - `artifacts/ai_shadow_report_<date>.json` with AI vs deterministic comparison.
+
+## Daily Pipeline Discord Report
+When the daily pipeline runs, include an AI usage block in the Discord report payload.
+
+Minimum reported fields:
+- `date_utc`
+- `ai_mode`
+- `provider` / `model`
+- `calls_total`
+- `input_tokens_total`
+- `output_tokens_total`
+- `run_estimated_cost_usd`
+- `day_spend_usd` and `day_limit_usd` (`1.00`)
+- `month_spend_usd` and `month_limit_usd` (`5.00`)
+- `fallback_count`
+- `fallback_reasons` (collapsed summary)
+
+Rules:
+- If `AI_MODE=off`, report zeros explicitly rather than omitting fields.
+- If limits are hit, the report must flag limit breach and confirm deterministic fallback was used.
+
+## Human Intervention and Operations
+Expected manual intervention for normal daily runs:
+- none (pipeline should run unattended and fallback deterministically on AI failures).
+
+One-time setup required:
+1. Generate external provider API credentials (for example OpenAI project API key).
+2. Store credentials as CI secrets for each environment that will call external AI.
+3. Configure Phase 3 environment variables in CI:
+   - `AI_MODE`
+   - `AI_PROVIDER`
+   - `AI_MODEL`
+   - `AI_MAX_DAILY_USD=1.00`
+   - `AI_MAX_MONTHLY_USD=5.00`
+4. Ensure Discord reporting secret/config is present for daily usage summaries.
+5. If local provider is used, install and preload model(s) on the local machine.
+
+Recurring operator actions:
+- Review the daily Discord usage block (calls/tokens/spend/fallbacks).
+- Rotate external provider API keys on a regular cadence or immediately on suspicion of leakage.
+- Adjust budget/model settings only through reviewed config changes.
+
+Manual action triggers:
+- If `day_limit` or `month_limit` is reached: decide whether to keep deterministic-only mode or raise limits.
+- If provider auth fails: generate a new key/token and update CI secret(s).
 
 ## Data Contract Impact
 Phase 3 should preserve current quiz payload schema compatibility.
@@ -121,5 +223,7 @@ If synthetic content is introduced in a later phase, contract must be updated fi
 - In `off` mode, output is unchanged from deterministic baseline.
 - In `shadow` mode, output remains deterministic while comparison telemetry is produced.
 - In `on` mode, AI-ranked distractors are used only when fully valid and within budget.
+- Hard budget caps are enforced at `1.00 USD/day` and `5.00 USD/month`.
+- Daily Discord report includes calls/tokens/spend and fallback summary.
 - No synthetic options are published in Phase 3.
 - No fabricated/incorrect source attribution appears in output.

@@ -27,6 +27,9 @@ Track potential future quiz formats and product features after Phase 1.
 
 ## Product Features
 - AI-assisted distractor ranking for MCQ quality (Phase 3 candidate).
+- Phase 3 budget defaults target low-risk experimentation:
+  - `AI_MAX_DAILY_USD=1.00`
+  - `AI_MAX_MONTHLY_USD=5.00`
 - Optional synthetic distractors for experiments only after explicit provenance/labeling contract is implemented.
 - Ratings on each generated question.
 - Improvement loop using ratings to tune generation quality.

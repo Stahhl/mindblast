@@ -6,10 +6,12 @@ import datetime as dt
 from pathlib import Path
 from typing import Any
 
+from .ai import AIOrchestrator, load_ai_settings
 from .args import parse_args, parse_quiz_types, parse_target_date
 from .builders import QUIZ_BUILDERS
+from .constants import QUIZ_TYPE_HISTORY_MCQ_4
 from .discovery import write_discovery_artifacts
-from .selection import build_seed
+from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
 from .storage import build_output_path, find_existing_quiz_path, write_quiz_file
 from .validation import validate_quiz
@@ -19,6 +21,8 @@ def main() -> int:
     args = parse_args()
     target_date = parse_target_date(args.date)
     quiz_types = parse_quiz_types(args.quiz_types)
+    ai_settings = load_ai_settings(output_dir=args.output_dir)
+    ai_orchestrator = AIOrchestrator(settings=ai_settings, target_date=target_date)
 
     pending: list[tuple[str, Path]] = []
     quiz_paths: dict[str, Path] = {}
@@ -43,6 +47,34 @@ def main() -> int:
         for quiz_type, output_path in pending:
             builder = QUIZ_BUILDERS[quiz_type]
             seed = build_seed(target_date, quiz_type)
+            ai_ranked_distractor_ids: list[str] | None = None
+            if quiz_type == QUIZ_TYPE_HISTORY_MCQ_4 and ai_orchestrator.is_enabled():
+                correct_event, distractor_pool = pick_history_mcq_distractor_pool(
+                    candidates,
+                    seed,
+                    preferred_distractor_events=reusable_correct_events,
+                    max_distractors=8,
+                )
+                question_prompt = f"Which event happened in {correct_event['year']}?"
+                ai_attempt = ai_orchestrator.rerank_history_mcq(
+                    question_prompt=question_prompt,
+                    correct_event=correct_event,
+                    distractor_candidates=distractor_pool,
+                )
+                if ai_attempt.applied and ai_attempt.response is not None:
+                    ai_ranked_distractor_ids = ai_attempt.response.ranked_distractor_ids
+                    print(
+                        f"AI rerank applied for {quiz_type}: "
+                        f"provider={ai_attempt.response.provider} model={ai_attempt.response.model}"
+                    )
+                elif ai_attempt.response is not None:
+                    print(
+                        f"AI rerank (shadow) for {quiz_type}: "
+                        f"provider={ai_attempt.response.provider} model={ai_attempt.response.model}"
+                    )
+                elif ai_attempt.fallback_reason:
+                    print(f"AI rerank fallback for {quiz_type}: {ai_attempt.fallback_reason}")
+
             quiz = builder(
                 target_date,
                 retrieval_time,
@@ -50,6 +82,7 @@ def main() -> int:
                 candidates,
                 seed,
                 preferred_distractor_events=reusable_correct_events,
+                ai_ranked_distractor_ids=ai_ranked_distractor_ids,
             )
             validate_quiz(quiz, target_date)
             generated.append((quiz_type, output_path, quiz))
@@ -101,6 +134,11 @@ def main() -> int:
     for quiz_type, output_path, quiz in generated:
         write_quiz_file(output_path, quiz)
         print(f"Created quiz file for {quiz_type}: {output_path}")
+
+    ai_orchestrator.finalize()
+    ai_orchestrator.write_report()
+    if ai_settings.report_path:
+        print(f"Wrote AI run report: {ai_settings.report_path}")
 
     discovery_changes = write_discovery_artifacts(
         output_dir=args.output_dir,

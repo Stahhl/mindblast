@@ -37,6 +37,34 @@ def pick_history_mcq_events(
     seed: int,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
+    correct, distractor_pool = pick_history_mcq_distractor_pool(
+        candidates,
+        seed,
+        preferred_distractor_events=preferred_distractor_events,
+        max_distractors=3,
+    )
+    distractors = distractor_pool[:3]
+
+    options = [correct, *distractors]
+    options.sort(
+        key=lambda item: hashlib.sha256(
+            f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
+        ).hexdigest()
+    )
+
+    return correct, distractors, options
+
+
+def pick_history_mcq_distractor_pool(
+    candidates: list[dict[str, Any]],
+    seed: int,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
+    *,
+    max_distractors: int,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    if max_distractors < 3:
+        raise ValueError("max_distractors must be at least 3.")
+
     if len(candidates) < 4:
         raise ValueError("Not enough valid events to build a 4-option history MCQ.")
 
@@ -70,7 +98,7 @@ def pick_history_mcq_events(
 
             distractors.append(candidate)
             distractor_years.add(candidate["year"])
-            if len(distractors) == 3:
+            if len(distractors) == max_distractors:
                 break
 
     for offset in range(len(ordered) - 1):
@@ -88,17 +116,10 @@ def pick_history_mcq_events(
 
         distractors.append(event)
         distractor_years.add(event["year"])
-        if len(distractors) == 3:
+        if len(distractors) == max_distractors:
             break
 
-    if len(distractors) != 3:
+    if len(distractors) < 3:
         raise ValueError("Could not pick three distinct-year distractors for history_mcq_4.")
 
-    options = [correct, *distractors]
-    options.sort(
-        key=lambda item: hashlib.sha256(
-            f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
-        ).hexdigest()
-    )
-
-    return correct, distractors, options
+    return correct, distractors
