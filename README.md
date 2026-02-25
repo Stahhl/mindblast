@@ -21,6 +21,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 .
 ├── .github/workflows/
 │   └── daily-quiz.yml
+├── pyproject.toml
+├── uv.lock
 ├── infra/
 │   └── terraform/
 │       ├── modules/
@@ -96,6 +98,14 @@ Then install and run:
 cd src/apps/frontend
 pnpm install
 pnpm dev
+```
+
+## Local quiz-forge Run (uv)
+
+```zsh
+cd /Users/stahl/dev/mindblast
+uv sync --locked --no-dev --python 3.12
+uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4"
 ```
 
 ## Staging Deploy (GitHub Actions)

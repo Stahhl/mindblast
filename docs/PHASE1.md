@@ -214,6 +214,8 @@ Migration note:
 ```text
 .
 ├── .github/workflows/daily-quiz.yml
+├── pyproject.toml
+├── uv.lock
 ├── scripts/generate_quiz.py
 └── quizzes/
 ```

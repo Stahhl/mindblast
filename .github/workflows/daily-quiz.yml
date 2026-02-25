@@ -22,7 +22,7 @@ jobs:
       AI_MODEL: ${{ vars.AI_MODEL }}
       AI_MAX_DAILY_USD: ${{ vars.AI_MAX_DAILY_USD }}
       AI_MAX_MONTHLY_USD: ${{ vars.AI_MAX_MONTHLY_USD }}
-      QUIZ_FORGE_AI_REPORT_PATH: ${{ runner.temp }}/quiz-forge-ai-report.json
+      QUIZ_FORGE_AI_REPORT_PATH: ${{ github.workspace }}/.tmp/quiz-forge-ai-report.json
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,10 +32,16 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install uv
+        run: python -m pip install --upgrade uv
+
+      - name: Sync Python environment
+        run: uv sync --locked --no-dev --python 3.12
+
       - name: Generate daily quiz
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python scripts/generate_quiz.py --quiz-types "${QUIZ_TYPES}"
+        run: uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "${QUIZ_TYPES}"
 
       - name: Commit and push if new quiz was created
         run: |
@@ -58,7 +64,7 @@ jobs:
           REPO: ${{ github.repository }}
           WORKFLOW: ${{ github.workflow }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          QUIZ_FORGE_AI_REPORT_PATH: ${{ runner.temp }}/quiz-forge-ai-report.json
+          QUIZ_FORGE_AI_REPORT_PATH: ${{ github.workspace }}/.tmp/quiz-forge-ai-report.json
         run: |
           if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
             echo "DISCORD_WEBHOOK_URL is not set; skipping Discord notification."
@@ -76,29 +82,7 @@ jobs:
             "${STATUS_EMOJI}" "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
 
           if [ -f "${QUIZ_FORGE_AI_REPORT_PATH}" ]; then
-            AI_BLOCK="$(python3 - <<'PY'
-import json
-import os
-from pathlib import Path
-
-report_path = Path(os.environ["QUIZ_FORGE_AI_REPORT_PATH"])
-payload = json.loads(report_path.read_text(encoding="utf-8"))
-reasons = payload.get("fallback_reasons") or []
-reasons_text = ", ".join(reasons) if reasons else "none"
-lines = [
-    "ai:",
-    f"  mode: {payload.get('ai_mode', 'unknown')}",
-    f"  provider/model: {payload.get('provider', 'unknown')}/{payload.get('model', 'unknown')}",
-    f"  calls: {payload.get('calls_total', 0)}",
-    f"  tokens in/out: {payload.get('input_tokens_total', 0)}/{payload.get('output_tokens_total', 0)}",
-    f"  run spend usd: {payload.get('run_estimated_cost_usd', 0)}",
-    f"  day spend usd: {payload.get('day_spend_usd', 0)} / {payload.get('day_limit_usd', 0)}",
-    f"  month spend usd: {payload.get('month_spend_usd', 0)} / {payload.get('month_limit_usd', 0)}",
-    f"  fallbacks: {payload.get('fallback_count', 0)} ({reasons_text})",
-]
-print("\n".join(lines))
-PY
-)"
+            AI_BLOCK="$(python3 -c 'import json,os; from pathlib import Path; payload=json.loads(Path(os.environ["QUIZ_FORGE_AI_REPORT_PATH"]).read_text(encoding="utf-8")); reasons=payload.get("fallback_reasons") or []; reasons_text=", ".join(reasons) if reasons else "none"; lines=["ai:", f"  mode: {payload.get(\"ai_mode\", \"unknown\")}", f"  provider/model: {payload.get(\"provider\", \"unknown\")}/{payload.get(\"model\", \"unknown\")}", f"  calls: {payload.get(\"calls_total\", 0)}", f"  tokens in/out: {payload.get(\"input_tokens_total\", 0)}/{payload.get(\"output_tokens_total\", 0)}", f"  run spend usd: {payload.get(\"run_estimated_cost_usd\", 0)}", f"  day spend usd: {payload.get(\"day_spend_usd\", 0)} / {payload.get(\"day_limit_usd\", 0)}", f"  month spend usd: {payload.get(\"month_spend_usd\", 0)} / {payload.get(\"month_limit_usd\", 0)}", f"  fallbacks: {payload.get(\"fallback_count\", 0)} ({reasons_text})"]; print("\n".join(lines))')"
             MESSAGE="${MESSAGE}"$'\n'"${AI_BLOCK}"
           fi
 

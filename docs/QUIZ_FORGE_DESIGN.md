@@ -29,6 +29,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 
 ## Proposed Tech Stack
 - Runtime: Python 3.12
+- Python project/dependency manager: `uv` (`pyproject.toml` + `uv.lock`)
 - CI/Scheduler: GitHub Actions cron
 - HTTP client: Python standard library (`urllib`) or `requests`
 - Validation: built-in checks in Python (optionally add `jsonschema` later)
@@ -109,9 +110,10 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - Workflow steps:
   1. checkout
   2. setup python
-  3. run generator
-  4. emit operational summary report to Discord (including AI usage when enabled)
-  5. git add/commit/push if changes exist
+  3. install `uv` and sync locked environment
+  4. run generator with `uv run`
+  5. emit operational summary report to Discord (including AI usage when enabled)
+  6. git add/commit/push if changes exist
 - Bot commit message format:
   - `quiz-forge: add quiz for YYYY-MM-DD`
 
@@ -119,6 +121,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 ```text
 .
 ├── .github/workflows/daily-quiz.yml
+├── pyproject.toml
+├── uv.lock
 ├── scripts/generate_quiz.py
 ├── quizzes/
 └── docs/
