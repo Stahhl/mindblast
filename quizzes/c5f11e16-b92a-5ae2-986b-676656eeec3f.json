@@ -1,0 +1,41 @@
+{
+  "date": "2026-02-25",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Disbandment of the Warsaw Pact at a meeting of its members in Budapest.",
+      "year": 1991
+    },
+    {
+      "id": "B",
+      "label": "Marie-Ad\u00e9la\u00efde, the eldest of six daughters of Guillaume IV, becomes the first reigning Grand Duchess of Luxembourg.",
+      "year": 1912
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/25",
+    "retrieved_at": "2026-02-25T06:18:33Z",
+    "events_used": [
+      {
+        "text": "Disbandment of the Warsaw Pact at a meeting of its members in Budapest.",
+        "year": 1991,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Warsaw_Pact"
+      },
+      {
+        "text": "Marie-Ad\u00e9la\u00efde, the eldest of six daughters of Guillaume IV, becomes the first reigning Grand Duchess of Luxembourg.",
+        "year": 1912,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Marie-Ad%C3%A9la%C3%AFde%2C_Grand_Duchess_of_Luxembourg"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 1
+  }
+}

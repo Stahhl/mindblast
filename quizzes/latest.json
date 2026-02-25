@@ -1,12 +1,12 @@
 {
-  "date": "2026-02-24",
-  "index_file": "quizzes/index/2026-02-24.json",
+  "date": "2026-02-25",
+  "index_file": "quizzes/index/2026-02-25.json",
   "available_types": [
     "which_came_first",
     "history_mcq_4"
   ],
   "metadata": {
     "version": 1,
-    "updated_at": "2026-02-24T06:16:33Z"
+    "updated_at": "2026-02-25T06:18:34Z"
   }
 }

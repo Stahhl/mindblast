@@ -1,0 +1,15 @@
+{
+  "date": "2026-02-25",
+  "quiz_files": {
+    "which_came_first": "quizzes/c5f11e16-b92a-5ae2-986b-676656eeec3f.json",
+    "history_mcq_4": "quizzes/1afc27fe-d294-5c4e-a8b3-ed422db7e2f6.json"
+  },
+  "available_types": [
+    "which_came_first",
+    "history_mcq_4"
+  ],
+  "metadata": {
+    "version": 1,
+    "generated_at": "2026-02-25T06:18:34Z"
+  }
+}
