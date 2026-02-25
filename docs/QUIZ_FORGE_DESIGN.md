@@ -136,6 +136,13 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - If job fails on a day, no file is created for that day; this is acceptable for Phase 1.
 - Optional later improvement: backfill command for missing dates.
 
+## Testing Posture
+- Use `pytest` for unit tests and control-flow assertions.
+- Mock external boundaries (provider calls, HTTP source fetches, webhook posts) so tests run without network.
+- Minimum required Phase 3 tests:
+  - AI rerank call path is invoked for `history_mcq_4` when AI mode/provider are enabled.
+  - Deterministic fallback path when budgets are exceeded or provider call fails.
+
 ## Evolution Path
 1. Stabilize Phase 1 multi-type generation (`which_came_first`, `history_mcq_4`).
 2. Add Phase 1.5 discovery artifacts for static clients (`quizzes/latest.json` + daily index files).

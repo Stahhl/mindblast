@@ -5,5 +5,16 @@ description = "Mindblast quiz-forge daily quiz generator"
 requires-python = ">=3.12"
 dependencies = []
 
+[dependency-groups]
+dev = [
+  "pytest>=8.4.2",
+  "pytest-mock>=3.15.1",
+  "pytest-cov>=7.0.0",
+]
+
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests/quiz_forge"]
+addopts = "-q"

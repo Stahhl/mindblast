@@ -108,6 +108,14 @@ uv sync --locked --no-dev --python 3.12
 uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4"
 ```
 
+## Python Tests (uv)
+
+```zsh
+cd /Users/stahl/dev/mindblast
+uv sync --locked --dev --python 3.12
+uv run --python 3.12 pytest tests/quiz_forge
+```
+
 ## Staging Deploy (GitHub Actions)
 
 - Workflow: `.github/workflows/deploy-frontend-staging.yml`
