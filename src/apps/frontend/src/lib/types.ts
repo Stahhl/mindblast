@@ -98,6 +98,7 @@ export type QuizPayload = WhichCameFirstQuiz | HistoryMcqQuiz;
 
 export interface DailyQuizLoadResult {
   date: string;
+  latestDate: string;
   availableTypes: QuizType[];
   quizzes: QuizPayload[];
   errorsByType: Map<string, string>;

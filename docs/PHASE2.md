@@ -27,8 +27,11 @@ Ship the first playable `Mindblast` frontend that consumes generated quiz conten
 ## Data Access Contract
 Frontend load order:
 1. Fetch `quizzes/latest.json`.
-2. Fetch `quizzes/index/YYYY-MM-DD.json` from `latest.index_file`.
-3. Fetch each quiz payload listed in `quiz_files`.
+2. Resolve target date:
+   - default: `latest.date`
+   - archive mode: user-selected `YYYY-MM-DD`
+3. Fetch `quizzes/index/YYYY-MM-DD.json` for the resolved target date.
+4. Fetch each quiz payload listed in `quiz_files`.
 
 Required behavior:
 - If any fetch fails, show a clear fallback UI with retry action.
@@ -37,6 +40,8 @@ Required behavior:
 
 ## Product Requirements
 - Display one question card per quiz type for the selected date.
+- Allow browsing previous quiz dates (archive mode) via date selection.
+- Provide a quick "jump to latest" control (button and keyboard shortcut).
 - Allow selecting one answer per quiz.
 - Lock answer after selection for that quiz card.
 - Show immediate correctness feedback.
@@ -45,7 +50,7 @@ Required behavior:
 
 ## State and Persistence
 - Keep answers in client state.
-- Optional: persist answer state in `localStorage` for the current date only.
+- Optional: persist answer state in `localStorage` per date (`YYYY-MM-DD` keying).
 
 ## Suggested Technical Approach
 - Static frontend stack (example: React + Vite + TypeScript).
@@ -56,6 +61,7 @@ Required behavior:
 ## Quality and Reliability
 - Strict runtime validation of loaded JSON shape before rendering.
 - Fail gracefully on malformed data with non-breaking UI.
+- If selected archive date has no published index, show an explicit empty-state card with recovery actions.
 - Keep bundle and runtime dependencies minimal.
 - Prefer TypeScript source files (`.ts` / `.tsx`) for app code.
 

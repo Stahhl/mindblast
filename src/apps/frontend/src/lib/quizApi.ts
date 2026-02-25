@@ -1,5 +1,5 @@
 import { validateIndexPayload, validateLatestPayload, validateQuizPayload } from "./validation";
-import type { DailyQuizLoadResult, QuizPayload } from "./types";
+import type { DailyQuizLoadResult, QuizPayload, QuizType } from "./types";
 
 function toAbsolutePath(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) {
@@ -19,9 +19,13 @@ async function fetchJson(path: string): Promise<unknown> {
   return response.json();
 }
 
-export async function loadDailyQuizzes(): Promise<DailyQuizLoadResult> {
-  const latest = validateLatestPayload(await fetchJson("/quizzes/latest.json"));
-  const index = validateIndexPayload(await fetchJson(latest.index_file));
+async function loadQuizzesFromIndex(indexPath: string): Promise<{
+  date: string;
+  availableTypes: QuizType[];
+  quizzes: QuizPayload[];
+  errorsByType: Map<string, string>;
+}> {
+  const index = validateIndexPayload(await fetchJson(indexPath));
 
   const quizResults = await Promise.allSettled(
     Object.entries(index.quiz_files).map(async ([quizType, quizPath]) => {
@@ -57,5 +61,16 @@ export async function loadDailyQuizzes(): Promise<DailyQuizLoadResult> {
     availableTypes: index.available_types,
     quizzes,
     errorsByType
+  };
+}
+
+export async function loadDailyQuizzes(date?: string): Promise<DailyQuizLoadResult> {
+  const latest = validateLatestPayload(await fetchJson("/quizzes/latest.json"));
+  const indexPath = date ? `/quizzes/index/${date}.json` : latest.index_file;
+  const result = await loadQuizzesFromIndex(indexPath);
+
+  return {
+    ...result,
+    latestDate: latest.date
   };
 }

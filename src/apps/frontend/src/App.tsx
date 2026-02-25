@@ -12,6 +12,20 @@ function makeStorageKey(date: string): string {
   return `mindblast:answers:${date}`;
 }
 
+function shiftIsoDate(date: string, days: number): string {
+  const parsed = new Date(`${date}T00:00:00Z`);
+  parsed.setUTCDate(parsed.getUTCDate() + days);
+  return parsed.toISOString().slice(0, 10);
+}
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  const tagName = target.tagName.toLowerCase();
+  return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
+}
+
 function detectEnvironment(): AppEnvironment {
   const raw = String(import.meta.env.VITE_APP_ENV ?? "")
     .trim()
@@ -48,6 +62,8 @@ function environmentLabel(environment: AppEnvironment): string {
 export default function App() {
   const [status, setStatus] = useState<Status>("loading");
   const [date, setDate] = useState<string>("");
+  const [latestDate, setLatestDate] = useState<string>("");
+  const [dateInput, setDateInput] = useState<string>("");
   const [quizzes, setQuizzes] = useState<QuizPayload[]>([]);
   const [errorsByType, setErrorsByType] = useState<Map<string, string>>(new Map());
   const [fatalError, setFatalError] = useState<string>("");
@@ -107,13 +123,15 @@ export default function App() {
     localStorage.setItem(makeStorageKey(date), JSON.stringify(answers));
   }, [answers, date]);
 
-  async function refresh(): Promise<void> {
+  async function refresh(targetDate?: string): Promise<void> {
     setStatus("loading");
     setFatalError("");
 
     try {
-      const result = await loadDailyQuizzes();
+      const result = await loadDailyQuizzes(targetDate);
       setDate(result.date);
+      setLatestDate(result.latestDate);
+      setDateInput(result.date);
       setQuizzes(result.quizzes);
       setErrorsByType(result.errorsByType);
 
@@ -126,12 +144,46 @@ export default function App() {
       setStatus("ready");
     } catch (error) {
       setStatus("error");
-      setFatalError(error instanceof Error ? error.message : String(error));
+      setQuizzes([]);
+      setErrorsByType(new Map());
+      if (targetDate) {
+        setDate(targetDate);
+      }
+      const rawMessage = error instanceof Error ? error.message : String(error);
+      if (targetDate && rawMessage.includes("Request failed (404)")) {
+        setFatalError(`No published quiz index exists for ${targetDate}.`);
+      } else {
+        setFatalError(rawMessage);
+      }
     }
   }
 
   useEffect(() => {
-    refresh();
+    void refresh();
+  }, []);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent): void {
+      if (event.defaultPrevented || event.repeat) {
+        return;
+      }
+      if (event.key.toLowerCase() !== "t") {
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+      if (isTypingTarget(event.target)) {
+        return;
+      }
+      event.preventDefault();
+      void refresh();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   function onSelectChoice(quizType: QuizType, choiceId: string): void {
@@ -142,6 +194,27 @@ export default function App() {
       return { ...previous, [quizType]: choiceId };
     });
   }
+
+  function onLoadDate(): void {
+    if (!dateInput) {
+      return;
+    }
+    void refresh(dateInput);
+  }
+
+  function onShiftDate(days: number): void {
+    if (!date) {
+      return;
+    }
+    const nextDate = shiftIsoDate(date, days);
+    setDateInput(nextDate);
+    void refresh(nextDate);
+  }
+
+  const inArchiveMode = Boolean(date && latestDate && date !== latestDate);
+  const disableNextDay = status === "loading" || !date || (Boolean(latestDate) && date >= latestDate);
+  const disableLatest = status === "loading" || !latestDate || date === latestDate;
+  const missingArchiveDate = fatalError.match(/^No published quiz index exists for (\d{4}-\d{2}-\d{2})\.$/)?.[1] ?? "";
 
   return (
     <main className={`page-shell ${envClass}`}>
@@ -154,9 +227,52 @@ export default function App() {
           <p className={`environment-pill ${envClass}`}>Environment: {envLabel}</p>
           <h1>History Challenge</h1>
           <p className="subtitle">Load order: latest -&gt; daily index -&gt; quiz payloads.</p>
+
+          <div className="date-controls">
+            <label htmlFor="quiz-date">Browse date</label>
+            <div className="date-input-row">
+              <input
+                id="quiz-date"
+                type="date"
+                value={dateInput}
+                onChange={(event) => setDateInput(event.target.value)}
+                max={latestDate || undefined}
+              />
+              <button
+                type="button"
+                className="refresh-button secondary"
+                onClick={onLoadDate}
+                disabled={status === "loading" || !dateInput}
+              >
+                Load date
+              </button>
+            </div>
+            <div className="history-nav">
+              <button
+                type="button"
+                className="refresh-button secondary"
+                onClick={() => onShiftDate(-1)}
+                disabled={status === "loading" || !date}
+              >
+                Previous day
+              </button>
+              <button
+                type="button"
+                className="refresh-button secondary"
+                onClick={() => onShiftDate(1)}
+                disabled={disableNextDay}
+              >
+                Next day
+              </button>
+              <button type="button" className="refresh-button secondary" onClick={() => void refresh()} disabled={disableLatest}>
+                Latest
+              </button>
+            </div>
+            <p className="shortcut-hint">Shortcut: press T to jump to latest.</p>
+          </div>
         </div>
 
-        <button type="button" className="refresh-button" onClick={refresh} disabled={status === "loading"}>
+        <button type="button" className="refresh-button" onClick={() => void refresh(date)} disabled={status === "loading"}>
           {status === "loading" ? "Loading..." : "Retry"}
         </button>
       </header>
@@ -165,6 +281,9 @@ export default function App() {
         <section className="scoreboard">
           <p>
             Date: <strong>{date}</strong>
+          </p>
+          <p>
+            Mode: <strong>{inArchiveMode ? "Archive" : "Latest"}</strong>
           </p>
           <p>
             Score: <strong>{score.correct}</strong> / {score.total}
@@ -178,6 +297,29 @@ export default function App() {
         <section className="state-banner error">
           <p>Could not load quizzes.</p>
           {fatalError ? <p className="error-detail">{fatalError}</p> : null}
+        </section>
+      ) : null}
+
+      {status === "error" && missingArchiveDate ? (
+        <section className="archive-empty-state">
+          <h2>No quiz published for {missingArchiveDate}</h2>
+          <p>Try another date or jump back to the latest available quiz day.</p>
+          <div className="archive-empty-actions">
+            <button
+              type="button"
+              className="refresh-button secondary"
+              onClick={() => {
+                const previousDate = shiftIsoDate(missingArchiveDate, -1);
+                setDateInput(previousDate);
+                void refresh(previousDate);
+              }}
+            >
+              Try previous day
+            </button>
+            <button type="button" className="refresh-button secondary" onClick={() => void refresh()}>
+              Go to latest
+            </button>
+          </div>
         </section>
       ) : null}
 

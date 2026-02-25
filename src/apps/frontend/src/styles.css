@@ -129,6 +129,48 @@ h1 {
   color: var(--ink-muted);
 }
 
+.date-controls {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.date-controls label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.date-input-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.date-input-row input[type="date"] {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.55rem 0.6rem;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.history-nav {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.shortcut-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
 .refresh-button {
   border: 1px solid var(--line);
   background: var(--card);
@@ -137,6 +179,12 @@ h1 {
   padding: 0.65rem 1rem;
   font-size: 0.9rem;
   cursor: pointer;
+}
+
+.refresh-button.secondary {
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
 }
 
 .refresh-button:disabled {
@@ -193,6 +241,31 @@ h1 {
   margin-top: 0.4rem !important;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.88rem;
+}
+
+.archive-empty-state {
+  margin-top: 1rem;
+  border: 1px dashed #d9b786;
+  background: #fff6e7;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.archive-empty-state h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.archive-empty-state p {
+  margin: 0.55rem 0 0;
+  color: #5d4f31;
+}
+
+.archive-empty-actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .quiz-grid {
@@ -389,6 +462,11 @@ h1 {
 
   .refresh-button {
     width: 100%;
+  }
+
+  .history-nav .refresh-button.secondary {
+    width: auto;
+    flex: 1 1 7.2rem;
   }
 
   .choice {
