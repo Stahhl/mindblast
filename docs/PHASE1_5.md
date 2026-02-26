@@ -24,19 +24,44 @@ Add a lightweight discovery/index layer so clients can find daily quiz files wit
 ### Daily Index
 - Path: `quizzes/index/YYYY-MM-DD.json`
 - Exactly one index file per UTC date that has generated quizzes.
-- Contains pointers to the quiz files for that date.
+- Contains pointers to quiz files for that date, including multiple same-day editions.
+- `quiz_files` remains as a compatibility map for clients that only support one file per type.
 
 Example:
 ```json
 {
   "date": "2026-02-22",
+  "quizzes_by_type": {
+    "which_came_first": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json",
+        "generated_at": "2026-02-22T06:00:00Z"
+      }
+    ],
+    "history_mcq_4": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/137b933b-c96b-5794-b985-4e60a04f1b8d.json",
+        "generated_at": "2026-02-22T06:00:00Z"
+      },
+      {
+        "edition": 2,
+        "mode": "extra",
+        "quiz_file": "quizzes/8de3029a-38ec-5ed0-a530-3a8e3d1f00b2.json",
+        "generated_at": "2026-02-22T12:00:00Z"
+      }
+    ]
+  },
   "quiz_files": {
     "which_came_first": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json",
     "history_mcq_4": "quizzes/137b933b-c96b-5794-b985-4e60a04f1b8d.json"
   },
   "available_types": ["which_came_first", "history_mcq_4"],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "generated_at": "2026-02-22T06:00:00Z"
   }
 }
@@ -52,8 +77,12 @@ Example:
   "date": "2026-02-22",
   "index_file": "quizzes/index/2026-02-22.json",
   "available_types": ["which_came_first", "history_mcq_4"],
+  "latest_quiz_by_type": {
+    "which_came_first": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json",
+    "history_mcq_4": "quizzes/8de3029a-38ec-5ed0-a530-3a8e3d1f00b2.json"
+  },
   "metadata": {
-    "version": 1,
+    "version": 2,
     "updated_at": "2026-02-22T06:00:00Z"
   }
 }
@@ -73,9 +102,11 @@ Example:
 
 ## Validation Rules
 - `date` fields must be valid UTC dates in `YYYY-MM-DD`.
-- `quiz_files` keys must be known enabled types.
+- `quizzes_by_type` keys must be known enabled types.
+- `quiz_files` keys must be known enabled types (compatibility view).
 - Every `quiz_files` path must exist in the repository at generation time.
-- `available_types` must match `quiz_files` keys.
+- Every `quizzes_by_type[*][*].quiz_file` path must exist in the repository at generation time.
+- `available_types` must match `quizzes_by_type` keys.
 - Metadata timestamps must be UTC ISO-8601 strings with `Z`.
 
 ## Acceptance Criteria

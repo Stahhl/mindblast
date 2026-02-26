@@ -6,6 +6,8 @@ import datetime as dt
 from typing import Any
 
 from .constants import (
+    GENERATION_MODE_DAILY,
+    SUPPORTED_GENERATION_MODES,
     NORMALIZED_MODEL_VERSION,
     QUIZ_SCHEMA_VERSION,
     QUIZ_TYPE_HISTORY_MCQ_4,
@@ -94,6 +96,22 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
     normalized_model = metadata.get("normalized_model")
     if normalized_model != NORMALIZED_MODEL_VERSION:
         raise ValueError(f"metadata.normalized_model must be {NORMALIZED_MODEL_VERSION}.")
+
+    generation = quiz.get("generation")
+    if not isinstance(generation, dict):
+        raise ValueError("generation must be an object.")
+    generation_mode = generation.get("mode")
+    if generation_mode not in SUPPORTED_GENERATION_MODES:
+        supported = ", ".join(SUPPORTED_GENERATION_MODES)
+        raise ValueError(f"generation.mode must be one of: {supported}.")
+    edition = generation.get("edition")
+    if not isinstance(edition, int) or edition < 1:
+        raise ValueError("generation.edition must be an integer >= 1.")
+    generated_at = generation.get("generated_at")
+    if not isinstance(generated_at, str) or not generated_at.endswith("Z"):
+        raise ValueError("generation.generated_at must be a UTC timestamp.")
+    if edition == 1 and generation_mode != GENERATION_MODE_DAILY:
+        raise ValueError("generation.mode must be daily for edition 1.")
 
     return quiz_type, choices
 

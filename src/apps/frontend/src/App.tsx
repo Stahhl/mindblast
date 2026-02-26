@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import QuizCard from "./components/QuizCard";
 import { loadDailyQuizzes } from "./lib/quizApi";
-import type { QuizPayload, QuizType } from "./lib/types";
+import type { LoadedQuiz } from "./lib/types";
 
 type Status = "loading" | "ready" | "error";
-type AnswerMap = Partial<Record<QuizType, string>>;
+type AnswerMap = Record<string, string>;
 type AppEnvironment = "staging" | "production" | "local" | "unknown";
 
 function makeStorageKey(date: string): string {
@@ -64,7 +64,7 @@ export default function App() {
   const [date, setDate] = useState<string>("");
   const [latestDate, setLatestDate] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
-  const [quizzes, setQuizzes] = useState<QuizPayload[]>([]);
+  const [quizzes, setQuizzes] = useState<LoadedQuiz[]>([]);
   const [errorsByType, setErrorsByType] = useState<Map<string, string>>(new Map());
   const [fatalError, setFatalError] = useState<string>("");
   const [answers, setAnswers] = useState<AnswerMap>({});
@@ -79,7 +79,7 @@ export default function App() {
 
     let correct = 0;
     quizzes.forEach((quiz) => {
-      if (answers[quiz.type] === quiz.correct_choice_id) {
+      if (answers[quiz.key] === quiz.payload.correct_choice_id) {
         correct += 1;
       }
     });
@@ -106,11 +106,10 @@ export default function App() {
       }
 
       const answerEntries = Object.entries(parsed as Record<string, unknown>).filter(
-        ([quizType, choiceId]) =>
-          (quizType === "which_came_first" || quizType === "history_mcq_4") && typeof choiceId === "string"
-      ) as Array<[QuizType, string]>;
+        ([quizKey, choiceId]) => typeof quizKey === "string" && typeof choiceId === "string"
+      ) as Array<[string, string]>;
 
-      setAnswers(Object.fromEntries(answerEntries) as AnswerMap);
+      setAnswers(Object.fromEntries(answerEntries));
     } catch {
       setAnswers({});
     }
@@ -186,12 +185,12 @@ export default function App() {
     };
   }, []);
 
-  function onSelectChoice(quizType: QuizType, choiceId: string): void {
+  function onSelectChoice(quizKey: string, choiceId: string): void {
     setAnswers((previous) => {
-      if (previous[quizType]) {
+      if (previous[quizKey]) {
         return previous;
       }
-      return { ...previous, [quizType]: choiceId };
+      return { ...previous, [quizKey]: choiceId };
     });
   }
 
@@ -212,6 +211,14 @@ export default function App() {
   }
 
   const inArchiveMode = Boolean(date && latestDate && date !== latestDate);
+  const quizzesByTypeCount = useMemo(() => {
+    const counts = new Map<string, number>();
+    quizzes.forEach((quiz) => {
+      counts.set(quiz.type, (counts.get(quiz.type) ?? 0) + 1);
+    });
+    return counts;
+  }, [quizzes]);
+  const hasMultipleEditions = Array.from(quizzesByTypeCount.values()).some((count) => count > 1);
   const disableNextDay = status === "loading" || !date || (Boolean(latestDate) && date >= latestDate);
   const disableLatest = status === "loading" || !latestDate || date === latestDate;
   const missingArchiveDate = fatalError.match(/^No published quiz index exists for (\d{4}-\d{2}-\d{2})\.$/)?.[1] ?? "";
@@ -288,6 +295,11 @@ export default function App() {
           <p>
             Score: <strong>{score.correct}</strong> / {score.total}
           </p>
+          {hasMultipleEditions ? (
+            <p>
+              Editions: <strong>{quizzes.length}</strong> quizzes across {quizzesByTypeCount.size} type(s)
+            </p>
+          ) : null}
         </section>
       ) : null}
 
@@ -340,10 +352,16 @@ export default function App() {
         {quizzes.map((quiz, idx) => (
           <div
             className="quiz-wrap"
-            key={quiz.type}
+            key={quiz.key}
             style={{ "--stagger": `${idx * 80}ms` } as Record<string, string>}
           >
-            <QuizCard quiz={quiz} selectedChoiceId={answers[quiz.type]} onSelectChoice={onSelectChoice} />
+            <QuizCard
+              quiz={quiz.payload}
+              quizKey={quiz.key}
+              edition={quiz.edition}
+              selectedChoiceId={answers[quiz.key]}
+              onSelectChoice={onSelectChoice}
+            />
           </div>
         ))}
       </section>

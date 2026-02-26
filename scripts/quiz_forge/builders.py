@@ -11,6 +11,7 @@ from .constants import (
     QUIZ_SCHEMA_VERSION,
     QUIZ_TYPE_HISTORY_MCQ_4,
     QUIZ_TYPE_WHICH_CAME_FIRST,
+    SUPPORTED_GENERATION_MODES,
     WHICH_CAME_FIRST_QUESTION,
 )
 from .model import (
@@ -49,6 +50,8 @@ def build_which_came_first_quiz(
     source_url: str,
     candidates: list[dict[str, Any]],
     seed: int,
+    edition: int,
+    generation_mode: str,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
     ai_ranked_distractor_ids: list[str] | None = None,
 ) -> dict[str, Any]:
@@ -58,7 +61,9 @@ def build_which_came_first_quiz(
     options = [first, second]
     correct_event = first if first["year"] < second["year"] else second
 
-    question_id = build_question_id(target_date, QUIZ_TYPE_WHICH_CAME_FIRST)
+    if generation_mode not in SUPPORTED_GENERATION_MODES:
+        raise ValueError(f"Unsupported generation mode: {generation_mode}")
+    question_id = build_question_id(target_date, QUIZ_TYPE_WHICH_CAME_FIRST, edition)
     answer_facts = [
         build_answer_fact(
             first,
@@ -103,6 +108,11 @@ def build_which_came_first_quiz(
         "choices": choices,
         "correct_choice_id": correct_choice_id,
         "source": build_source(retrieval_time, source_url, [first, second]),
+        "generation": {
+            "mode": generation_mode,
+            "edition": edition,
+            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        },
         "metadata": {
             "version": QUIZ_SCHEMA_VERSION,
             "normalized_model": NORMALIZED_MODEL_VERSION,
@@ -116,9 +126,13 @@ def build_history_mcq_4_quiz(
     source_url: str,
     candidates: list[dict[str, Any]],
     seed: int,
+    edition: int,
+    generation_mode: str,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
     ai_ranked_distractor_ids: list[str] | None = None,
 ) -> dict[str, Any]:
+    if generation_mode not in SUPPORTED_GENERATION_MODES:
+        raise ValueError(f"Unsupported generation mode: {generation_mode}")
     correct, distractor_pool = pick_history_mcq_distractor_pool(
         candidates,
         seed,
@@ -163,7 +177,7 @@ def build_history_mcq_4_quiz(
         raise ValueError("Could not determine correct choice id for history_mcq_4.")
 
     question_object = build_question_object(
-        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_MCQ_4),
+        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_MCQ_4, edition),
         prompt=question_text,
         quiz_type=QUIZ_TYPE_HISTORY_MCQ_4,
         answer_fact_ids=[fact["id"] for fact in answer_facts],
@@ -181,6 +195,11 @@ def build_history_mcq_4_quiz(
         "choices": choices,
         "correct_choice_id": correct_choice_id,
         "source": build_source(retrieval_time, source_url, options),
+        "generation": {
+            "mode": generation_mode,
+            "edition": edition,
+            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        },
         "metadata": {
             "version": QUIZ_SCHEMA_VERSION,
             "normalized_model": NORMALIZED_MODEL_VERSION,

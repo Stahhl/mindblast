@@ -31,7 +31,8 @@ Frontend load order:
    - default: `latest.date`
    - archive mode: user-selected `YYYY-MM-DD`
 3. Fetch `quizzes/index/YYYY-MM-DD.json` for the resolved target date.
-4. Fetch each quiz payload listed in `quiz_files`.
+4. If `quizzes_by_type` exists, fetch each quiz payload listed per edition.
+5. Otherwise (legacy index), fetch each quiz payload listed in `quiz_files`.
 
 Required behavior:
 - If any fetch fails, show a clear fallback UI with retry action.
@@ -39,7 +40,8 @@ Required behavior:
 - Frontend must accept quiz payload `metadata.version` values `1` and `2` during migration.
 
 ## Product Requirements
-- Display one question card per quiz type for the selected date.
+- Display one or more question cards per quiz type for the selected date.
+- Support multiple same-day editions per quiz type when present in discovery artifacts.
 - Allow browsing previous quiz dates (archive mode) via date selection.
 - Provide a quick "jump to latest" control (button and keyboard shortcut).
 - Allow selecting one answer per quiz.

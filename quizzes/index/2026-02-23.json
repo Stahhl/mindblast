@@ -4,12 +4,30 @@
     "which_came_first": "quizzes/b5289ee9-991e-5901-896d-dcba4fc791ad.json",
     "history_mcq_4": "quizzes/137b933b-c96b-5794-b985-4e60a04f1b8d.json"
   },
+  "quizzes_by_type": {
+    "which_came_first": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/b5289ee9-991e-5901-896d-dcba4fc791ad.json",
+        "generated_at": "2026-02-23T06:17:44Z"
+      }
+    ],
+    "history_mcq_4": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/137b933b-c96b-5794-b985-4e60a04f1b8d.json",
+        "generated_at": "2026-02-23T06:17:44Z"
+      }
+    ]
+  },
   "available_types": [
     "which_came_first",
     "history_mcq_4"
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "generated_at": "2026-02-23T06:17:45Z"
   }
 }

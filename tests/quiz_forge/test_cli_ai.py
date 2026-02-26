@@ -28,6 +28,8 @@ def _patch_cli_args(monkeypatch, tmp_path: Path) -> None:
         output_dir=(tmp_path / "quizzes").as_posix(),
         timeout=1,
         retries=1,
+        mode="daily",
+        count=1,
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
 

@@ -9,7 +9,8 @@ Mindblast is a quiz project built to evolve over time.
 
 Phase 1.5 focuses on `quiz-forge` + static discovery:
 - one scheduled GitHub Actions run per day
-- one history question per enabled quiz type per day
+- default daily generation: one history quiz per enabled type per UTC day (`edition = 1`)
+- optional manual extra generation: additional same-day editions (`edition > 1`)
 - enabled types: `which_came_first`, `history_mcq_4`
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields
 - discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
@@ -47,6 +48,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── PHASE1_5.md
 │   ├── PHASE2.md
 │   ├── PHASE3.md
+│   ├── PHASE4.md
 │   ├── HOSTING_ROLLOUT.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
@@ -63,6 +65,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 1.5 discovery layer: `docs/PHASE1_5.md`
 - Phase 2 frontend scope: `docs/PHASE2.md`
 - Phase 3 AI workflow scope: `docs/PHASE3.md`
+- Phase 4 multi-generation scope: `docs/PHASE4.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
 - Terraform IaC setup: `infra/terraform/README.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`

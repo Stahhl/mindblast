@@ -11,7 +11,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 ## Scope (Phase 1)
 - One repository: `quiz-forge`.
 - One scheduled CI workflow in GitHub Actions.
-- Generate exactly **1** quiz per enabled type per UTC day.
+- Generate exactly **1** quiz per enabled type per UTC day in default `daily` mode.
 - Enabled types:
   - `which_came_first`
   - `history_mcq_4`
@@ -22,9 +22,11 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 ## Out of Scope (for now)
 - User-facing app.
 - Leaderboards, achievements, and ratings.
-- Multiple quizzes per type per day.
 - Non-history categories.
 - Non-Wikipedia content sources.
+
+Note:
+- Multiple quizzes per type per day are introduced in Phase 4 (`docs/PHASE4.md`) via `extra` mode.
 
 ## Content Source
 - Use Wikipedia via Wikimedia On This Day API:
@@ -39,7 +41,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 ## Output Format
 - Store one JSON file per enabled quiz type per UTC day:
   - `quizzes/<uuid>.json`
-- `<uuid>` must be a deterministic UUIDv5 derived from `date + quiz_type`.
+- `<uuid>` must be a deterministic UUIDv5 derived from `date + quiz_type + edition`.
 - If a file for a date/type already exists, do not create duplicates.
 - Commit only when at least one new file is created.
 
@@ -55,6 +57,9 @@ Common fields for all types:
 - `correct_choice_id`: one of the choice ids (legacy compatibility view).
 - `source.name`, `source.url`, `source.retrieved_at`: non-empty strings.
 - `source.events_used`: array of source events (`event_id`, `text`, `year`, `wikipedia_url`).
+- `generation.mode`: `daily` for `edition = 1`.
+- `generation.edition`: integer `>= 1`.
+- `generation.generated_at`: UTC ISO-8601 timestamp (`Z`).
 - `metadata.version`: `2`.
 - `metadata.normalized_model`: `question_answer_facts_v1`.
 
@@ -168,6 +173,11 @@ Common fields for all types:
       }
     ]
   },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-02-25T06:00:00Z"
+  },
   "metadata": {
     "version": 2,
     "normalized_model": "question_answer_facts_v1"
@@ -203,6 +213,9 @@ Migration note:
 - `choices[*].answer_fact_id` must be non-empty and aligned with `questions[0].answer_fact_ids` order.
 - Source attribution must be present and non-empty.
 - `source.events_used` entries must include non-empty `event_id`, `text`, integer `year`, and non-empty `wikipedia_url`.
+- `generation.mode` must be `daily` when `generation.edition` is `1`.
+- `generation.edition` must be integer `>= 1`.
+- `generation.generated_at` must be UTC ISO-8601 with `Z`.
 - `questions[0].correct_answer_fact_id` must match the fact linked by `correct_choice_id`.
 
 ## Reliability and Safety

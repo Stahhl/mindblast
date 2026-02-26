@@ -5,8 +5,12 @@
     "which_came_first",
     "history_mcq_4"
   ],
+  "latest_quiz_by_type": {
+    "which_came_first": "quizzes/c5f11e16-b92a-5ae2-986b-676656eeec3f.json",
+    "history_mcq_4": "quizzes/1afc27fe-d294-5c4e-a8b3-ed422db7e2f6.json"
+  },
   "metadata": {
-    "version": 1,
-    "updated_at": "2026-02-26T06:17:07Z"
+    "version": 2,
+    "updated_at": "2026-02-26T09:17:30Z"
   }
 }

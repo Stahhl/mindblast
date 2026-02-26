@@ -1,5 +1,5 @@
 import { validateIndexPayload, validateLatestPayload, validateQuizPayload } from "./validation";
-import type { DailyQuizLoadResult, QuizPayload, QuizType } from "./types";
+import type { DailyQuizLoadResult, LoadedQuiz, QuizType } from "./types";
 
 function toAbsolutePath(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) {
@@ -22,39 +22,80 @@ async function fetchJson(path: string): Promise<unknown> {
 async function loadQuizzesFromIndex(indexPath: string): Promise<{
   date: string;
   availableTypes: QuizType[];
-  quizzes: QuizPayload[];
+  quizzes: LoadedQuiz[];
   errorsByType: Map<string, string>;
 }> {
   const index = validateIndexPayload(await fetchJson(indexPath));
 
-  const quizResults = await Promise.allSettled(
-    Object.entries(index.quiz_files).map(async ([quizType, quizPath]) => {
-      const quiz = validateQuizPayload(await fetchJson(quizPath));
-      if (quiz.type !== quizType) {
-        throw new Error(`Quiz type mismatch for ${quizType}`);
+  const targets: Array<{
+    quizType: QuizType;
+    quizPath: string;
+    edition: number;
+  }> = [];
+  if (index.quizzes_by_type) {
+    index.available_types.forEach((quizType) => {
+      const editions = index.quizzes_by_type?.[quizType];
+      if (!editions) {
+        return;
       }
-      return [quizType, quiz] as const;
+      editions.forEach((entry) => {
+        targets.push({
+          quizType,
+          quizPath: entry.quiz_file,
+          edition: entry.edition
+        });
+      });
+    });
+  } else {
+    Object.entries(index.quiz_files).forEach(([quizType, quizPath]) => {
+      targets.push({
+        quizType: quizType as QuizType,
+        quizPath,
+        edition: 1
+      });
+    });
+  }
+
+  const quizResults = await Promise.allSettled(
+    targets.map(async (target) => {
+      const quiz = validateQuizPayload(await fetchJson(target.quizPath));
+      if (quiz.type !== target.quizType) {
+        throw new Error(`Quiz type mismatch for ${target.quizType}`);
+      }
+      const quizEdition = quiz.generation?.edition ?? target.edition;
+      const quizKey = `${target.quizType}:${quizEdition}:${target.quizPath}`;
+      return {
+        key: quizKey,
+        type: target.quizType,
+        edition: quizEdition,
+        sourcePath: target.quizPath,
+        payload: quiz
+      } satisfies LoadedQuiz;
     })
   );
 
-  const quizzesByType = new Map<string, QuizPayload>();
+  const quizzes: LoadedQuiz[] = [];
   const errorsByType = new Map<string, string>();
 
   quizResults.forEach((result, idx) => {
-    const quizType = index.available_types[idx];
+    const target = targets[idx];
+    const errorKey = `${target.quizType} (edition ${target.edition})`;
     if (result.status === "fulfilled") {
-      const [type, quiz] = result.value;
-      quizzesByType.set(type, quiz);
+      quizzes.push(result.value);
       return;
     }
 
     const message = result.reason instanceof Error ? result.reason.message : String(result.reason);
-    errorsByType.set(quizType, message);
+    errorsByType.set(errorKey, message);
   });
 
-  const quizzes = index.available_types
-    .map((quizType) => quizzesByType.get(quizType))
-    .filter((quiz): quiz is QuizPayload => Boolean(quiz));
+  quizzes.sort((a, b) => {
+    const typeOrder = index.available_types.indexOf(a.type) - index.available_types.indexOf(b.type);
+    if (typeOrder !== 0) {
+      return typeOrder;
+    }
+    return a.edition - b.edition;
+  });
 
   return {
     date: index.date,

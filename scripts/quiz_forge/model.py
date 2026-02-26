@@ -29,8 +29,8 @@ def build_answer_fact_id(event: dict[str, Any]) -> str:
     return str(uuid.uuid5(ANSWER_FACT_NAMESPACE, key))
 
 
-def build_question_id(target_date: dt.date, quiz_type: str) -> str:
-    key = f"{target_date.isoformat()}|{quiz_type}"
+def build_question_id(target_date: dt.date, quiz_type: str, edition: int) -> str:
+    key = f"{target_date.isoformat()}|{quiz_type}|{edition}"
     return str(uuid.uuid5(QUIZ_QUESTION_NAMESPACE, key))
 
 
@@ -101,4 +101,3 @@ def build_question_object(
         },
         "selection_rules": selection_rules,
     }
-

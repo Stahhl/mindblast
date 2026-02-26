@@ -3,7 +3,30 @@ name: Daily Quiz Generation
 on:
   schedule:
     - cron: "0 6 * * *"
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "UTC date override (YYYY-MM-DD). Leave empty for today."
+        required: false
+        type: string
+      quiz_types:
+        description: "Comma-separated quiz types."
+        required: false
+        default: "which_came_first,history_mcq_4"
+        type: string
+      mode:
+        description: "Generation mode."
+        required: false
+        default: "extra"
+        type: choice
+        options:
+          - daily
+          - extra
+      count:
+        description: "Quizzes per quiz type."
+        required: false
+        default: "1"
+        type: string
 
 permissions:
   contents: write
@@ -16,7 +39,10 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     env:
-      QUIZ_TYPES: "which_came_first,history_mcq_4"
+      QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4' }}
+      QUIZ_MODE: ${{ inputs.mode || 'daily' }}
+      QUIZ_COUNT: ${{ inputs.count || '1' }}
+      QUIZ_DATE: ${{ inputs.date || '' }}
       AI_MODE: ${{ vars.AI_MODE }}
       AI_PROVIDER: ${{ vars.AI_PROVIDER }}
       AI_MODEL: ${{ vars.AI_MODEL }}
@@ -41,7 +67,17 @@ jobs:
       - name: Generate daily quiz
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "${QUIZ_TYPES}"
+        run: |
+          EXTRA_ARGS=()
+          if [ -n "${QUIZ_DATE}" ]; then
+            EXTRA_ARGS+=(--date "${QUIZ_DATE}")
+          fi
+
+          uv run --python 3.12 python scripts/generate_quiz.py \
+            --quiz-types "${QUIZ_TYPES}" \
+            --mode "${QUIZ_MODE}" \
+            --count "${QUIZ_COUNT}" \
+            "${EXTRA_ARGS[@]}"
 
       - name: Commit and push if new quiz was created
         run: |
@@ -82,7 +118,29 @@ jobs:
             "${STATUS_EMOJI}" "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
 
           if [ -f "${QUIZ_FORGE_AI_REPORT_PATH}" ]; then
-            AI_BLOCK="$(python3 -c 'import json,os; from pathlib import Path; payload=json.loads(Path(os.environ["QUIZ_FORGE_AI_REPORT_PATH"]).read_text(encoding="utf-8")); reasons=payload.get("fallback_reasons") or []; reasons_text=", ".join(reasons) if reasons else "none"; lines=["ai:", f"  mode: {payload.get(\"ai_mode\", \"unknown\")}", f"  provider/model: {payload.get(\"provider\", \"unknown\")}/{payload.get(\"model\", \"unknown\")}", f"  calls: {payload.get(\"calls_total\", 0)}", f"  tokens in/out: {payload.get(\"input_tokens_total\", 0)}/{payload.get(\"output_tokens_total\", 0)}", f"  run spend usd: {payload.get(\"run_estimated_cost_usd\", 0)}", f"  day spend usd: {payload.get(\"day_spend_usd\", 0)} / {payload.get(\"day_limit_usd\", 0)}", f"  month spend usd: {payload.get(\"month_spend_usd\", 0)} / {payload.get(\"month_limit_usd\", 0)}", f"  fallbacks: {payload.get(\"fallback_count\", 0)} ({reasons_text})"]; print("\n".join(lines))')"
+            AI_BLOCK="$(python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report_path = Path(os.environ["QUIZ_FORGE_AI_REPORT_PATH"])
+          payload = json.loads(report_path.read_text(encoding="utf-8"))
+          reasons = payload.get("fallback_reasons") or []
+          reasons_text = ", ".join(reasons) if reasons else "none"
+          lines = [
+              "ai:",
+              f"  mode: {payload.get('ai_mode', 'unknown')}",
+              f"  provider/model: {payload.get('provider', 'unknown')}/{payload.get('model', 'unknown')}",
+              f"  calls: {payload.get('calls_total', 0)}",
+              f"  tokens in/out: {payload.get('input_tokens_total', 0)}/{payload.get('output_tokens_total', 0)}",
+              f"  run spend usd: {payload.get('run_estimated_cost_usd', 0)}",
+              f"  day spend usd: {payload.get('day_spend_usd', 0)} / {payload.get('day_limit_usd', 0)}",
+              f"  month spend usd: {payload.get('month_spend_usd', 0)} / {payload.get('month_limit_usd', 0)}",
+              f"  fallbacks: {payload.get('fallback_count', 0)} ({reasons_text})",
+          ]
+          print("\n".join(lines))
+          PY
+            )"
             MESSAGE="${MESSAGE}"$'\n'"${AI_BLOCK}"
           fi
 

@@ -7,8 +7,8 @@ import datetime as dt
 from typing import Any
 
 
-def build_seed(target_date: dt.date, quiz_type: str) -> int:
-    key = f"{target_date.isoformat()}:{quiz_type}"
+def build_seed(target_date: dt.date, quiz_type: str, edition: int) -> int:
+    key = f"{target_date.isoformat()}:{quiz_type}:{edition}"
     return int(hashlib.sha256(key.encode("utf-8")).hexdigest(), 16)
 
 

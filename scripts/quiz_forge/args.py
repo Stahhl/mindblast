@@ -5,7 +5,12 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 
-from .constants import DEFAULT_QUIZ_TYPES, SUPPORTED_QUIZ_TYPES
+from .constants import (
+    DEFAULT_QUIZ_TYPES,
+    GENERATION_MODE_DAILY,
+    SUPPORTED_GENERATION_MODES,
+    SUPPORTED_QUIZ_TYPES,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -40,6 +45,21 @@ def parse_args() -> argparse.Namespace:
         default=3,
         help="Max HTTP retries.",
     )
+    parser.add_argument(
+        "--mode",
+        default=GENERATION_MODE_DAILY,
+        help=(
+            "Generation mode. "
+            f"Supported: {', '.join(SUPPORTED_GENERATION_MODES)}. "
+            f"Default: {GENERATION_MODE_DAILY}."
+        ),
+    )
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=1,
+        help="How many quizzes to generate per quiz type for this run.",
+    )
     return parser.parse_args()
 
 
@@ -69,3 +89,17 @@ def parse_quiz_types(value: str) -> list[str]:
         parsed.append(quiz_type)
 
     return parsed
+
+
+def parse_generation_mode(value: str) -> str:
+    mode = value.strip().lower()
+    if mode not in SUPPORTED_GENERATION_MODES:
+        supported = ", ".join(SUPPORTED_GENERATION_MODES)
+        raise ValueError(f"Unsupported --mode '{value}'. Supported: {supported}")
+    return mode
+
+
+def parse_generation_count(value: int) -> int:
+    if value < 1:
+        raise ValueError("--count must be >= 1.")
+    return value

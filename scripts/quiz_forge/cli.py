@@ -7,36 +7,91 @@ from pathlib import Path
 from typing import Any
 
 from .ai import AIOrchestrator, load_ai_settings
-from .args import parse_args, parse_quiz_types, parse_target_date
+from .args import (
+    parse_args,
+    parse_generation_count,
+    parse_generation_mode,
+    parse_quiz_types,
+    parse_target_date,
+)
 from .builders import QUIZ_BUILDERS
-from .constants import QUIZ_TYPE_HISTORY_MCQ_4
+from .constants import (
+    GENERATION_MODE_DAILY,
+    GENERATION_MODE_EXTRA,
+    QUIZ_TYPE_HISTORY_MCQ_4,
+)
 from .discovery import write_discovery_artifacts
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
-from .storage import build_output_path, find_existing_quiz_path, write_quiz_file
+from .storage import (
+    build_output_path,
+    find_existing_quiz_path,
+    list_quiz_records_for_date_type,
+    write_quiz_file,
+)
 from .validation import validate_quiz
+
+
+def _build_generation_plan(
+    output_dir: str,
+    target_date: dt.date,
+    quiz_types: list[str],
+    mode: str,
+    count: int,
+) -> list[tuple[str, int, Path]]:
+    pending: list[tuple[str, int, Path]] = []
+    for quiz_type in quiz_types:
+        existing_records = list_quiz_records_for_date_type(output_dir, target_date, quiz_type)
+        existing_editions = {record.edition for record in existing_records}
+        if mode == GENERATION_MODE_DAILY:
+            edition = 1
+            output_path = build_output_path(output_dir, target_date, quiz_type, edition)
+            existing_path = find_existing_quiz_path(output_path, target_date, quiz_type, edition)
+            if existing_path is not None:
+                print(f"Quiz already exists for {quiz_type} edition {edition}: {existing_path}")
+                continue
+            pending.append((quiz_type, edition, output_path))
+            continue
+
+        if mode != GENERATION_MODE_EXTRA:
+            raise ValueError(f"Unsupported generation mode: {mode}")
+
+        if 1 not in existing_editions:
+            raise ValueError(
+                f"Cannot generate extra editions for {quiz_type} on {target_date.isoformat()} "
+                "before daily edition 1 exists."
+            )
+
+        next_edition = max(existing_editions) + 1
+        for edition in range(next_edition, next_edition + count):
+            output_path = build_output_path(output_dir, target_date, quiz_type, edition)
+            existing_path = find_existing_quiz_path(output_path, target_date, quiz_type, edition)
+            if existing_path is not None:
+                print(f"Quiz already exists for {quiz_type} edition {edition}: {existing_path}")
+                continue
+            pending.append((quiz_type, edition, output_path))
+
+    return pending
 
 
 def main() -> int:
     args = parse_args()
     target_date = parse_target_date(args.date)
     quiz_types = parse_quiz_types(args.quiz_types)
+    generation_mode = parse_generation_mode(args.mode)
+    generation_count = parse_generation_count(args.count)
     ai_settings = load_ai_settings(output_dir=args.output_dir)
     ai_orchestrator = AIOrchestrator(settings=ai_settings, target_date=target_date)
 
-    pending: list[tuple[str, Path]] = []
-    quiz_paths: dict[str, Path] = {}
-    for quiz_type in quiz_types:
-        output_path = build_output_path(args.output_dir, target_date, quiz_type)
-        existing_path = find_existing_quiz_path(output_path, target_date, quiz_type)
-        if existing_path is not None:
-            print(f"Quiz already exists for {quiz_type}: {existing_path}")
-            quiz_paths[quiz_type] = existing_path
-            continue
-        pending.append((quiz_type, output_path))
-        quiz_paths[quiz_type] = output_path
+    pending = _build_generation_plan(
+        output_dir=args.output_dir,
+        target_date=target_date,
+        quiz_types=quiz_types,
+        mode=generation_mode,
+        count=generation_count,
+    )
 
-    generated: list[tuple[str, Path, dict[str, Any]]] = []
+    generated: list[tuple[str, int, Path, dict[str, Any]]] = []
     if pending:
         retrieval_time = dt.datetime.now(dt.timezone.utc)
         source_url = build_api_url(target_date)
@@ -44,9 +99,9 @@ def main() -> int:
         candidates = extract_candidates(source_payload)
         reusable_correct_events: list[dict[str, Any]] = []
 
-        for quiz_type, output_path in pending:
+        for quiz_type, edition, output_path in pending:
             builder = QUIZ_BUILDERS[quiz_type]
-            seed = build_seed(target_date, quiz_type)
+            seed = build_seed(target_date, quiz_type, edition)
             ai_ranked_distractor_ids: list[str] | None = None
             if quiz_type == QUIZ_TYPE_HISTORY_MCQ_4 and ai_orchestrator.is_enabled():
                 correct_event, distractor_pool = pick_history_mcq_distractor_pool(
@@ -81,11 +136,13 @@ def main() -> int:
                 source_url,
                 candidates,
                 seed,
+                edition,
+                generation_mode,
                 preferred_distractor_events=reusable_correct_events,
                 ai_ranked_distractor_ids=ai_ranked_distractor_ids,
             )
             validate_quiz(quiz, target_date)
-            generated.append((quiz_type, output_path, quiz))
+            generated.append((quiz_type, edition, output_path, quiz))
 
             questions = quiz.get("questions")
             answer_facts = quiz.get("answer_facts")
@@ -131,9 +188,9 @@ def main() -> int:
                     }
                 )
 
-    for quiz_type, output_path, quiz in generated:
+    for quiz_type, edition, output_path, quiz in generated:
         write_quiz_file(output_path, quiz)
-        print(f"Created quiz file for {quiz_type}: {output_path}")
+        print(f"Created quiz file for {quiz_type} edition {edition}: {output_path}")
 
     ai_orchestrator.finalize()
     ai_orchestrator.write_report()
@@ -143,8 +200,6 @@ def main() -> int:
     discovery_changes = write_discovery_artifacts(
         output_dir=args.output_dir,
         target_date=target_date,
-        quiz_types=quiz_types,
-        quiz_paths=quiz_paths,
         generated_now=bool(generated),
     )
     for discovery_path in discovery_changes:

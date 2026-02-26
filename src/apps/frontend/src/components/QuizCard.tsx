@@ -2,8 +2,10 @@ import type { QuizPayload, QuizType } from "../lib/types";
 
 interface QuizCardProps {
   quiz: QuizPayload;
+  quizKey: string;
+  edition: number;
   selectedChoiceId: string | undefined;
-  onSelectChoice: (quizType: QuizType, choiceId: string) => void;
+  onSelectChoice: (quizKey: string, choiceId: string) => void;
 }
 
 function answerTone(isCorrect: boolean): "correct" | "wrong" {
@@ -20,7 +22,7 @@ function formatQuizType(type: QuizType): string {
   return type;
 }
 
-export default function QuizCard({ quiz, selectedChoiceId, onSelectChoice }: QuizCardProps) {
+export default function QuizCard({ quiz, quizKey, edition, selectedChoiceId, onSelectChoice }: QuizCardProps) {
   const hasAnswered = Boolean(selectedChoiceId);
   const correctChoice = quiz.choices.find((choice) => choice.id === quiz.correct_choice_id);
   const isCorrect = selectedChoiceId === quiz.correct_choice_id;
@@ -29,6 +31,7 @@ export default function QuizCard({ quiz, selectedChoiceId, onSelectChoice }: Qui
     <article className="quiz-card">
       <header className="quiz-header">
         <p className="quiz-type">{formatQuizType(quiz.type)}</p>
+        <p className="quiz-type">Edition {edition}</p>
         <h2>{quiz.question}</h2>
       </header>
 
@@ -56,7 +59,7 @@ export default function QuizCard({ quiz, selectedChoiceId, onSelectChoice }: Qui
               type="button"
               className={classes.join(" ")}
               disabled={hasAnswered}
-              onClick={() => onSelectChoice(quiz.type, choice.id)}
+              onClick={() => onSelectChoice(quizKey, choice.id)}
             >
               <span className="choice-id">{choice.id}</span>
               <span className="choice-label">{choice.label}</span>

@@ -73,6 +73,19 @@ function validateCommonQuizShape(quiz: unknown): asserts quiz is QuizPayload {
   const metadata = quizValue.metadata as Record<string, unknown>;
   assert(metadata.version === 1 || metadata.version === 2, "quiz.metadata.version must be 1 or 2");
 
+  const generation = quizValue.generation;
+  if (generation !== undefined) {
+    assert(generation && typeof generation === "object", "quiz.generation must be an object when present");
+    const generationValue = generation as Record<string, unknown>;
+    assert(isNonEmptyString(generationValue.mode), "quiz.generation.mode must be a non-empty string");
+    assert(Number.isInteger(generationValue.edition), "quiz.generation.edition must be an integer");
+    assert((generationValue.edition as number) >= 1, "quiz.generation.edition must be >= 1");
+    assert(
+      isNonEmptyString(generationValue.generated_at),
+      "quiz.generation.generated_at must be a non-empty string"
+    );
+  }
+
   if (metadata.version === 2) {
     assert(
       isNonEmptyString(metadata.normalized_model),
@@ -212,7 +225,21 @@ export function validateLatestPayload(payload: unknown): LatestPayload {
 
   assert(latest.metadata && typeof latest.metadata === "object", "latest.metadata must be an object");
   const metadata = latest.metadata as Record<string, unknown>;
-  assert(metadata.version === 1, "latest.metadata.version must be 1");
+  assert(metadata.version === 1 || metadata.version === 2, "latest.metadata.version must be 1 or 2");
+
+  if (latest.latest_quiz_by_type !== undefined) {
+    assert(
+      latest.latest_quiz_by_type && typeof latest.latest_quiz_by_type === "object",
+      "latest.latest_quiz_by_type must be an object when present"
+    );
+    Object.entries(latest.latest_quiz_by_type as Record<string, unknown>).forEach(([quizType, quizPath]) => {
+      assert(isQuizType(quizType), `latest.latest_quiz_by_type key '${quizType}' must be a known quiz type`);
+      assert(
+        isNonEmptyString(quizPath),
+        `latest.latest_quiz_by_type['${quizType}'] must be a non-empty string`
+      );
+    });
+  }
 
   return latest as unknown as LatestPayload;
 }
@@ -238,14 +265,60 @@ export function validateIndexPayload(payload: unknown): IndexPayload {
   });
 
   const fileKeys = entries.map(([quizType]) => quizType);
-  assert(
-    JSON.stringify(fileKeys) === JSON.stringify(index.available_types),
-    "index.available_types must match index.quiz_files keys order"
-  );
 
   assert(index.metadata && typeof index.metadata === "object", "index.metadata must be an object");
   const metadata = index.metadata as Record<string, unknown>;
-  assert(metadata.version === 1, "index.metadata.version must be 1");
+  assert(metadata.version === 1 || metadata.version === 2, "index.metadata.version must be 1 or 2");
+
+  if (index.quizzes_by_type !== undefined) {
+    assert(index.quizzes_by_type && typeof index.quizzes_by_type === "object", "index.quizzes_by_type must be an object");
+    const typeEntries = Object.entries(index.quizzes_by_type as Record<string, unknown>);
+    assert(typeEntries.length > 0, "index.quizzes_by_type must not be empty");
+
+    typeEntries.forEach(([quizType, editions]) => {
+      assert(isQuizType(quizType), `index.quizzes_by_type key '${quizType}' must be a known quiz type`);
+      assert(Array.isArray(editions), `index.quizzes_by_type['${quizType}'] must be an array`);
+      assert(editions.length > 0, `index.quizzes_by_type['${quizType}'] must not be empty`);
+      let previousEdition = 0;
+      editions.forEach((entry, idx) => {
+        assert(entry && typeof entry === "object", `index.quizzes_by_type['${quizType}'][${idx}] must be an object`);
+        const entryValue = entry as Record<string, unknown>;
+        assert(
+          Number.isInteger(entryValue.edition) && (entryValue.edition as number) >= 1,
+          `index.quizzes_by_type['${quizType}'][${idx}].edition must be an integer >= 1`
+        );
+        const edition = entryValue.edition as number;
+        assert(
+          edition > previousEdition,
+          `index.quizzes_by_type['${quizType}'][${idx}].edition must be strictly ascending`
+        );
+        previousEdition = edition;
+        assert(
+          isNonEmptyString(entryValue.mode),
+          `index.quizzes_by_type['${quizType}'][${idx}].mode must be a non-empty string`
+        );
+        assert(
+          isNonEmptyString(entryValue.quiz_file),
+          `index.quizzes_by_type['${quizType}'][${idx}].quiz_file must be a non-empty string`
+        );
+        assert(
+          isNonEmptyString(entryValue.generated_at),
+          `index.quizzes_by_type['${quizType}'][${idx}].generated_at must be a non-empty string`
+        );
+      });
+    });
+
+    const typeKeys = typeEntries.map(([quizType]) => quizType);
+    assert(
+      JSON.stringify(typeKeys) === JSON.stringify(index.available_types),
+      "index.available_types must match index.quizzes_by_type keys order"
+    );
+  } else {
+    assert(
+      JSON.stringify(fileKeys) === JSON.stringify(index.available_types),
+      "index.available_types must match index.quiz_files keys order"
+    );
+  }
 
   return index as unknown as IndexPayload;
 }

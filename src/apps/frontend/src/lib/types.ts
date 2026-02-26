@@ -1,11 +1,19 @@
 export type QuizType = "which_came_first" | "history_mcq_4";
 
+export interface IndexQuizEdition {
+  edition: number;
+  mode: "daily" | "extra" | string;
+  quiz_file: string;
+  generated_at: string;
+}
+
 export interface LatestPayload {
   date: string;
   index_file: string;
   available_types: QuizType[];
+  latest_quiz_by_type?: Record<QuizType, string> | Record<string, string>;
   metadata: {
-    version: 1;
+    version: 1 | 2;
     updated_at: string;
   };
 }
@@ -13,9 +21,10 @@ export interface LatestPayload {
 export interface IndexPayload {
   date: string;
   quiz_files: Record<QuizType, string> | Record<string, string>;
+  quizzes_by_type?: Record<QuizType, IndexQuizEdition[]> | Record<string, IndexQuizEdition[]>;
   available_types: QuizType[];
   metadata: {
-    version: 1;
+    version: 1 | 2;
     generated_at: string;
   };
 }
@@ -44,6 +53,11 @@ interface QuizBase {
   metadata: {
     version: 1 | 2;
     normalized_model?: string;
+  };
+  generation?: {
+    mode: "daily" | "extra" | string;
+    edition: number;
+    generated_at: string;
   };
   questions?: QuizQuestionModel[];
   answer_facts?: QuizAnswerFact[];
@@ -96,10 +110,18 @@ export interface HistoryMcqQuiz extends QuizBase {
 
 export type QuizPayload = WhichCameFirstQuiz | HistoryMcqQuiz;
 
+export interface LoadedQuiz {
+  key: string;
+  type: QuizType;
+  edition: number;
+  sourcePath: string;
+  payload: QuizPayload;
+}
+
 export interface DailyQuizLoadResult {
   date: string;
   latestDate: string;
   availableTypes: QuizType[];
-  quizzes: QuizPayload[];
+  quizzes: LoadedQuiz[];
   errorsByType: Map<string, string>;
 }
