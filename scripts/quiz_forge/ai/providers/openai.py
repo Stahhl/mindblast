@@ -13,6 +13,29 @@ from ..types import AIRerankResponse, AISettings, AIUsage
 class OpenAIProvider:
     endpoint = "https://api.openai.com/v1/chat/completions"
 
+    @staticmethod
+    def _extract_ranked_ids(ranked_json: dict[str, Any]) -> list[str]:
+        primary = ranked_json.get("ranked_distractor_ids")
+        if isinstance(primary, list):
+            return [str(item) for item in primary]
+
+        alternative_keys = (
+            "selected_distractor_ids",
+            "selected",
+            "distractors",
+            "ranked_ids",
+        )
+        for key in alternative_keys:
+            value = ranked_json.get(key)
+            if isinstance(value, list):
+                return [str(item) for item in value]
+
+        for value in ranked_json.values():
+            if isinstance(value, list) and all(isinstance(item, str) for item in value):
+                return list(value)
+
+        return []
+
     def rerank_distractors(self, payload: dict[str, Any], settings: AISettings) -> AIRerankResponse:
         api_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not api_key:
@@ -35,14 +58,18 @@ class OpenAIProvider:
 
         body = {
             "model": settings.model,
-            "temperature": 0,
-            "max_tokens": settings.max_output_tokens,
             "response_format": {"type": "json_object"},
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": json.dumps(user_payload, ensure_ascii=True)},
             ],
         }
+        if settings.model.startswith("gpt-5"):
+            body["max_completion_tokens"] = settings.max_output_tokens
+            body["reasoning_effort"] = "minimal"
+        else:
+            body["temperature"] = 0
+            body["max_tokens"] = settings.max_output_tokens
 
         request_body = json.dumps(body).encode("utf-8")
         req = request.Request(
@@ -77,12 +104,12 @@ class OpenAIProvider:
         except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:
             raise RuntimeError(f"Could not parse OpenAI rerank response: {exc}") from exc
 
-        ranked_ids = ranked_json.get("ranked_distractor_ids")
+        ranked_ids = self._extract_ranked_ids(ranked_json)
         reason_codes = ranked_json.get("reason_codes", [])
         usage = payload_json.get("usage", {})
 
         return AIRerankResponse(
-            ranked_distractor_ids=list(ranked_ids) if isinstance(ranked_ids, list) else [],
+            ranked_distractor_ids=ranked_ids,
             reason_codes=[str(item) for item in reason_codes] if isinstance(reason_codes, list) else [],
             provider="openai",
             model=settings.model,

@@ -99,3 +99,27 @@ def test_orchestrator_records_usage_and_applies_valid_response(tmp_path, mocker)
     report = json.loads(Path(settings.report_path).read_text(encoding="utf-8"))
     assert report["calls_total"] == 1
     assert report["fallback_count"] == 0
+
+
+def test_orchestrator_provider_error_includes_actionable_label(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+    correct, candidates = _sample_correct_and_candidates()
+
+    mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.rerank_distractors",
+        side_effect=RuntimeError("OpenAI request failed with HTTP 401: unauthorized"),
+    )
+
+    attempt = orchestrator.rerank_history_mcq(
+        question_prompt="Which event happened in 1901?",
+        correct_event=correct,
+        distractor_candidates=candidates,
+    )
+    orchestrator.write_report()
+
+    assert attempt.applied is False
+    assert attempt.fallback_reason == "provider_error:RuntimeError:http_401"
+
+    report = json.loads(Path(settings.report_path).read_text(encoding="utf-8"))
+    assert "provider_error:RuntimeError:http_401:1" in report["fallback_reasons"]

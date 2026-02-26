@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
+import os
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +20,39 @@ def _estimate_cost_usd(*, input_tokens: int, output_tokens: int, settings: AISet
     input_cost = (input_tokens / 1_000_000) * settings.input_price_per_million_usd
     output_cost = (output_tokens / 1_000_000) * settings.output_price_per_million_usd
     return input_cost + output_cost
+
+
+def _normalize_error_text(message: str) -> str:
+    normalized = " ".join(message.split())
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if api_key:
+        normalized = normalized.replace(api_key, "[REDACTED]")
+    normalized = re.sub(r"Bearer\s+[A-Za-z0-9._-]+", "Bearer [REDACTED]", normalized, flags=re.IGNORECASE)
+    return normalized
+
+
+def _provider_error_label(exc: Exception) -> str:
+    message = _normalize_error_text(str(exc))
+    lowered = message.lower()
+
+    http_match = re.search(r"http\s+(\d{3})", message, flags=re.IGNORECASE)
+    if http_match is not None:
+        return f"http_{http_match.group(1)}"
+    if "timed out" in lowered or "timeout" in lowered:
+        return "timeout"
+    if "connection refused" in lowered:
+        return "connection_refused"
+    if "name or service not known" in lowered or "temporary failure in name resolution" in lowered:
+        return "dns_error"
+    if "openai_api_key is required" in lowered:
+        return "missing_api_key"
+    if "could not parse openai rerank response" in lowered:
+        return "parse_error"
+
+    compact = re.sub(r"[^a-z0-9]+", "_", lowered).strip("_")
+    if not compact:
+        return "unknown"
+    return compact[:64]
 
 
 class AIOrchestrator:
@@ -93,7 +128,8 @@ class AIOrchestrator:
         try:
             response = self.provider.rerank_distractors(payload, self.settings)
         except Exception as exc:  # noqa: BLE001 - keep fallback behavior resilient
-            return self._fallback(f"provider_error:{type(exc).__name__}")
+            reason = f"provider_error:{type(exc).__name__}:{_provider_error_label(exc)}"
+            return self._fallback(reason)
 
         # Record usage even if response is later rejected.
         usage = AIUsage(
