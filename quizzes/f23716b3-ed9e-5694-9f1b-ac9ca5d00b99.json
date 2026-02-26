@@ -1,0 +1,210 @@
+{
+  "date": "2026-02-26",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "fda6071a-ecce-5842-89c0-372535ac4d56",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1936?",
+      "answer_fact_ids": [
+        "7bfbee3c-3044-52f8-bf11-e598de5c9841",
+        "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+        "5ed74817-f18d-553d-9270-688fdf1eaa83",
+        "2311e83d-2929-524c-ab80-d8ccefcc3be8"
+      ],
+      "correct_answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1936
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "7bfbee3c-3044-52f8-bf11-e598de5c9841",
+      "label": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
+      "year": 1914,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1910s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1910s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1914,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1910s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+      "label": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
+      "year": 1936,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1930s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1930s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1936,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1930s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "5ed74817-f18d-553d-9270-688fdf1eaa83",
+      "label": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
+      "year": 1870,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1870s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1870s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1870,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1870s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "2311e83d-2929-524c-ab80-d8ccefcc3be8",
+      "label": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
+      "year": 1876,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1870s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1870s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1876,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1870s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened in 1936?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
+      "answer_fact_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841"
+    },
+    {
+      "id": "B",
+      "label": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
+      "answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c"
+    },
+    {
+      "id": "C",
+      "label": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
+      "answer_fact_id": "5ed74817-f18d-553d-9270-688fdf1eaa83"
+    },
+    {
+      "id": "D",
+      "label": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
+      "answer_fact_id": "2311e83d-2929-524c-ab80-d8ccefcc3be8"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/26",
+    "retrieved_at": "2026-02-26T06:17:05Z",
+    "events_used": [
+      {
+        "event_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841",
+        "text": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
+        "year": 1914,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/HMHS_Britannic"
+      },
+      {
+        "event_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+        "text": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
+        "year": 1936,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/February_26_incident"
+      },
+      {
+        "event_id": "5ed74817-f18d-553d-9270-688fdf1eaa83",
+        "text": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
+        "year": 1870,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Beach_Pneumatic_Transit"
+      },
+      {
+        "event_id": "2311e83d-2929-524c-ab80-d8ccefcc3be8",
+        "text": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
+        "year": 1876,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Empire_of_Japan"
+      }
+    ]
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
