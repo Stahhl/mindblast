@@ -1,0 +1,60 @@
+{
+  "provider": "openai",
+  "api": "chat_completions",
+  "scope": "quiz_forge_rerank_distractors",
+  "last_reviewed_utc": "2026-02-26",
+  "source_urls": [
+    "https://platform.openai.com/docs/api-reference/chat/create-chat-completion",
+    "https://platform.openai.com/docs/api-reference/chat/create#chat-createtemperature",
+    "https://platform.openai.com/docs/guides/reasoning"
+  ],
+  "request_profiles": {
+    "gpt5_family": {
+      "model_prefixes": [
+        "gpt-5"
+      ],
+      "required_params": [
+        "model",
+        "messages",
+        "response_format",
+        "max_completion_tokens",
+        "reasoning_effort"
+      ],
+      "forbidden_params": [
+        "max_tokens",
+        "temperature"
+      ],
+      "fixed_values": {
+        "response_format.type": "json_object",
+        "reasoning_effort": "minimal"
+      }
+    },
+    "non_gpt5_family": {
+      "required_params": [
+        "model",
+        "messages",
+        "response_format",
+        "max_tokens",
+        "temperature"
+      ],
+      "forbidden_params": [
+        "max_completion_tokens",
+        "reasoning_effort"
+      ],
+      "fixed_values": {
+        "response_format.type": "json_object",
+        "temperature": 0
+      }
+    }
+  },
+  "response_contract": {
+    "primary_ranked_ids_key": "ranked_distractor_ids",
+    "accepted_ranked_ids_keys": [
+      "ranked_distractor_ids",
+      "selected_distractor_ids",
+      "selected",
+      "distractors",
+      "ranked_ids"
+    ]
+  }
+}

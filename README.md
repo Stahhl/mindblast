@@ -52,6 +52,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── HOSTING_ROLLOUT.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
+│   ├── api_contracts/
 │   └── DOMAIN_PREPURCHASE_CHECKLIST.md
 ├── scripts/
 │   ├── generate_quiz.py
@@ -69,6 +70,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
 - Terraform IaC setup: `infra/terraform/README.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
+- Provider API contract snapshots: `docs/api_contracts/`
 - Future roadmap ideas: `docs/FUTURE_FEATURES.md`
 - Domain/brand pre-purchase checks: `docs/DOMAIN_PREPURCHASE_CHECKLIST.md`
 

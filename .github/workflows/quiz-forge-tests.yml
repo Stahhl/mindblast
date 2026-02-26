@@ -5,6 +5,7 @@ on:
     paths:
       - "scripts/quiz_forge/**"
       - "tests/quiz_forge/**"
+      - "docs/api_contracts/**"
       - "pyproject.toml"
       - "uv.lock"
   push:
@@ -13,6 +14,7 @@ on:
     paths:
       - "scripts/quiz_forge/**"
       - "tests/quiz_forge/**"
+      - "docs/api_contracts/**"
       - "pyproject.toml"
       - "uv.lock"
   workflow_dispatch:

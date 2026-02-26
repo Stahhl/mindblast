@@ -8,33 +8,15 @@ from typing import Any
 from urllib import error, request
 
 from ..types import AIRerankResponse, AISettings, AIUsage
+from .openai_contract import (
+    OPENAI_CHAT_COMPLETIONS_ENDPOINT,
+    build_chat_request_body,
+    extract_ranked_ids,
+)
 
 
 class OpenAIProvider:
-    endpoint = "https://api.openai.com/v1/chat/completions"
-
-    @staticmethod
-    def _extract_ranked_ids(ranked_json: dict[str, Any]) -> list[str]:
-        primary = ranked_json.get("ranked_distractor_ids")
-        if isinstance(primary, list):
-            return [str(item) for item in primary]
-
-        alternative_keys = (
-            "selected_distractor_ids",
-            "selected",
-            "distractors",
-            "ranked_ids",
-        )
-        for key in alternative_keys:
-            value = ranked_json.get(key)
-            if isinstance(value, list):
-                return [str(item) for item in value]
-
-        for value in ranked_json.values():
-            if isinstance(value, list) and all(isinstance(item, str) for item in value):
-                return list(value)
-
-        return []
+    endpoint = OPENAI_CHAT_COMPLETIONS_ENDPOINT
 
     def rerank_distractors(self, payload: dict[str, Any], settings: AISettings) -> AIRerankResponse:
         api_key = os.getenv("OPENAI_API_KEY", "").strip()
@@ -56,20 +38,12 @@ class OpenAIProvider:
             "constraints": payload.get("constraints"),
         }
 
-        body = {
-            "model": settings.model,
-            "response_format": {"type": "json_object"},
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": json.dumps(user_payload, ensure_ascii=True)},
-            ],
-        }
-        if settings.model.startswith("gpt-5"):
-            body["max_completion_tokens"] = settings.max_output_tokens
-            body["reasoning_effort"] = "minimal"
-        else:
-            body["temperature"] = 0
-            body["max_tokens"] = settings.max_output_tokens
+        body = build_chat_request_body(
+            model=settings.model,
+            max_output_tokens=settings.max_output_tokens,
+            system_prompt=system_prompt,
+            user_payload=user_payload,
+        )
 
         request_body = json.dumps(body).encode("utf-8")
         req = request.Request(
@@ -104,7 +78,7 @@ class OpenAIProvider:
         except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:
             raise RuntimeError(f"Could not parse OpenAI rerank response: {exc}") from exc
 
-        ranked_ids = self._extract_ranked_ids(ranked_json)
+        ranked_ids = extract_ranked_ids(ranked_json)
         reason_codes = ranked_json.get("reason_codes", [])
         usage = payload_json.get("usage", {})
 

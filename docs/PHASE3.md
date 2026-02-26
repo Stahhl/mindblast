@@ -121,6 +121,7 @@ Provider selection/config contract:
 - `AI_TIMEOUT_MS`
 - external provider credentials via environment secret(s)
 - local provider endpoint/model via environment config
+- provider schema snapshots under `docs/api_contracts/` (review-date stamped)
 
 ## Provider Architecture Contract
 Define task/provider interfaces under `scripts/quiz_forge/ai/`:
@@ -136,6 +137,12 @@ Provider response contract (minimum):
 - model/provider identifier,
 - token usage/cost fields when available,
 - timestamp for audit logging.
+
+Schema guardrail:
+- OpenAI-specific request/response assumptions must be encoded in:
+  - `scripts/quiz_forge/ai/providers/openai_contract.py`
+  - `docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
+  - CI-backed tests in `tests/quiz_forge/`
 
 ## Budget and Safety Controls
 Environment-controlled hard limits:

@@ -95,6 +95,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - Network timeouts and small retry policy for source fetch.
 - Atomic write pattern (write temp file then move).
 - No partial commits on failure.
+- Provider API schema assumptions must be centralized and tested (see `docs/api_contracts/` + `tests/quiz_forge/`).
 
 ### Security Guardrails
 - Minimal GitHub permissions in workflow:
