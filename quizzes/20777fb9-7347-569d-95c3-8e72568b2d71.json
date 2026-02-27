@@ -1,0 +1,215 @@
+{
+  "date": "2026-02-27",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "5efd7d32-a6cb-54e8-aa03-1eef60fbbdc1",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1943?",
+      "answer_fact_ids": [
+        "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5",
+        "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+        "2ff7e684-3666-59c8-bf98-bcab240d582f",
+        "2d84eacf-4b11-54b4-a5f7-98a472dcaad2"
+      ],
+      "correct_answer_fact_id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1943
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5",
+      "label": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
+      "year": 1943,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1940s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1940s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1943,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1940s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+      "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+      "year": 907,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "10th-century",
+        "900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "10th-century",
+        "temporal_decade": "900s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 907,
+          "temporal_century": "10th-century",
+          "temporal_decade": "900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "2ff7e684-3666-59c8-bf98-bcab240d582f",
+      "label": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
+      "year": 1942,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1940s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1940s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1942,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1940s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2",
+      "label": "Martin Kamen and Sam Ruben discover carbon-14.",
+      "year": 1940,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1940s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1940s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1940,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1940s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Martin Kamen and Sam Ruben discover carbon-14.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened in 1943?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
+      "answer_fact_id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5"
+    },
+    {
+      "id": "B",
+      "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada"
+    },
+    {
+      "id": "C",
+      "label": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
+      "answer_fact_id": "2ff7e684-3666-59c8-bf98-bcab240d582f"
+    },
+    {
+      "id": "D",
+      "label": "Martin Kamen and Sam Ruben discover carbon-14.",
+      "answer_fact_id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/27",
+    "retrieved_at": "2026-02-27T06:13:20Z",
+    "events_used": [
+      {
+        "event_id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5",
+        "text": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
+        "year": 1943,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/The_Holocaust"
+      },
+      {
+        "event_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+        "text": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+        "year": 907,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Abaoji"
+      },
+      {
+        "event_id": "2ff7e684-3666-59c8-bf98-bcab240d582f",
+        "text": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
+        "year": 1942,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/World_War_II"
+      },
+      {
+        "event_id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2",
+        "text": "Martin Kamen and Sam Ruben discover carbon-14.",
+        "year": 1940,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Martin_Kamen"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-02-27T06:13:20Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

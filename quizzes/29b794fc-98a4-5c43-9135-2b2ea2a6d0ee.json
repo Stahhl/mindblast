@@ -1,0 +1,134 @@
+{
+  "date": "2026-02-27",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "bf6aa707-a686-5a84-adf1-b45a6a46bf82",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+        "114979c5-f478-59b8-ad59-5b5b07afa107"
+      ],
+      "correct_answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+      "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+      "year": 907,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "10th-century",
+        "900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "10th-century",
+        "temporal_decade": "900s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 907,
+          "temporal_century": "10th-century",
+          "temporal_decade": "900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "114979c5-f478-59b8-ad59-5b5b07afa107",
+      "label": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
+      "year": 1988,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "20th-century",
+        "1980s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1980s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1988,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1980s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+      "year": 907,
+      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada"
+    },
+    {
+      "id": "B",
+      "label": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
+      "year": 1988,
+      "answer_fact_id": "114979c5-f478-59b8-ad59-5b5b07afa107"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/27",
+    "retrieved_at": "2026-02-27T06:13:20Z",
+    "events_used": [
+      {
+        "event_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+        "text": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+        "year": 907,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Abaoji"
+      },
+      {
+        "event_id": "114979c5-f478-59b8-ad59-5b5b07afa107",
+        "text": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
+        "year": 1988,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Sumgait_pogrom"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-02-27T06:13:20Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

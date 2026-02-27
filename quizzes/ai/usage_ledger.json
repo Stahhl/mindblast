@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "version": 1,
+    "updated_at": "2026-02-27T06:13:24Z"
+  },
+  "daily": {
+    "2026-02-27": {
+      "calls": 1,
+      "input_tokens": 1392,
+      "output_tokens": 89,
+      "spend_usd": 0.000526
+    }
+  },
+  "monthly": {
+    "2026-02": {
+      "calls": 1,
+      "input_tokens": 1392,
+      "output_tokens": 89,
+      "spend_usd": 0.000526
+    }
+  }
+}
