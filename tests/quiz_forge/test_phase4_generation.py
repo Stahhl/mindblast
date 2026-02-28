@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from quiz_forge.ai.types import AIJsonTaskResponse, AIUsage
 from quiz_forge.discovery import write_discovery_artifacts
 from quiz_forge.storage import (
     build_output_path,
@@ -217,3 +218,74 @@ def test_cli_generates_history_factoid_mcq(monkeypatch, tmp_path) -> None:
     assert facets["question_format"] == "factoid"
     assert facets["answer_kind"] == "time"
     assert facets["prompt_style"] == "when"
+
+
+def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, mocker) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setenv("AI_MODE", "on")
+    monkeypatch.setenv("AI_PROVIDER", "openai")
+    monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
+    monkeypatch.setenv("AI_MAX_CALLS_PER_RUN", "8")
+    monkeypatch.setenv("FACTOID_AI_PIPELINE_ENABLED", "true")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    def fake_run_json_task(*args, **kwargs) -> AIJsonTaskResponse:  # noqa: ANN002,ANN003
+        del args
+        user_payload = kwargs["user_payload"]
+        task = user_payload.get("task")
+        if task == "factoid_question_generation":
+            payload = {"candidates": [{"question": "When was this event officially recognized?", "score": 0.95}]}
+        elif task == "factoid_question_rank":
+            payload = {"best_index": 0, "best_score": 0.95}
+        elif task == "factoid_distractor_label_generation":
+            choices = user_payload.get("choices", [])
+            labels_by_id = {
+                choice["id"]: ("1901" if choice.get("is_correct") else f"Distractor {idx + 1}")
+                for idx, choice in enumerate(choices)
+                if isinstance(choice, dict) and isinstance(choice.get("id"), str)
+            }
+            payload = {"choice_labels_by_id": labels_by_id}
+        elif task == "factoid_final_judge":
+            payload = {"final_score": 0.99, "publishable": True}
+        else:
+            raise AssertionError(f"Unexpected task: {task}")
+
+        return AIJsonTaskResponse(
+            payload=payload,
+            provider="openai",
+            model="gpt-5-mini",
+            usage=AIUsage(input_tokens=20, output_tokens=10, estimated_cost_usd=0.0),
+        )
+
+    run_json_mock = mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=fake_run_json_task,
+    )
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+    assert run_json_mock.call_count == 4
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    payload = records[0].payload
+    assert payload["question"] == "When was this event officially recognized?"
+    assert payload["metadata"]["generation_method"] == "ai_native_factoid_v1"

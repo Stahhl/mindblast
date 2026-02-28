@@ -175,10 +175,11 @@ Required fields:
 - Verification stages should remain deterministic-first.
 
 Provider-agnostic configuration:
-- `AI_MODEL_QA_GEN`
-- `AI_MODEL_DISTRACTOR_GEN`
-- `AI_MODEL_RANKER`
-- `AI_MODEL_JUDGE`
+- `FACTOID_AI_MODEL_QA_GEN`
+- `FACTOID_AI_MODEL_DISTRACTOR_GEN`
+- `FACTOID_AI_MODEL_RANKER`
+- `FACTOID_AI_MODEL_JUDGE`
+- `FACTOID_AI_PIPELINE_ENABLED` (feature flag, default `false`)
 
 ## Budget Guardrails
 - Keep existing hard caps:

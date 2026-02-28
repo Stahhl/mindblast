@@ -46,7 +46,7 @@ def _provider_error_label(exc: Exception) -> str:
         return "dns_error"
     if "openai_api_key is required" in lowered:
         return "missing_api_key"
-    if "could not parse openai rerank response" in lowered:
+    if "could not parse openai rerank response" in lowered or "could not parse openai response content" in lowered:
         return "parse_error"
 
     compact = re.sub(r"[^a-z0-9]+", "_", lowered).strip("_")
@@ -87,6 +87,16 @@ class AIOrchestrator:
             applied=False,
             fallback_reason=reason,
         )
+
+    def _json_fallback(self, reason: str) -> tuple[None, str]:
+        self.stats.add_fallback(reason)
+        return None, reason
+
+    @staticmethod
+    def _task_reason(task_name: str, reason: str) -> str:
+        if not task_name:
+            return reason
+        return f"{task_name}:{reason}"
 
     def rerank_history_mcq(
         self,
@@ -186,6 +196,87 @@ class AIOrchestrator:
             fallback_reason=None,
             response=response,
         )
+
+    def run_json_task(
+        self,
+        *,
+        task_name: str,
+        system_prompt: str,
+        user_payload: dict[str, Any],
+        model: str | None = None,
+        max_output_tokens: int | None = None,
+    ) -> tuple[dict[str, Any] | None, str | None]:
+        if self.settings.mode == AI_MODE_OFF:
+            return self._json_fallback(self._task_reason(task_name, "ai_mode_off"))
+
+        if self.settings.provider == AI_PROVIDER_NOOP:
+            return self._json_fallback(self._task_reason(task_name, "provider_noop"))
+
+        if self.stats.calls_total >= self.settings.max_calls_per_run:
+            return self._json_fallback(self._task_reason(task_name, "run_call_limit_reached"))
+
+        if self.stats.day_spend_usd >= self.settings.max_daily_usd:
+            return self._json_fallback(self._task_reason(task_name, "daily_budget_reached"))
+        if self.stats.month_spend_usd >= self.settings.max_monthly_usd:
+            return self._json_fallback(self._task_reason(task_name, "monthly_budget_reached"))
+
+        effective_model = (model or self.settings.model).strip() or self.settings.model
+        requested_max_output = max_output_tokens if max_output_tokens is not None else self.settings.max_output_tokens
+        if requested_max_output <= 0:
+            return self._json_fallback(self._task_reason(task_name, "output_token_limit_precheck"))
+        effective_max_output = min(requested_max_output, self.settings.max_output_tokens)
+
+        estimated_input_tokens = estimate_input_tokens(
+            {
+                "system_prompt": system_prompt,
+                "user_payload": user_payload,
+            }
+        )
+        if estimated_input_tokens > self.settings.max_input_tokens:
+            return self._json_fallback(self._task_reason(task_name, "input_token_limit_precheck"))
+
+        self.stats.calls_total += 1
+        try:
+            response = self.provider.run_json_task(
+                system_prompt=system_prompt,
+                user_payload=user_payload,
+                settings=self.settings,
+                model=effective_model,
+                max_output_tokens=effective_max_output,
+            )
+        except Exception as exc:  # noqa: BLE001 - keep fallback behavior resilient
+            reason = self._task_reason(task_name, f"provider_error:{type(exc).__name__}:{_provider_error_label(exc)}")
+            return self._json_fallback(reason)
+
+        usage = AIUsage(
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            estimated_cost_usd=_estimate_cost_usd(
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                settings=self.settings,
+            ),
+        )
+        response.usage = usage
+
+        self.stats.add_usage(usage)
+        record_usage(self.ledger, self.target_date, usage)
+        self.ledger_dirty = True
+        self.stats.day_spend_usd, self.stats.month_spend_usd = get_spend_totals(self.ledger, self.target_date)
+
+        if response.usage.input_tokens > self.settings.max_input_tokens:
+            return self._json_fallback(self._task_reason(task_name, "input_token_limit_exceeded"))
+        if response.usage.output_tokens > effective_max_output:
+            return self._json_fallback(self._task_reason(task_name, "output_token_limit_exceeded"))
+        if self.stats.day_spend_usd > self.settings.max_daily_usd:
+            return self._json_fallback(self._task_reason(task_name, "daily_budget_exceeded_after_call"))
+        if self.stats.month_spend_usd > self.settings.max_monthly_usd:
+            return self._json_fallback(self._task_reason(task_name, "monthly_budget_exceeded_after_call"))
+
+        if not isinstance(response.payload, dict):
+            return self._json_fallback(self._task_reason(task_name, "provider_response_invalid"))
+
+        return response.payload, None
 
     def finalize(self) -> None:
         if not self.ledger_dirty:

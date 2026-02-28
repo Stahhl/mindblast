@@ -11,8 +11,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - one scheduled GitHub Actions run per day
 - default daily generation: one history quiz per enabled type per UTC day (`edition = 1`)
 - optional manual extra generation: additional same-day editions (`edition > 1`)
-- default enabled types: `which_came_first`, `history_mcq_4`
-- supported additional type: `history_factoid_mcq_4` (Phase 5, manual rollout first)
+- default enabled types: `which_came_first`, `history_mcq_4`, `history_factoid_mcq_4`
+- `history_factoid_mcq_4` AI-native rewrite path is behind `FACTOID_AI_PIPELINE_ENABLED` (disabled by default)
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields
 - discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
 - output committed as JSON to this repository
@@ -115,7 +115,7 @@ pnpm dev
 ```zsh
 cd /Users/stahl/dev/mindblast
 uv sync --locked --no-dev --python 3.12
-uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4"
+uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4,history_factoid_mcq_4"
 ```
 
 ## Python Tests (uv)

@@ -295,8 +295,8 @@ def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dic
     question = quiz.get("question")
     if not isinstance(question, str) or not question.strip().endswith("?"):
         raise ValueError("history_factoid_mcq_4 question text must end with '?'.")
-    if not question.startswith("When did this happen: "):
-        raise ValueError("history_factoid_mcq_4 question text is invalid.")
+    if not question.strip().lower().startswith("when"):
+        raise ValueError("history_factoid_mcq_4 question text must be a 'when' question.")
 
     questions = quiz.get("questions")
     if not isinstance(questions, list) or not questions or not isinstance(questions[0], dict):

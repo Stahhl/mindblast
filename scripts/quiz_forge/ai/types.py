@@ -40,6 +40,14 @@ class AIRerankResponse:
 
 
 @dataclass
+class AIJsonTaskResponse:
+    payload: dict[str, Any]
+    provider: str
+    model: str
+    usage: AIUsage
+
+
+@dataclass
 class AIAttempt:
     mode: str
     provider: str

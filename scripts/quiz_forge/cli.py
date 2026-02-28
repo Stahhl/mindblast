@@ -18,9 +18,11 @@ from .builders import QUIZ_BUILDERS
 from .constants import (
     GENERATION_MODE_DAILY,
     GENERATION_MODE_EXTRA,
+    QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_MCQ_4,
 )
 from .discovery import write_discovery_artifacts
+from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
 from .storage import (
@@ -82,6 +84,7 @@ def main() -> int:
     generation_count = parse_generation_count(args.count)
     ai_settings = load_ai_settings(output_dir=args.output_dir)
     ai_orchestrator = AIOrchestrator(settings=ai_settings, target_date=target_date)
+    factoid_pipeline_settings = load_factoid_pipeline_settings(ai_settings.model)
 
     pending = _build_generation_plan(
         output_dir=args.output_dir,
@@ -141,6 +144,20 @@ def main() -> int:
                 preferred_distractor_events=reusable_correct_events,
                 ai_ranked_distractor_ids=ai_ranked_distractor_ids,
             )
+            if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
+                quiz, factoid_reason = apply_factoid_ai_pipeline(
+                    quiz=quiz,
+                    settings=factoid_pipeline_settings,
+                    ai_orchestrator=ai_orchestrator,
+                )
+                if factoid_pipeline_settings.enabled:
+                    if factoid_reason is None:
+                        print("AI factoid pipeline applied for history_factoid_mcq_4.")
+                    elif factoid_reason == "shadow_mode":
+                        print("AI factoid pipeline shadow run completed for history_factoid_mcq_4.")
+                    else:
+                        print(f"AI factoid pipeline fallback for history_factoid_mcq_4: {factoid_reason}")
+
             validate_quiz(quiz, target_date)
             generated.append((quiz_type, edition, output_path, quiz))
 

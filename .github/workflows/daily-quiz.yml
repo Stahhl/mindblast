@@ -12,7 +12,7 @@ on:
       quiz_types:
         description: "Comma-separated quiz types."
         required: false
-        default: "which_came_first,history_mcq_4"
+        default: "which_came_first,history_mcq_4,history_factoid_mcq_4"
         type: string
       mode:
         description: "Generation mode."
@@ -39,15 +39,24 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     env:
-      QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4' }}
+      QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4,history_factoid_mcq_4' }}
       QUIZ_MODE: ${{ inputs.mode || 'daily' }}
       QUIZ_COUNT: ${{ inputs.count || '1' }}
       QUIZ_DATE: ${{ inputs.date || '' }}
       AI_MODE: ${{ vars.AI_MODE }}
       AI_PROVIDER: ${{ vars.AI_PROVIDER }}
       AI_MODEL: ${{ vars.AI_MODEL }}
+      AI_MAX_CALLS_PER_RUN: ${{ vars.AI_MAX_CALLS_PER_RUN }}
       AI_MAX_DAILY_USD: ${{ vars.AI_MAX_DAILY_USD }}
       AI_MAX_MONTHLY_USD: ${{ vars.AI_MAX_MONTHLY_USD }}
+      FACTOID_AI_PIPELINE_ENABLED: ${{ vars.FACTOID_AI_PIPELINE_ENABLED }}
+      FACTOID_AI_MODEL_QA_GEN: ${{ vars.FACTOID_AI_MODEL_QA_GEN }}
+      FACTOID_AI_MODEL_RANKER: ${{ vars.FACTOID_AI_MODEL_RANKER }}
+      FACTOID_AI_MODEL_DISTRACTOR_GEN: ${{ vars.FACTOID_AI_MODEL_DISTRACTOR_GEN }}
+      FACTOID_AI_MODEL_JUDGE: ${{ vars.FACTOID_AI_MODEL_JUDGE }}
+      FACTOID_AI_MAX_STAGE_TOKENS: ${{ vars.FACTOID_AI_MAX_STAGE_TOKENS }}
+      FACTOID_AI_MIN_QUESTION_SCORE: ${{ vars.FACTOID_AI_MIN_QUESTION_SCORE }}
+      FACTOID_AI_MIN_FINAL_SCORE: ${{ vars.FACTOID_AI_MIN_FINAL_SCORE }}
       QUIZ_FORGE_AI_REPORT_PATH: ${{ github.workspace }}/.tmp/quiz-forge-ai-report.json
     steps:
       - name: Checkout repository

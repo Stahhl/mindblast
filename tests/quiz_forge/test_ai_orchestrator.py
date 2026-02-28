@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from quiz_forge.ai.orchestrator import AIOrchestrator
-from quiz_forge.ai.types import AIRerankResponse, AISettings, AIUsage
+from quiz_forge.ai.types import AIJsonTaskResponse, AIRerankResponse, AISettings, AIUsage
 
 
 def _settings(tmp_path: Path, *, mode: str = "on") -> AISettings:
@@ -123,3 +123,48 @@ def test_orchestrator_provider_error_includes_actionable_label(tmp_path, mocker)
 
     report = json.loads(Path(settings.report_path).read_text(encoding="utf-8"))
     assert "provider_error:RuntimeError:http_401:1" in report["fallback_reasons"]
+
+
+def test_orchestrator_run_json_task_records_usage(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+    mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        return_value=AIJsonTaskResponse(
+            payload={"result": "ok"},
+            provider="openai",
+            model="gpt-5-mini",
+            usage=AIUsage(input_tokens=42, output_tokens=12, estimated_cost_usd=0.0),
+        ),
+    )
+
+    payload, reason = orchestrator.run_json_task(
+        task_name="test",
+        system_prompt="Return JSON.",
+        user_payload={"task": "test", "value": 1},
+    )
+    orchestrator.finalize()
+
+    assert reason is None
+    assert payload == {"result": "ok"}
+
+    ledger = json.loads(Path(settings.ledger_path).read_text(encoding="utf-8"))
+    assert ledger["daily"]["2026-02-25"]["calls"] == 1
+    assert ledger["monthly"]["2026-02"]["calls"] == 1
+
+
+def test_orchestrator_run_json_task_respects_call_limit(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    settings.max_calls_per_run = 0
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+    provider_mock = mocker.patch("quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task")
+
+    payload, reason = orchestrator.run_json_task(
+        task_name="test",
+        system_prompt="Return JSON.",
+        user_payload={"task": "test"},
+    )
+
+    assert payload is None
+    assert reason == "test:run_call_limit_reached"
+    provider_mock.assert_not_called()

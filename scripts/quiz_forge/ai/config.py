@@ -67,7 +67,7 @@ def load_ai_settings(*, output_dir: str) -> AISettings:
         timeout_ms=_env_int("AI_TIMEOUT_MS", 15000),
         max_daily_usd=_env_float("AI_MAX_DAILY_USD", 1.00),
         max_monthly_usd=_env_float("AI_MAX_MONTHLY_USD", 5.00),
-        max_calls_per_run=_env_int("AI_MAX_CALLS_PER_RUN", 1),
+        max_calls_per_run=_env_int("AI_MAX_CALLS_PER_RUN", 5),
         max_input_tokens=_env_int("AI_MAX_INPUT_TOKENS", 12000),
         max_output_tokens=_env_int("AI_MAX_OUTPUT_TOKENS", 500),
         input_price_per_million_usd=_env_float("AI_PRICE_INPUT_PER_M_USD", 0.25),
