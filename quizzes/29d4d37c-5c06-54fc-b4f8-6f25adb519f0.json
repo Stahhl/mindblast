@@ -1,0 +1,215 @@
+{
+  "date": "2026-02-28",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "3232ff14-fd82-5ee7-8fe2-7c61453e068d",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1959?",
+      "answer_fact_ids": [
+        "c07204e1-6753-593b-9a38-936c59b28fce",
+        "0463da94-b1fc-5a27-8f76-0a765fb20801",
+        "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8",
+        "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca"
+      ],
+      "correct_answer_fact_id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1959
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "c07204e1-6753-593b-9a38-936c59b28fce",
+      "label": "Space Shuttle Atlantis is launched on STS-36.",
+      "year": 1990,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1990s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1990s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1990,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1990s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Space Shuttle Atlantis is launched on STS-36.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "0463da94-b1fc-5a27-8f76-0a765fb20801",
+      "label": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
+      "year": 1983,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1980s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1980s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1983,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1980s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8",
+      "label": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
+      "year": 1993,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1990s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1990s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1993,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1990s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca",
+      "label": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
+      "year": 1959,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1950s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1950s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1959,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1950s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened in 1959?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Space Shuttle Atlantis is launched on STS-36.",
+      "answer_fact_id": "c07204e1-6753-593b-9a38-936c59b28fce"
+    },
+    {
+      "id": "B",
+      "label": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
+      "answer_fact_id": "0463da94-b1fc-5a27-8f76-0a765fb20801"
+    },
+    {
+      "id": "C",
+      "label": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
+      "answer_fact_id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8"
+    },
+    {
+      "id": "D",
+      "label": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
+      "answer_fact_id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca"
+    }
+  ],
+  "correct_choice_id": "D",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/2/28",
+    "retrieved_at": "2026-02-28T06:04:09Z",
+    "events_used": [
+      {
+        "event_id": "c07204e1-6753-593b-9a38-936c59b28fce",
+        "text": "Space Shuttle Atlantis is launched on STS-36.",
+        "year": 1990,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Space_Shuttle_Atlantis"
+      },
+      {
+        "event_id": "0463da94-b1fc-5a27-8f76-0a765fb20801",
+        "text": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
+        "year": 1983,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Goodbye%2C_Farewell_and_Amen"
+      },
+      {
+        "event_id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8",
+        "text": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
+        "year": 1993,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Bureau_of_Alcohol%2C_Tobacco%2C_Firearms_and_Explosives"
+      },
+      {
+        "event_id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca",
+        "text": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
+        "year": 1959,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Discoverer_1"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-02-28T06:04:09Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

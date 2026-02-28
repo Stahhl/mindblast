@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-02-27T06:13:24Z"
+    "updated_at": "2026-02-28T06:04:13Z"
   },
   "daily": {
     "2026-02-27": {
@@ -9,14 +9,20 @@
       "input_tokens": 1392,
       "output_tokens": 89,
       "spend_usd": 0.000526
+    },
+    "2026-02-28": {
+      "calls": 1,
+      "input_tokens": 1428,
+      "output_tokens": 89,
+      "spend_usd": 0.000535
     }
   },
   "monthly": {
     "2026-02": {
-      "calls": 1,
-      "input_tokens": 1392,
-      "output_tokens": 89,
-      "spend_usd": 0.000526
+      "calls": 2,
+      "input_tokens": 2820,
+      "output_tokens": 178,
+      "spend_usd": 0.001061
     }
   }
 }
