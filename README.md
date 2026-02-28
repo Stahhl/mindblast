@@ -49,6 +49,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── PHASE2.md
 │   ├── PHASE3.md
 │   ├── PHASE4.md
+│   ├── PHASE5.md
+│   ├── PHASE5_5.md
 │   ├── HOSTING_ROLLOUT.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
@@ -67,6 +69,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 2 frontend scope: `docs/PHASE2.md`
 - Phase 3 AI workflow scope: `docs/PHASE3.md`
 - Phase 4 multi-generation scope: `docs/PHASE4.md`
+- Phase 5 history factoid MCQ scope: `docs/PHASE5.md`
+- Phase 5.5 AI-native factoid pipeline: `docs/PHASE5_5.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
 - Terraform IaC setup: `infra/terraform/README.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
