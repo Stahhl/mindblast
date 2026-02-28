@@ -19,6 +19,9 @@ function formatQuizType(type: QuizType): string {
   if (type === "history_mcq_4") {
     return "History MCQ";
   }
+  if (type === "history_factoid_mcq_4") {
+    return "History Factoid";
+  }
   return type;
 }
 

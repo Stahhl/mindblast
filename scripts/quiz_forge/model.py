@@ -81,12 +81,23 @@ def build_question_object(
     answer_fact_ids: list[str],
     correct_answer_fact_id: str,
     target_year: int | None = None,
+    extra_facets: dict[str, Any] | None = None,
+    extra_selection_rules: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     selection_rules: dict[str, Any] = {
         "distractor_same_year_allowed": False,
     }
     if target_year is not None:
         selection_rules["target_year"] = target_year
+    if extra_selection_rules:
+        selection_rules.update(extra_selection_rules)
+
+    facets: dict[str, Any] = {
+        "topic": "history",
+        "difficulty_band": "baseline",
+    }
+    if extra_facets:
+        facets.update(extra_facets)
 
     return {
         "id": question_id,
@@ -95,9 +106,6 @@ def build_question_object(
         "answer_fact_ids": answer_fact_ids,
         "correct_answer_fact_id": correct_answer_fact_id,
         "tags": ["history", quiz_type],
-        "facets": {
-            "topic": "history",
-            "difficulty_band": "baseline",
-        },
+        "facets": facets,
         "selection_rules": selection_rules,
     }

@@ -177,3 +177,43 @@ def test_extra_mode_requires_daily_edition_first(tmp_path) -> None:
             mode="extra",
             count=1,
         )
+
+
+def test_cli_generates_history_factoid_mcq(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    assert [record.edition for record in records] == [1]
+    payload = records[0].payload
+    assert payload["type"] == "history_factoid_mcq_4"
+    assert isinstance(payload.get("question"), str) and payload["question"].endswith("?")
+    assert len(payload["choices"]) == 4
+    assert all("year" not in choice for choice in payload["choices"])
+    facets = payload["questions"][0]["facets"]
+    assert facets["question_format"] == "factoid"
+    assert facets["answer_kind"] == "time"
+    assert facets["prompt_style"] == "when"

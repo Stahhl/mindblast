@@ -1,4 +1,4 @@
-export type QuizType = "which_came_first" | "history_mcq_4";
+export type QuizType = "which_came_first" | "history_mcq_4" | "history_factoid_mcq_4";
 
 export interface IndexQuizEdition {
   edition: number;
@@ -108,7 +108,12 @@ export interface HistoryMcqQuiz extends QuizBase {
   choices: HistoryMcqChoice[];
 }
 
-export type QuizPayload = WhichCameFirstQuiz | HistoryMcqQuiz;
+export interface HistoryFactoidMcqQuiz extends QuizBase {
+  type: "history_factoid_mcq_4";
+  choices: HistoryMcqChoice[];
+}
+
+export type QuizPayload = WhichCameFirstQuiz | HistoryMcqQuiz | HistoryFactoidMcqQuiz;
 
 export interface LoadedQuiz {
   key: string;

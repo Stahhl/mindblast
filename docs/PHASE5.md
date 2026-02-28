@@ -26,6 +26,7 @@ Add a second history MCQ format where questions are more specific and answers ar
 - Keep exactly 4 choices with exactly 1 correct choice.
 - Keep normalized `questions` + `answer_facts` model.
 - Keep discovery/index flow unchanged (Phase 4 multi-edition compatible).
+- Initial implementation target: `when`/`time` prompts first, with `who`/`where` expansion in follow-up work.
 
 ## Out of Scope
 - Replacing `history_mcq_4`.
@@ -40,10 +41,11 @@ Add a second history MCQ format where questions are more specific and answers ar
 
 ### Question Style
 - More elaborate prompt, shorter answer labels.
-- Prompt must be one of the supported factoid styles:
+- Phase 5 initial support:
+  - `when` (time/date/year as short time answer)
+- Planned expansion:
   - `who` (person)
   - `where` (place)
-  - `when` (time/date/year as short time answer)
 
 Examples:
 - `Who assassinated Julius Caesar?`
@@ -70,14 +72,12 @@ No new top-level schema version is required. Use current v2 schema with additive
 
 `questions[0]` required additions for this type:
 - `facets.question_format = "factoid"`
-- `facets.answer_kind` in:
-  - `person`
-  - `place`
-  - `time`
-- `facets.prompt_style` in:
-  - `who`
-  - `where`
-  - `when`
+- Phase 5 initial values:
+  - `facets.answer_kind = "time"`
+  - `facets.prompt_style = "when"`
+- Planned expansion values:
+  - `facets.answer_kind` in `person|place|time`
+  - `facets.prompt_style` in `who|where|when`
 
 `answer_facts[*]` recommended additions:
 - `facets.entity_type` aligned with `questions[0].facets.answer_kind`
@@ -114,8 +114,9 @@ Failure policy:
 - `choices[*].year` is forbidden.
 - `question` must end with `?`.
 - `questions[0].facets.question_format == "factoid"`.
-- `questions[0].facets.answer_kind` is one of `person|place|time`.
-- `questions[0].facets.prompt_style` is one of `who|where|when`.
+- Phase 5 initial values:
+  - `questions[0].facets.answer_kind == "time"`.
+  - `questions[0].facets.prompt_style == "when"`.
 - Exactly one correct choice.
 
 ## Rollout Plan

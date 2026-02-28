@@ -1,6 +1,6 @@
 import type { IndexPayload, LatestPayload, QuizPayload, QuizSource, QuizType } from "./types";
 
-const KNOWN_TYPES = new Set<QuizType>(["which_came_first", "history_mcq_4"]);
+const KNOWN_TYPES = new Set<QuizType>(["which_came_first", "history_mcq_4", "history_factoid_mcq_4"]);
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -210,6 +210,19 @@ function validateHistoryMcq4(quiz: QuizPayload): void {
   validateSource(quiz.source, 4);
 }
 
+function validateHistoryFactoidMcq4(quiz: QuizPayload): void {
+  assert(quiz.type === "history_factoid_mcq_4", "quiz.type mismatch for history_factoid_mcq_4 validation");
+  assert(quiz.choices.length === 4, "history_factoid_mcq_4 must have exactly 4 choices");
+
+  quiz.choices.forEach((choice, idx) => {
+    const choiceWithYear = choice as { year?: unknown };
+    assert(choiceWithYear.year === undefined, `history_factoid_mcq_4 choice ${idx + 1} must not include year`);
+  });
+
+  assert(quiz.question.trim().endsWith("?"), "history_factoid_mcq_4 question must end with '?'");
+  validateSource(quiz.source, 4);
+}
+
 export function validateLatestPayload(payload: unknown): LatestPayload {
   assert(payload && typeof payload === "object", "latest payload must be an object");
   const latest = payload as Record<string, unknown>;
@@ -329,8 +342,10 @@ export function validateQuizPayload(payload: unknown): QuizPayload {
 
   if (quiz.type === "which_came_first") {
     validateWhichCameFirst(quiz);
-  } else {
+  } else if (quiz.type === "history_mcq_4") {
     validateHistoryMcq4(quiz);
+  } else {
+    validateHistoryFactoidMcq4(quiz);
   }
 
   return quiz;

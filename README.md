@@ -11,7 +11,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - one scheduled GitHub Actions run per day
 - default daily generation: one history quiz per enabled type per UTC day (`edition = 1`)
 - optional manual extra generation: additional same-day editions (`edition > 1`)
-- enabled types: `which_came_first`, `history_mcq_4`
+- default enabled types: `which_came_first`, `history_mcq_4`
+- supported additional type: `history_factoid_mcq_4` (Phase 5, manual rollout first)
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields
 - discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
 - output committed as JSON to this repository

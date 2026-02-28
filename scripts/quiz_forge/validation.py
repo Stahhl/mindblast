@@ -10,6 +10,7 @@ from .constants import (
     SUPPORTED_GENERATION_MODES,
     NORMALIZED_MODEL_VERSION,
     QUIZ_SCHEMA_VERSION,
+    QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_MCQ_4,
     QUIZ_TYPE_WHICH_CAME_FIRST,
     SUPPORTED_QUIZ_TYPES,
@@ -283,6 +284,38 @@ def validate_history_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dict[str, A
         raise ValueError("history_mcq_4 source.events_used must contain exactly 4 entries.")
 
 
+def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dict[str, Any]) -> None:
+    if len(choices) != 4:
+        raise ValueError("history_factoid_mcq_4 choices must contain exactly 4 entries.")
+
+    for choice in choices:
+        if "year" in choice:
+            raise ValueError("history_factoid_mcq_4 choices must not include year.")
+
+    question = quiz.get("question")
+    if not isinstance(question, str) or not question.strip().endswith("?"):
+        raise ValueError("history_factoid_mcq_4 question text must end with '?'.")
+    if not question.startswith("When did this happen: "):
+        raise ValueError("history_factoid_mcq_4 question text is invalid.")
+
+    questions = quiz.get("questions")
+    if not isinstance(questions, list) or not questions or not isinstance(questions[0], dict):
+        raise ValueError("history_factoid_mcq_4 questions[0] must be present.")
+    facets = questions[0].get("facets")
+    if not isinstance(facets, dict):
+        raise ValueError("history_factoid_mcq_4 questions[0].facets must be an object.")
+    if facets.get("question_format") != "factoid":
+        raise ValueError("history_factoid_mcq_4 facets.question_format must be 'factoid'.")
+    if facets.get("answer_kind") != "time":
+        raise ValueError("history_factoid_mcq_4 facets.answer_kind must be 'time'.")
+    if facets.get("prompt_style") != "when":
+        raise ValueError("history_factoid_mcq_4 facets.prompt_style must be 'when'.")
+
+    events_used = quiz["source"]["events_used"]
+    if len(events_used) != 4:
+        raise ValueError("history_factoid_mcq_4 source.events_used must contain exactly 4 entries.")
+
+
 def validate_quiz(quiz: dict[str, Any], target_date: dt.date) -> None:
     quiz_type, choices = validate_common_fields(quiz, target_date)
     facts_by_id = _validate_answer_facts(quiz)
@@ -294,6 +327,10 @@ def validate_quiz(quiz: dict[str, Any], target_date: dt.date) -> None:
 
     if quiz_type == QUIZ_TYPE_HISTORY_MCQ_4:
         validate_history_mcq_4_quiz(choices, quiz)
+        return
+
+    if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
+        validate_history_factoid_mcq_4_quiz(choices, quiz)
         return
 
     raise ValueError(f"Unsupported quiz type for validation: {quiz_type}")
