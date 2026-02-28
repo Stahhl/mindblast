@@ -28,6 +28,30 @@ Define a production-safe AI workflow for generating `history_factoid_mcq_4` cont
 
 ## Pipeline Overview
 
+### Source Page Selection Policy (Deterministic)
+Selection must be deterministic and repeatable for `(date, edition, quiz_type)`.
+
+Required policy:
+1. Maintain a curated source registry (seed set of approved Wikipedia pages + tags).
+2. Build a daily candidate set from:
+   - registry pages not on cooldown,
+   - optionally a small freshness slice from trusted linked pages.
+3. Apply hard filters before AI calls:
+   - no disambiguation/list pages,
+   - minimum content quality threshold,
+   - no blocked/risky pages from compliance policy.
+4. Score candidates using non-AI heuristics:
+   - recency of use (prefer less recently used),
+   - historical acceptance rate,
+   - answer-kind balance (`person/place/time`).
+5. Pick page(s) using deterministic seeded ordering:
+   - seed key: `date + edition + quiz_type`.
+6. On repeated low-quality outcomes, apply cooldown and move to next candidate.
+
+Operational notes:
+- Page selection should not depend on non-deterministic model output.
+- Re-runs for same seed should resolve to same primary candidate ordering unless registry changes.
+
 ### Stage 0: Source Ingest
 Inputs:
 - Curated source URL list (initially Wikipedia pages with clear attribution trail).
