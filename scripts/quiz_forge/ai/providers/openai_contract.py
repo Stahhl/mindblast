@@ -10,13 +10,23 @@ import json
 from typing import Any
 
 OPENAI_CHAT_COMPLETIONS_ENDPOINT = "https://api.openai.com/v1/chat/completions"
-OPENAI_SCHEMA_LAST_REVIEWED_UTC = "2026-02-26"
+OPENAI_SCHEMA_LAST_REVIEWED_UTC = "2026-03-01"
 OPENAI_SCHEMA_SOURCES = (
     "https://platform.openai.com/docs/api-reference/chat/create-chat-completion",
     "https://platform.openai.com/docs/api-reference/chat/create#chat-createtemperature",
     "https://platform.openai.com/docs/guides/reasoning",
 )
 GPT5_PREFIX = "gpt-5"
+
+# Model prefixes known to support the ``reasoning_effort`` parameter.
+# Standard GPT-5 chat models (e.g. ``gpt-5.2``) do NOT support this
+# parameter and will return HTTP 400 if it is sent.  Only reasoning-
+# oriented variants are allowlisted here.
+REASONING_MODEL_PREFIXES: tuple[str, ...] = (
+    "gpt-5-mini",
+    "o1",
+    "o3",
+)
 
 RANKED_ID_RESPONSE_KEYS = (
     "ranked_distractor_ids",
@@ -29,6 +39,11 @@ RANKED_ID_RESPONSE_KEYS = (
 
 def is_gpt5_model(model: str) -> bool:
     return model.startswith(GPT5_PREFIX)
+
+
+def is_reasoning_model(model: str) -> bool:
+    """Return ``True`` when *model* is known to accept ``reasoning_effort``."""
+    return any(model.startswith(prefix) for prefix in REASONING_MODEL_PREFIXES)
 
 
 def build_chat_request_body(
@@ -46,7 +61,7 @@ def build_chat_request_body(
             {"role": "user", "content": json.dumps(user_payload, ensure_ascii=True)},
         ],
     }
-    if is_gpt5_model(model):
+    if is_reasoning_model(model):
         body["max_completion_tokens"] = max_output_tokens
         body["reasoning_effort"] = "minimal"
     else:
