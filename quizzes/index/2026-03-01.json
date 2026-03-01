@@ -1,0 +1,43 @@
+{
+  "date": "2026-03-01",
+  "quiz_files": {
+    "which_came_first": "quizzes/99031df8-81b5-5f59-9757-0b223b88415b.json",
+    "history_mcq_4": "quizzes/6f8b50b8-359b-5bbe-b864-ddf4dd12e17c.json",
+    "history_factoid_mcq_4": "quizzes/14547764-d2ce-5804-863b-3d337b7238e3.json"
+  },
+  "quizzes_by_type": {
+    "which_came_first": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/99031df8-81b5-5f59-9757-0b223b88415b.json",
+        "generated_at": "2026-03-01T06:10:50Z"
+      }
+    ],
+    "history_mcq_4": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/6f8b50b8-359b-5bbe-b864-ddf4dd12e17c.json",
+        "generated_at": "2026-03-01T06:10:50Z"
+      }
+    ],
+    "history_factoid_mcq_4": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/14547764-d2ce-5804-863b-3d337b7238e3.json",
+        "generated_at": "2026-03-01T06:10:50Z"
+      }
+    ]
+  },
+  "available_types": [
+    "which_came_first",
+    "history_mcq_4",
+    "history_factoid_mcq_4"
+  ],
+  "metadata": {
+    "version": 2,
+    "generated_at": "2026-03-01T06:10:53Z"
+  }
+}
