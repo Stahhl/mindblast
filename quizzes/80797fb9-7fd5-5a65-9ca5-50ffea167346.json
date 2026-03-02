@@ -1,0 +1,134 @@
+{
+  "date": "2026-03-02",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "ec766753-2837-57f0-a565-673916b9304e",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3",
+        "4d72a07c-0fd1-5dca-837e-c9b5541480e1"
+      ],
+      "correct_answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3",
+      "label": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
+      "year": 1962,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "20th-century",
+        "1960s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1962,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+      "label": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
+      "year": 537,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "6th-century",
+        "530s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "6th-century",
+        "temporal_decade": "530s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 537,
+          "temporal_century": "6th-century",
+          "temporal_decade": "530s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
+      "year": 1962,
+      "answer_fact_id": "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3"
+    },
+    {
+      "id": "B",
+      "label": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
+      "year": 537,
+      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/2",
+    "retrieved_at": "2026-03-02T06:13:53Z",
+    "events_used": [
+      {
+        "event_id": "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3",
+        "text": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
+        "year": 1962,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Myanmar"
+      },
+      {
+        "event_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+        "text": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
+        "year": 537,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Siege_of_Rome_(537%E2%80%93538)"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-02T06:13:53Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
