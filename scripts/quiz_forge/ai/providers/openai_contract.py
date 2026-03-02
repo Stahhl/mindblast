@@ -10,7 +10,7 @@ import json
 from typing import Any
 
 OPENAI_CHAT_COMPLETIONS_ENDPOINT = "https://api.openai.com/v1/chat/completions"
-OPENAI_SCHEMA_LAST_REVIEWED_UTC = "2026-03-01"
+OPENAI_SCHEMA_LAST_REVIEWED_UTC = "2026-03-02"
 OPENAI_SCHEMA_SOURCES = (
     "https://platform.openai.com/docs/api-reference/chat/create-chat-completion",
     "https://platform.openai.com/docs/api-reference/chat/create#chat-createtemperature",
@@ -62,9 +62,17 @@ def build_chat_request_body(
         ],
     }
     if is_reasoning_model(model):
+        # Reasoning models (gpt-5-mini, o1, o3): max_completion_tokens + reasoning_effort.
         body["max_completion_tokens"] = max_output_tokens
         body["reasoning_effort"] = "minimal"
+    elif is_gpt5_model(model):
+        # Standard GPT-5 chat models (e.g. gpt-5.2): max_completion_tokens + temperature.
+        # These models require max_completion_tokens (max_tokens returns HTTP 400)
+        # but do NOT support reasoning_effort.
+        body["max_completion_tokens"] = max_output_tokens
+        body["temperature"] = 0
     else:
+        # Legacy models (gpt-4o, gpt-4o-mini, etc.): max_tokens + temperature.
         body["temperature"] = 0
         body["max_tokens"] = max_output_tokens
     return body

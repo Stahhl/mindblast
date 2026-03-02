@@ -5,7 +5,7 @@
 - API: `chat.completions`
 - Task: `history_mcq_4` distractor rerank
 - Snapshot file: `/Users/stahl/dev/mindblast/docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
-- Last reviewed: `2026-02-26`
+- Last reviewed: `2026-03-02`
 
 ## Canonical Sources
 - [OpenAI Chat Completions API Reference](https://platform.openai.com/docs/api-reference/chat/create-chat-completion)
@@ -14,7 +14,7 @@
 
 ## Request Rules
 
-### GPT-5 family (`model` starts with `gpt-5`)
+### Reasoning models (`gpt-5-mini`, `o1`, `o3` prefixes)
 - Required:
   - `model`
   - `messages`
@@ -25,7 +25,19 @@
   - `max_tokens`
   - `temperature`
 
-### Non-GPT-5 family
+### GPT-5 standard chat models (`gpt-5` prefix, excluding reasoning variants)
+- Required:
+  - `model`
+  - `messages`
+  - `response_format: {"type":"json_object"}`
+  - `max_completion_tokens`
+  - `temperature: 0`
+- Forbidden:
+  - `max_tokens`
+  - `reasoning_effort`
+- Note: These models (e.g. `gpt-5.2`) reject the legacy `max_tokens` parameter with HTTP 400 but do NOT support `reasoning_effort`.
+
+### Legacy models (non-GPT-5, e.g. `gpt-4o`, `gpt-4o-mini`)
 - Required:
   - `model`
   - `messages`

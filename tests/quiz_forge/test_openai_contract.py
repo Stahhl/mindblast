@@ -52,8 +52,8 @@ def test_non_gpt5_request_schema_uses_max_tokens_and_temperature() -> None:
     assert "reasoning_effort" not in body
 
 
-def test_gpt5_standard_chat_model_uses_max_tokens_and_temperature() -> None:
-    """gpt-5.2 is a standard chat model, not a reasoning model."""
+def test_gpt5_standard_chat_model_uses_completion_tokens_and_temperature() -> None:
+    """gpt-5.2 is a standard GPT-5 chat model: max_completion_tokens + temperature, no reasoning_effort."""
     body = build_chat_request_body(
         model="gpt-5.2",
         max_output_tokens=700,
@@ -62,9 +62,9 @@ def test_gpt5_standard_chat_model_uses_max_tokens_and_temperature() -> None:
     )
     assert is_gpt5_model("gpt-5.2")
     assert not is_reasoning_model("gpt-5.2")
-    assert body["max_tokens"] == 700
+    assert body["max_completion_tokens"] == 700
     assert body["temperature"] == 0
-    assert "max_completion_tokens" not in body
+    assert "max_tokens" not in body
     assert "reasoning_effort" not in body
 
 

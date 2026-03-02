@@ -2,7 +2,7 @@
   "provider": "openai",
   "api": "chat_completions",
   "scope": "quiz_forge_rerank_distractors",
-  "last_reviewed_utc": "2026-03-01",
+  "last_reviewed_utc": "2026-03-02",
   "source_urls": [
     "https://platform.openai.com/docs/api-reference/chat/create-chat-completion",
     "https://platform.openai.com/docs/api-reference/chat/create#chat-createtemperature",
@@ -32,8 +32,30 @@
         "reasoning_effort": "minimal"
       }
     },
-    "standard_chat_models": {
-      "description": "All other models including standard GPT-5 chat models (e.g. gpt-5.2).",
+    "gpt5_standard_chat_models": {
+      "description": "Standard GPT-5 chat models (e.g. gpt-5.2) that require max_completion_tokens but do NOT support reasoning_effort.",
+      "model_prefix": "gpt-5",
+      "excludes": [
+        "gpt-5-mini"
+      ],
+      "required_params": [
+        "model",
+        "messages",
+        "response_format",
+        "max_completion_tokens",
+        "temperature"
+      ],
+      "forbidden_params": [
+        "max_tokens",
+        "reasoning_effort"
+      ],
+      "fixed_values": {
+        "response_format.type": "json_object",
+        "temperature": 0
+      }
+    },
+    "legacy_chat_models": {
+      "description": "Non-GPT-5 models (e.g. gpt-4o, gpt-4o-mini).",
       "required_params": [
         "model",
         "messages",
