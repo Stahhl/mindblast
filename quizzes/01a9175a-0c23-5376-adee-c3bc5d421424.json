@@ -1,0 +1,225 @@
+{
+  "date": "2026-03-03",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "7063f9f7-fcb3-5967-9d17-f9a1d2ecdf80",
+      "type": "history_factoid_mcq_4",
+      "prompt": "When did Mughal Emperor Akbar defeat Sultan of Bengal Daud Khan Karrani's army at the Battle of Tukaroi?",
+      "answer_fact_ids": [
+        "a0968825-bbe3-5c28-aadf-2ef4a30b1391",
+        "19512475-160f-5230-aaa2-d61842b5a854",
+        "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0",
+        "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba"
+      ],
+      "correct_answer_fact_id": "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "time",
+        "prompt_style": "when",
+        "generation_method": "ai_native_factoid_v1"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1575
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391",
+      "label": "A bomb blast in Karachi, Pakistan, kills at least 48 people and injured 200 others in a predominantly Shia Muslim area.",
+      "year": 2013,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "21th-century",
+        "2010s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "21th-century",
+        "temporal_decade": "2010s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 2013,
+          "temporal_century": "21th-century",
+          "temporal_decade": "2010s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "A bomb blast in Karachi, Pakistan, kills at least 48 people and injured 200 others in a predominantly Shia Muslim area.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "19512475-160f-5230-aaa2-d61842b5a854",
+      "label": "US magazine Time publishes its first issue.",
+      "year": 1923,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1920s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1920s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1923,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1920s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "US magazine Time publishes its first issue.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0",
+      "label": "Mughal Emperor Akbar defeats Sultan of Bengal Daud Khan Karrani's army at the Battle of Tukaroi.",
+      "year": 1575,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "16th-century",
+        "1570s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "16th-century",
+        "temporal_decade": "1570s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1575,
+          "temporal_century": "16th-century",
+          "temporal_decade": "1570s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Mughal Emperor Akbar defeats Sultan of Bengal Daud Khan Karrani's army at the Battle of Tukaroi.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba",
+      "label": "American Revolutionary War: The Continental Army is routed at the Battle of Brier Creek near Savannah, Georgia.",
+      "year": 1779,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "18th-century",
+        "1770s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1770s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1779,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1770s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "American Revolutionary War: The Continental Army is routed at the Battle of Brier Creek near Savannah, Georgia.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "When did Mughal Emperor Akbar defeat Sultan of Bengal Daud Khan Karrani's army at the Battle of Tukaroi?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "2013",
+      "answer_fact_id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391"
+    },
+    {
+      "id": "B",
+      "label": "1923",
+      "answer_fact_id": "19512475-160f-5230-aaa2-d61842b5a854"
+    },
+    {
+      "id": "C",
+      "label": "1575",
+      "answer_fact_id": "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0"
+    },
+    {
+      "id": "D",
+      "label": "1779",
+      "answer_fact_id": "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba"
+    }
+  ],
+  "correct_choice_id": "C",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/3",
+    "retrieved_at": "2026-03-03T06:11:51Z",
+    "events_used": [
+      {
+        "event_id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391",
+        "text": "A bomb blast in Karachi, Pakistan, kills at least 48 people and injured 200 others in a predominantly Shia Muslim area.",
+        "year": 2013,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/March_2013_Karachi_bombing"
+      },
+      {
+        "event_id": "19512475-160f-5230-aaa2-d61842b5a854",
+        "text": "US magazine Time publishes its first issue.",
+        "year": 1923,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Time_(magazine)"
+      },
+      {
+        "event_id": "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0",
+        "text": "Mughal Emperor Akbar defeats Sultan of Bengal Daud Khan Karrani's army at the Battle of Tukaroi.",
+        "year": 1575,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Mughal_Empire"
+      },
+      {
+        "event_id": "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba",
+        "text": "American Revolutionary War: The Continental Army is routed at the Battle of Brier Creek near Savannah, Georgia.",
+        "year": 1779,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Continental_Army"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-03T06:11:51Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1",
+    "pipeline_version": "phase5_5_v1",
+    "generation_method": "ai_native_factoid_v1"
+  }
+}
