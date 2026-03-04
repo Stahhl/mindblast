@@ -6,25 +6,25 @@ Deliver Phase 6 (`quiz_feedback_v1`) in small, reviewable pull requests with cle
 ## PR1: Backend MVP
 
 Scope:
-- [ ] Add Firebase Functions service with `POST /api/quiz-feedback`.
-- [ ] Add Hosting rewrite for `/api/**` in `firebase.json` (before SPA catch-all).
-- [ ] Implement strict payload validation:
-  - [ ] `rating` integer `1..5`
-  - [ ] optional `comment` max 500 chars (trimmed)
-  - [ ] `quiz_type` in supported set
-  - [ ] `question_human_id` format `Q<integer>`
-- [ ] Implement server-issued anonymous `client_id` cookie:
-  - [ ] `HttpOnly`
-  - [ ] `SameSite=Lax`
-  - [ ] `Secure` in production
-- [ ] Implement deterministic upsert key:
-  - [ ] `(client_id, question_id, feedback_date_utc)`
-- [ ] Persist `created_at` and `updated_at`.
-- [ ] Return response shape `{ ok, mode, feedback_id }`.
-- [ ] Add backend tests for:
-  - [ ] valid create
-  - [ ] valid update (upsert path)
-  - [ ] invalid payload rejection
+- [x] Add Firebase Functions service with `POST /api/quiz-feedback`.
+- [x] Add Hosting rewrite for `/api/**` in `firebase.json` (before SPA catch-all).
+- [x] Implement strict payload validation:
+  - [x] `rating` integer `1..5`
+  - [x] optional `comment` max 500 chars (trimmed)
+  - [x] `quiz_type` in supported set
+  - [x] `question_human_id` format `Q<integer>`
+- [x] Implement server-issued anonymous `client_id` cookie:
+  - [x] `HttpOnly`
+  - [x] `SameSite=Lax`
+  - [x] `Secure` in production
+- [x] Implement deterministic upsert key:
+  - [x] `(client_id, question_id, feedback_date_utc)`
+- [x] Persist `created_at` and `updated_at`.
+- [x] Return response shape `{ ok, mode, feedback_id }`.
+- [x] Add backend tests for:
+  - [x] valid create
+  - [x] valid update (upsert path)
+  - [x] invalid payload rejection
 
 Exit criteria:
 - Endpoint works end-to-end in local/staging with deterministic upsert behavior.

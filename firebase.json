@@ -1,4 +1,20 @@
 {
+  "functions": [
+    {
+      "source": "src/apps/feedback-api",
+      "codebase": "feedback-api",
+      "predeploy": [
+        "pnpm --dir \"$RESOURCE_DIR\" install --no-frozen-lockfile",
+        "pnpm --dir \"$RESOURCE_DIR\" build"
+      ],
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ],
   "hosting": [
     {
       "target": "staging",
@@ -28,6 +44,10 @@
         }
       ],
       "rewrites": [
+        {
+          "source": "/api/**",
+          "function": "quizFeedbackApi"
+        },
         {
           "source": "**",
           "destination": "/index.html"
@@ -62,6 +82,10 @@
         }
       ],
       "rewrites": [
+        {
+          "source": "/api/**",
+          "function": "quizFeedbackApi"
+        },
         {
           "source": "**",
           "destination": "/index.html"

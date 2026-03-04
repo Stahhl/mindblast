@@ -1,0 +1,50 @@
+name: Feedback API Tests
+
+on:
+  pull_request:
+    paths:
+      - "src/apps/feedback-api/**"
+      - "firebase.json"
+      - ".github/workflows/feedback-api-tests.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/apps/feedback-api/**"
+      - "firebase.json"
+      - ".github/workflows/feedback-api-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: feedback-api-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: feedback-api vitest + build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm --dir src/apps/feedback-api install --no-frozen-lockfile
+
+      - name: Run tests
+        run: pnpm --dir src/apps/feedback-api test
+
+      - name: Build
+        run: pnpm --dir src/apps/feedback-api build

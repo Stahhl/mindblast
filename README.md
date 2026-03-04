@@ -34,6 +34,11 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │           └── production/
 ├── src/
 │   └── apps/
+│       ├── feedback-api/
+│       │   ├── src/
+│       │   ├── tests/
+│       │   ├── package.json
+│       │   └── tsconfig.json
 │       └── frontend/
 │           ├── src/
 │           │   ├── components/
@@ -91,8 +96,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 ## Next Steps
 
 1. Run the local frontend and validate quiz UX on desktop/mobile.
-2. Backfill discovery artifacts for any legacy quiz dates that predate Phase 1.5.
-3. Re-evaluate backend API need after Phase 2 against the decision gate in `docs/PHASE2.md`.
+2. Integrate Phase 6 feedback UI in quiz cards and wire it to `POST /api/quiz-feedback`.
+3. Add Phase 6 abuse controls (rate limits, App Check, kill-switch flags).
 
 ## Local Frontend Run
 
@@ -135,6 +140,22 @@ This backfill mode can also normalize legacy schema v1 quiz payloads to v2.
 cd /Users/stahl/dev/mindblast
 uv sync --locked --dev --python 3.12
 uv run --python 3.12 pytest tests/quiz_forge
+```
+
+## Feedback API Build + Tests (pnpm)
+
+```zsh
+cd /Users/stahl/dev/mindblast/src/apps/feedback-api
+pnpm install
+pnpm test
+pnpm build
+```
+
+Deploy feedback function manually:
+
+```zsh
+firebase deploy --only functions:quizFeedbackApi --project mindblast-staging
+firebase deploy --only functions:quizFeedbackApi --project mindblast-prod
 ```
 
 ## Staging Deploy (GitHub Actions)
