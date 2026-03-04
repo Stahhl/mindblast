@@ -65,3 +65,32 @@ resource "google_project_iam_member" "github_actions_roles" {
   role    = each.value
   member  = "serviceAccount:${google_service_account.github_actions[0].email}"
 }
+
+data "google_iam_policy" "feedback_api_invoker" {
+  count = var.manage_feedback_api_invoker_iam ? 1 : 0
+
+  dynamic "binding" {
+    for_each = var.feedback_api_allow_public_invoker ? [1] : []
+    content {
+      role    = "roles/run.invoker"
+      members = ["allUsers"]
+    }
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "feedback_api_invoker" {
+  count = var.manage_feedback_api_invoker_iam ? 1 : 0
+
+  project     = local.effective_project_id
+  location    = var.feedback_api_region
+  service     = var.feedback_api_cloud_run_service_name
+  policy_data = data.google_iam_policy.feedback_api_invoker[0].policy_data
+}
+
+resource "google_project_iam_member" "feedback_api_runtime_roles" {
+  for_each = var.manage_feedback_api_runtime_project_roles && var.feedback_api_runtime_service_account_email != null ? toset(var.feedback_api_runtime_project_roles) : toset([])
+
+  project = local.effective_project_id
+  role    = each.value
+  member  = "serviceAccount:${var.feedback_api_runtime_service_account_email}"
+}

@@ -78,13 +78,41 @@ Exit criteria:
 ## PR4: Staging Validation and Operations
 
 Scope:
-- [ ] Run staged load/sanity script for feedback submission bursts.
-- [ ] Validate:
-  - [ ] create/update behavior under repeated submits
-  - [ ] rate-limit enforcement
-  - [ ] reject reason logging visibility
-- [ ] Produce rollout notes + rollback procedure.
-- [ ] Document incident kill-switch usage.
+- [x] Upgrade `mindblast-staging` to Blaze (pay-as-you-go) so backend APIs can be enabled.
+- [x] Apply Terraform infra updates in staging (backend APIs + CI IAM roles).
+- [x] Deploy `quizFeedbackApi` + Firestore rules/indexes to staging
+  (`functions:feedback-api:quizFeedbackApi` codebase selector).
+- [x] Run staged load/sanity script for feedback submission bursts.
+- [x] Validate:
+  - [x] create/update behavior under repeated submits
+  - [x] rate-limit enforcement
+  - [x] reject reason logging visibility
+- [x] Produce rollout notes + rollback procedure.
+- [x] Document incident kill-switch usage.
+
+Current status (2026-03-04):
+- Blaze/billing blocker resolved; backend APIs required by Functions v2 are enabled.
+- Terraform staging reconciliation completed (`terraform plan`: no changes).
+- Staging public API route is intentionally disabled after PR4 verification:
+  - Hosting rewrite `/api/** -> quizFeedbackApi` removed from staging target,
+  - direct function/service URLs return `403` without invoker permission.
+- `quizFeedbackApi` is deployed but not publicly invokable (no `allUsers` invoker binding).
+- Staging runtime keeps App Check in `off` mode via auto-detection for known staging
+  project (`mindblast-staging`) while production stays strict in `auto`.
+
+Validation evidence (2026-03-04 UTC):
+- Smoke test requests (same cookie/question/day) returned:
+  - `200 created` on first submit
+  - `200 updated` on repeated submits
+  - `429 rate_limited` on requests `#6` and `#7` with `Retry-After` header
+- Firestore document verified:
+  - `quiz_feedback/fdbk_c02ba08de8e438b75ce1454990a9012a`
+  - `created_at` and later `updated_at` values present, same deterministic ID across updates
+- Cloud Logging verification:
+  - Request status counts in smoke window: `200 x 5`, `429 x 2`, `5xx x 0`
+  - Reject reasons in smoke window: `rate_limited x 2`
+- Rollout/rollback runbook:
+  - `docs/roadmap/phase6_rollout_runbook.md`
 
 Exit criteria:
 - Staging validation evidence is attached and production rollout checklist is approved.
@@ -100,4 +128,4 @@ Exit criteria:
 - [ ] One logical feedback record per `(client_id, question_id, day)` is enforced.
 - [ ] Abuse controls are active and tested.
 - [ ] Endpoint failures never block quiz gameplay.
-- [ ] Staging validation complete and runbook documented.
+- [x] Staging validation complete and runbook documented.

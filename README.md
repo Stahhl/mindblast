@@ -58,6 +58,9 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── PHASE4.md
 │   ├── PHASE5.md
 │   ├── PHASE5_5.md
+│   ├── PHASE6.md
+│   ├── PHASE6_5.md
+│   ├── PHASE7.md
 │   ├── HOSTING_ROLLOUT.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
@@ -79,6 +82,8 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 5 history factoid MCQ scope: `docs/PHASE5.md`
 - Phase 5.5 AI-native factoid pipeline: `docs/PHASE5_5.md`
 - Phase 6 feedback API scope: `docs/PHASE6.md`
+- Phase 6.5 Terraform access/IAM parameterization: `docs/PHASE6_5.md`
+- Phase 7 auth scope: `docs/PHASE7.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
 - Backend service architecture: `docs/BACKEND_SERVICE_DESIGN.md`
 - Terraform IaC setup: `infra/terraform/README.md`
@@ -155,8 +160,12 @@ pnpm build
 Deploy feedback function manually:
 
 ```zsh
-firebase deploy --only functions:quizFeedbackApi --project mindblast-staging
-firebase deploy --only functions:quizFeedbackApi --project mindblast-prod
+# Firebase Functions v2 requires Blaze (pay-as-you-go) in each project.
+# Apply backend API + IAM infra changes first:
+# cd infra/terraform/envs/staging && terraform plan && terraform apply
+
+firebase deploy --only functions:feedback-api:quizFeedbackApi,firestore:rules,firestore:indexes --project mindblast-staging
+firebase deploy --only functions:feedback-api:quizFeedbackApi,firestore:rules,firestore:indexes --project mindblast-prod
 ```
 
 ## Staging Deploy (GitHub Actions)
@@ -167,6 +176,22 @@ firebase deploy --only functions:quizFeedbackApi --project mindblast-prod
 
 Required repository secrets:
 - `FIREBASE_SERVICE_ACCOUNT_STAGING`: service account JSON for Firebase Hosting deploy
+
+## Feedback API Staging Deploy (GitHub Actions)
+
+- Workflow: `.github/workflows/deploy-feedback-api-staging.yml`
+- Trigger: push to `main` when feedback-api source, Firestore config, or Firebase config changes
+- Deploy target: `mindblast-staging`
+- Deploy command:
+  - `functions:feedback-api:quizFeedbackApi`
+  - `firestore:rules`
+  - `firestore:indexes`
+
+Required repository secrets:
+- `FIREBASE_SERVICE_ACCOUNT_STAGING`: service account JSON for Firebase deploy auth
+
+Operational runbook:
+- `docs/roadmap/phase6_rollout_runbook.md`
 
 ## Production Deploy (GitHub Actions)
 

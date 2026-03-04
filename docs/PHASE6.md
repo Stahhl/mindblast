@@ -43,6 +43,22 @@ The goal is to collect useful quality signals tied to stable quiz identifiers (`
 - Continue serving quiz payloads statically from `/quizzes/**`.
 - Follow backend portability guardrails in `docs/BACKEND_SERVICE_DESIGN.md` (ports/adapters, Firebase as infrastructure adapter only).
 
+## Infra Prerequisites
+- Enable backend APIs in each environment project:
+  - `cloudfunctions.googleapis.com`
+  - `run.googleapis.com`
+  - `cloudbuild.googleapis.com`
+  - `artifactregistry.googleapis.com`
+  - `eventarc.googleapis.com`
+  - `firestore.googleapis.com`
+- Ensure each Firebase project is on Blaze (pay-as-you-go), otherwise
+  `run/cloudbuild/artifactregistry` cannot be enabled and Functions v2 deploy is blocked.
+- Ensure CI deploy service account has:
+  - `roles/cloudfunctions.admin`
+  - `roles/iam.serviceAccountUser`
+  - existing Hosting roles from prior phases.
+- Apply Terraform for staging/production before first backend deploy.
+
 ## Data Model (`quiz_feedback_v1`)
 
 One logical feedback record per `(client_id, question_id, feedback_date_utc)`.
@@ -160,6 +176,11 @@ No-auth endpoints are spammable by default. Phase 6 must include all controls be
 - Feature flags:
   - disable comments while keeping star ratings.
   - disable feedback writes globally if incident occurs.
+- Operational use (staging/production):
+  - current reliable path is hotfix default toggles in
+    `src/apps/feedback-api/src/application/runtime_config.ts` plus redeploy.
+  - write stop: set `writeEnabled` fallback to `false`, redeploy.
+  - comments-only stop: set `commentsEnabled` fallback to `false`, redeploy.
 
 ## Storage and Indexing
 - Collection: `quiz_feedback`.
@@ -205,8 +226,10 @@ No-auth endpoints are spammable by default. Phase 6 must include all controls be
    - upsert behavior,
    - rate-limit enforcement.
 6. Add frontend tests for submit/update/error states.
-7. Roll out in staging and monitor reject/error rates.
-8. Promote to production with comments enabled behind feature flag.
+7. Ensure staging Firebase project billing is enabled (Blaze).
+8. Apply infra updates (APIs + IAM) in staging.
+9. Deploy function + Firestore rules/indexes to staging and monitor reject/error rates.
+10. Promote to production with comments enabled behind feature flag.
 
 ## Acceptance Criteria
 - Users can submit `1..5` rating and optional comment per quiz card.

@@ -19,7 +19,7 @@ infra/terraform/
 ```
 
 ## What Terraform Manages
-- Required Google APIs for Firebase hosting workflows.
+- Required Google APIs for Firebase hosting + backend workflows.
 - Firebase project enablement.
 - Firebase Hosting site.
 - Optional CI service account + project IAM roles.
@@ -66,6 +66,59 @@ terraform plan
 ```zsh
 terraform apply
 ```
+
+## Phase 6 Backend Infra Notes
+
+The default module/env values now include APIs and IAM roles required for:
+- Firebase Hosting deploys,
+- Firebase Functions deploys,
+- Firestore-backed feedback writes.
+
+New default APIs:
+- `cloudbuild.googleapis.com`
+- `cloudfunctions.googleapis.com`
+- `eventarc.googleapis.com`
+- `artifactregistry.googleapis.com`
+- `run.googleapis.com`
+- `firestore.googleapis.com`
+
+New default CI service account roles:
+- `roles/cloudfunctions.admin`
+- `roles/iam.serviceAccountUser`
+
+These are additive to the existing Hosting roles and are required before
+GitHub Actions (or local CLI) can deploy `quizFeedbackApi`.
+
+Important billing prerequisite:
+- Firebase Functions v2 deployment requires projects on Blaze (pay-as-you-go).
+- On Spark, enabling `cloudbuild.googleapis.com`, `artifactregistry.googleapis.com`,
+  and `run.googleapis.com` fails and backend deploys are blocked.
+
+After updating Terraform for staging/production, run:
+
+```zsh
+cd infra/terraform/envs/staging
+terraform plan
+terraform apply
+```
+
+## Phase 6.5 Access + IAM Toggles
+
+Terraform now exposes environment-level toggles for feedback API access/iam:
+- `manage_feedback_api_invoker_iam` (default `true` in envs)
+- `feedback_api_allow_public_invoker` (default `false`)
+- `feedback_api_cloud_run_service_name` (default `quizfeedbackapi`)
+- `feedback_api_region` (default `us-central1`)
+- `manage_feedback_api_runtime_project_roles` (default `false`)
+- `feedback_api_runtime_service_account_email` + `feedback_api_runtime_project_roles`
+
+Common use:
+- Keep staging closed: `feedback_api_allow_public_invoker = false`
+- Temporarily open public invoker (if needed): set to `true`, `terraform apply`
+- Re-close: set back to `false`, `terraform apply`
+
+Note:
+- Terraform can only manage Cloud Run IAM after the feedback function has been deployed at least once (service exists).
 
 ## Import Notes
 If an existing GCP project or Firebase Hosting site already exists, import resources before apply.

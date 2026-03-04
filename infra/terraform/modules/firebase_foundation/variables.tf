@@ -38,8 +38,14 @@ variable "required_services" {
   type        = list(string)
   default = [
     "cloudresourcemanager.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "cloudfunctions.googleapis.com",
+    "eventarc.googleapis.com",
+    "artifactregistry.googleapis.com",
     "firebase.googleapis.com",
     "firebasehosting.googleapis.com",
+    "firestore.googleapis.com",
+    "run.googleapis.com",
     "serviceusage.googleapis.com",
   ]
 }
@@ -71,9 +77,52 @@ variable "github_actions_project_roles" {
   description = "Project roles granted to the GitHub Actions deployer service account."
   type        = list(string)
   default = [
+    "roles/cloudfunctions.admin",
     "roles/firebasehosting.admin",
     "roles/firebase.viewer",
+    "roles/iam.serviceAccountUser",
     "roles/serviceusage.serviceUsageConsumer",
   ]
 }
 
+variable "manage_feedback_api_invoker_iam" {
+  description = "Whether Terraform should manage public invoker IAM on the feedback API Cloud Run service."
+  type        = bool
+  default     = false
+}
+
+variable "feedback_api_region" {
+  description = "Region for the feedback API Cloud Run service."
+  type        = string
+  default     = "us-central1"
+}
+
+variable "feedback_api_cloud_run_service_name" {
+  description = "Cloud Run service name backing the feedback API function."
+  type        = string
+  default     = "quizfeedbackapi"
+}
+
+variable "feedback_api_allow_public_invoker" {
+  description = "Whether to grant allUsers run.invoker on the feedback API service."
+  type        = bool
+  default     = false
+}
+
+variable "manage_feedback_api_runtime_project_roles" {
+  description = "Whether Terraform should manage project IAM roles for the feedback API runtime service account."
+  type        = bool
+  default     = false
+}
+
+variable "feedback_api_runtime_service_account_email" {
+  description = "Runtime service account email used by feedback API. Required when managing runtime roles."
+  type        = string
+  default     = null
+}
+
+variable "feedback_api_runtime_project_roles" {
+  description = "Project roles to grant to the feedback API runtime service account."
+  type        = list(string)
+  default     = []
+}

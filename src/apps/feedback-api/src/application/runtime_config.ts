@@ -75,7 +75,9 @@ function parseAppCheckRequired(nodeEnv: string): boolean {
     return false;
   }
   if (mode === "auto") {
-    return nodeEnv === "production";
+    const projectId = (process.env.GCLOUD_PROJECT || "").trim().toLowerCase();
+    const isKnownStaging = projectId === "mindblast-staging";
+    return nodeEnv === "production" && !isKnownStaging;
   }
   throw new Error("FEEDBACK_APP_CHECK_ENFORCEMENT must be one of: auto|required|off");
 }

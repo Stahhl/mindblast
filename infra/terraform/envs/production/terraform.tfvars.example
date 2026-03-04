@@ -13,3 +13,38 @@ hosting_site_id = "mindblast-prod"
 create_github_actions_service_account = true
 github_actions_service_account_id     = "mindblast-prod-gha"
 
+# Optional overrides. Defaults already include APIs/roles needed for Hosting + Functions + Firestore.
+# required_services = [
+#   "cloudresourcemanager.googleapis.com",
+#   "cloudbuild.googleapis.com",
+#   "cloudfunctions.googleapis.com",
+#   "eventarc.googleapis.com",
+#   "artifactregistry.googleapis.com",
+#   "firebase.googleapis.com",
+#   "firebasehosting.googleapis.com",
+#   "firestore.googleapis.com",
+#   "run.googleapis.com",
+#   "serviceusage.googleapis.com",
+# ]
+#
+# github_actions_project_roles = [
+#   "roles/cloudfunctions.admin",
+#   "roles/firebasehosting.admin",
+#   "roles/firebase.viewer",
+#   "roles/iam.serviceAccountUser",
+#   "roles/serviceusage.serviceUsageConsumer",
+# ]
+#
+# Feedback API IAM toggles (Phase 6.5):
+# manage_feedback_api_invoker_iam = true
+# feedback_api_region             = "us-central1"
+# feedback_api_cloud_run_service_name = "quizfeedbackapi"
+# feedback_api_allow_public_invoker   = false
+#
+# Runtime service-account IAM (optional):
+# manage_feedback_api_runtime_project_roles   = false
+# feedback_api_runtime_service_account_email  = "<runtime-sa>@mindblast-prod.iam.gserviceaccount.com"
+# feedback_api_runtime_project_roles = [
+#   "roles/datastore.user",
+#   "roles/logging.logWriter",
+# ]

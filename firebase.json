@@ -49,10 +49,6 @@
       ],
       "rewrites": [
         {
-          "source": "/api/**",
-          "function": "quizFeedbackApi"
-        },
-        {
           "source": "**",
           "destination": "/index.html"
         }
