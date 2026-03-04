@@ -40,6 +40,17 @@ resource "google_firebase_project" "this" {
   ]
 }
 
+resource "google_firestore_database" "default" {
+  count = var.enable_firestore_database ? 1 : 0
+
+  project     = local.effective_project_id
+  name        = var.firestore_database_name
+  location_id = var.firestore_database_location
+  type        = var.firestore_database_type
+
+  depends_on = [google_firebase_project.this]
+}
+
 resource "google_firebase_hosting_site" "default" {
   provider = google-beta
   count    = var.enable_hosting_site ? 1 : 0

@@ -21,6 +21,7 @@ infra/terraform/
 ## What Terraform Manages
 - Required Google APIs for Firebase hosting + backend workflows.
 - Firebase project enablement.
+- Optional/default Firestore database resource (for feedback backend persistence).
 - Firebase Hosting site.
 - Optional CI service account + project IAM roles.
 
@@ -119,6 +120,9 @@ Common use:
 
 Note:
 - Terraform can only manage Cloud Run IAM after the feedback function has been deployed at least once (service exists).
+- Firestore rules/indexes deploy requires a Firestore database in the project.
+  Use `enable_firestore_database = true` to create/manage `(default)` via Terraform.
+  If a database already exists, import it before enabling management.
 
 ## Import Notes
 If an existing GCP project or Firebase Hosting site already exists, import resources before apply.
@@ -131,6 +135,9 @@ terraform import 'module.firebase_foundation.google_firebase_project.this' <proj
 
 # Existing hosting site
 terraform import 'module.firebase_foundation.google_firebase_hosting_site.default[0]' projects/<project-id>/sites/<site-id>
+
+# Existing Firestore default database
+terraform import 'module.firebase_foundation.google_firestore_database.default[0]' 'projects/<project-id>/databases/(default)'
 ```
 
 ## CI Authentication Recommendation

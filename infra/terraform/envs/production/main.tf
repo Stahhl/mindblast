@@ -8,6 +8,10 @@ module "firebase_foundation" {
   org_id                                     = var.org_id
   folder_id                                  = var.folder_id
   required_services                          = var.required_services
+  enable_firestore_database                  = var.enable_firestore_database
+  firestore_database_name                    = var.firestore_database_name
+  firestore_database_location                = var.firestore_database_location
+  firestore_database_type                    = var.firestore_database_type
   enable_hosting_site                        = var.enable_hosting_site
   hosting_site_id                            = var.hosting_site_id
   create_github_actions_service_account      = var.create_github_actions_service_account

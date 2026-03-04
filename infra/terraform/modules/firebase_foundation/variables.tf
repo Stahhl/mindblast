@@ -50,6 +50,30 @@ variable "required_services" {
   ]
 }
 
+variable "enable_firestore_database" {
+  description = "Whether to create/manage a Firestore database resource."
+  type        = bool
+  default     = false
+}
+
+variable "firestore_database_name" {
+  description = "Firestore database name. Use (default) for the default database."
+  type        = string
+  default     = "(default)"
+}
+
+variable "firestore_database_location" {
+  description = "Firestore database location/region."
+  type        = string
+  default     = "us-central1"
+}
+
+variable "firestore_database_type" {
+  description = "Firestore database type."
+  type        = string
+  default     = "FIRESTORE_NATIVE"
+}
+
 variable "enable_hosting_site" {
   description = "Whether to create a Firebase Hosting site."
   type        = bool

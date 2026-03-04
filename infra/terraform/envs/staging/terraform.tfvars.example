@@ -13,6 +13,12 @@ hosting_site_id = "mindblast-staging"
 create_github_actions_service_account = true
 github_actions_service_account_id     = "mindblast-staging-gha"
 
+# Firestore database toggle and shape (set true only when Terraform should create/manage DB):
+# enable_firestore_database   = false
+# firestore_database_name     = "(default)"
+# firestore_database_location = "nam5"
+# firestore_database_type     = "FIRESTORE_NATIVE"
+
 # Optional overrides. Defaults already include APIs/roles needed for Hosting + Functions + Firestore.
 # required_services = [
 #   "cloudresourcemanager.googleapis.com",

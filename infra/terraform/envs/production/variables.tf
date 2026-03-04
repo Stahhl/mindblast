@@ -56,6 +56,30 @@ variable "required_services" {
   ]
 }
 
+variable "enable_firestore_database" {
+  description = "Whether Terraform should create/manage the Firestore database."
+  type        = bool
+  default     = true
+}
+
+variable "firestore_database_name" {
+  description = "Firestore database name."
+  type        = string
+  default     = "(default)"
+}
+
+variable "firestore_database_location" {
+  description = "Firestore database location/region."
+  type        = string
+  default     = "us-central1"
+}
+
+variable "firestore_database_type" {
+  description = "Firestore database type."
+  type        = string
+  default     = "FIRESTORE_NATIVE"
+}
+
 variable "enable_hosting_site" {
   description = "Whether to create a production hosting site."
   type        = bool

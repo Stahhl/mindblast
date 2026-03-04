@@ -1,0 +1,61 @@
+name: Deploy Feedback API Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/deploy-feedback-api-production.yml"
+      - "firebase.json"
+      - "firestore.rules"
+      - "firestore.indexes.json"
+      - "src/apps/feedback-api/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: feedback-api-production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_PROJECT_ID: mindblast-prod
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION != '' && secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION || secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION_ }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: src/apps/feedback-api/pnpm-lock.yaml
+
+      - name: Validate deploy credentials
+        run: |
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON}" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_PRODUCTION secret."
+            exit 1
+          fi
+
+      - name: Write service account credentials
+        run: |
+          key_file="${RUNNER_TEMP}/firebase-production.json"
+          printf '%s' "${FIREBASE_SERVICE_ACCOUNT_JSON}" > "${key_file}"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${key_file}" >> "${GITHUB_ENV}"
+
+      - name: Deploy feedback API + Firestore config (production)
+        run: |
+          npx --yes firebase-tools@13 deploy \
+            --only functions:feedback-api:quizFeedbackApi,firestore:rules,firestore:indexes \
+            --project "${FIREBASE_PROJECT_ID}"
