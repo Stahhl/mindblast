@@ -1,0 +1,50 @@
+name: Frontend Tests
+
+on:
+  pull_request:
+    paths:
+      - "src/apps/frontend/**"
+      - ".github/workflows/frontend-tests.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/apps/frontend/**"
+      - ".github/workflows/frontend-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: frontend vitest + build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: src/apps/frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm --dir src/apps/frontend install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm --dir src/apps/frontend test
+
+      - name: Build
+        run: pnpm --dir src/apps/frontend build

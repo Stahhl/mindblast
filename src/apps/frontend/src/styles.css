@@ -416,6 +416,102 @@ h1 {
   color: var(--bad);
 }
 
+.feedback-panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.feedback-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.feedback-stars {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.feedback-star {
+  border: 1px solid var(--line);
+  background: #fdf8ec;
+  color: var(--ink-muted);
+  border-radius: 999px;
+  width: 2rem;
+  height: 2rem;
+  font-family: "IBM Plex Mono", monospace;
+  cursor: pointer;
+}
+
+.feedback-star.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, #fff);
+  color: #7a3216;
+}
+
+.feedback-star:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.feedback-comment-label {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.feedback-comment {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem;
+  min-height: 4.4rem;
+  resize: vertical;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+}
+
+.feedback-comment-count {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+}
+
+.feedback-actions {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.feedback-submit {
+  border: 1px solid var(--line);
+  background: #f7efe0;
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.feedback-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.feedback-message {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.feedback-message.ok {
+  color: var(--ok);
+}
+
+.feedback-message.error {
+  color: var(--bad);
+}
+
 .source-block {
   padding-top: 0.6rem;
 }

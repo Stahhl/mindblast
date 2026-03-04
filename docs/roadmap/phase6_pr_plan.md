@@ -32,21 +32,21 @@ Exit criteria:
 ## PR2: Frontend Feedback UX
 
 Scope:
-- [ ] Add feedback API client wrapper (`POST /api/quiz-feedback`).
-- [ ] Add quiz-card UI controls:
-  - [ ] `1..5` stars
-  - [ ] optional comment textarea
-  - [ ] submit/update action
-- [ ] Include quiz identity fields in request payload:
-  - [ ] `quiz_file`, `date`, `quiz_type`, `edition`
-  - [ ] `question_id`, `question_human_id`
-- [ ] Add UX states:
-  - [ ] saving
-  - [ ] saved
-  - [ ] updated
-  - [ ] retry/error
-- [ ] Optional local draft persistence per `question_id`.
-- [ ] Add frontend tests for submit/update/error flows.
+- [x] Add feedback API client wrapper (`POST /api/quiz-feedback`).
+- [x] Add quiz-card UI controls:
+  - [x] `1..5` stars
+  - [x] optional comment textarea
+  - [x] submit/update action
+- [x] Include quiz identity fields in request payload:
+  - [x] `quiz_file`, `date`, `quiz_type`, `edition`
+  - [x] `question_id`, `question_human_id`
+- [x] Add UX states:
+  - [x] saving
+  - [x] saved
+  - [x] updated
+  - [x] retry/error
+- [x] Optional local draft persistence per `question_id`.
+- [x] Add frontend tests for submit/update/error flows.
 
 Exit criteria:
 - Users can submit and update feedback from quiz cards without blocking quiz play.

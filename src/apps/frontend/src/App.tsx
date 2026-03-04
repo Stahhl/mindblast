@@ -358,6 +358,7 @@ export default function App() {
             <QuizCard
               quiz={quiz.payload}
               quizKey={quiz.key}
+              quizFile={quiz.sourcePath}
               edition={quiz.edition}
               selectedChoiceId={answers[quiz.key]}
               onSelectChoice={onSelectChoice}

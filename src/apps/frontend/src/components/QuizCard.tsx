@@ -1,12 +1,20 @@
+import { useEffect, useMemo, useState } from "react";
+
+import { submitQuizFeedback } from "../lib/feedbackApi";
 import type { QuizPayload, QuizType } from "../lib/types";
 
 interface QuizCardProps {
   quiz: QuizPayload;
   quizKey: string;
+  quizFile: string;
   edition: number;
   selectedChoiceId: string | undefined;
   onSelectChoice: (quizKey: string, choiceId: string) => void;
 }
+
+type FeedbackStatus = "idle" | "saving" | "saved" | "updated" | "error";
+
+const COMMENT_MAX_LENGTH = 500;
 
 function answerTone(isCorrect: boolean): "correct" | "wrong" {
   return isCorrect ? "correct" : "wrong";
@@ -25,11 +33,147 @@ function formatQuizType(type: QuizType): string {
   return type;
 }
 
-export default function QuizCard({ quiz, quizKey, edition, selectedChoiceId, onSelectChoice }: QuizCardProps) {
+function feedbackDraftKey(questionId: string): string {
+  return `mindblast:feedback-draft:${questionId}`;
+}
+
+interface FeedbackDraft {
+  rating?: number;
+  comment?: string;
+}
+
+function readDraft(questionId: string): FeedbackDraft {
+  if (!questionId) {
+    return {};
+  }
+  try {
+    const raw = localStorage.getItem(feedbackDraftKey(questionId));
+    if (!raw) {
+      return {};
+    }
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object") {
+      return {};
+    }
+    const asRecord = parsed as Record<string, unknown>;
+    const rating = Number.isInteger(asRecord.rating) ? (asRecord.rating as number) : undefined;
+    const comment = typeof asRecord.comment === "string" ? asRecord.comment : undefined;
+    if (rating !== undefined && (rating < 1 || rating > 5)) {
+      return { comment };
+    }
+    return { rating, comment };
+  } catch {
+    return {};
+  }
+}
+
+function writeDraft(questionId: string, draft: FeedbackDraft): void {
+  if (!questionId) {
+    return;
+  }
+  if (draft.rating === undefined && (!draft.comment || !draft.comment.trim())) {
+    localStorage.removeItem(feedbackDraftKey(questionId));
+    return;
+  }
+  localStorage.setItem(
+    feedbackDraftKey(questionId),
+    JSON.stringify({
+      rating: draft.rating,
+      comment: draft.comment ?? "",
+    }),
+  );
+}
+
+export default function QuizCard({ quiz, quizKey, quizFile, edition, selectedChoiceId, onSelectChoice }: QuizCardProps) {
   const hasAnswered = Boolean(selectedChoiceId);
   const correctChoice = quiz.choices.find((choice) => choice.id === quiz.correct_choice_id);
   const isCorrect = selectedChoiceId === quiz.correct_choice_id;
   const questionHumanId = quiz.questions?.[0]?.human_id;
+  const questionId = quiz.questions?.[0]?.id ?? "";
+  const canSubmitFeedback = Boolean(questionId && questionHumanId);
+  const [rating, setRating] = useState<number | undefined>(undefined);
+  const [comment, setComment] = useState<string>("");
+  const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("idle");
+  const [feedbackMessage, setFeedbackMessage] = useState<string>("");
+
+  useEffect(() => {
+    const draft = readDraft(questionId);
+    setRating(draft.rating);
+    setComment(draft.comment ?? "");
+    setFeedbackStatus("idle");
+    setFeedbackMessage("");
+  }, [questionId]);
+
+  useEffect(() => {
+    writeDraft(questionId, { rating, comment });
+  }, [questionId, rating, comment]);
+
+  const remainingCommentCharacters = useMemo(() => COMMENT_MAX_LENGTH - comment.length, [comment.length]);
+
+  function onRatingSelect(nextRating: number): void {
+    setRating(nextRating);
+    if (feedbackStatus !== "saving") {
+      setFeedbackStatus("idle");
+      setFeedbackMessage("");
+    }
+  }
+
+  function onCommentChange(value: string): void {
+    setComment(value);
+    if (feedbackStatus !== "saving") {
+      setFeedbackStatus("idle");
+      setFeedbackMessage("");
+    }
+  }
+
+  async function onSubmitFeedback(): Promise<void> {
+    if (!canSubmitFeedback || feedbackStatus === "saving") {
+      return;
+    }
+    if (!rating) {
+      setFeedbackStatus("error");
+      setFeedbackMessage("Select a star rating before submitting.");
+      return;
+    }
+
+    setFeedbackStatus("saving");
+    setFeedbackMessage("");
+    try {
+      const response = await submitQuizFeedback({
+        quiz_file: quizFile,
+        date: quiz.date,
+        quiz_type: quiz.type,
+        edition,
+        question_id: questionId,
+        question_human_id: questionHumanId as string,
+        rating,
+        ...(comment.trim() ? { comment: comment.trim() } : {}),
+      });
+
+      if (response.mode === "created") {
+        setFeedbackStatus("saved");
+        setFeedbackMessage("Feedback saved.");
+      } else {
+        setFeedbackStatus("updated");
+        setFeedbackMessage("Feedback updated.");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setFeedbackStatus("error");
+      setFeedbackMessage(`Could not submit feedback: ${message}`);
+    }
+  }
+
+  const submitButtonLabel =
+    feedbackStatus === "saving"
+      ? "Saving..."
+      : feedbackStatus === "updated"
+        ? "Updated"
+        : feedbackStatus === "saved"
+          ? "Saved"
+          : feedbackStatus === "error"
+            ? "Retry submit"
+            : "Submit feedback";
 
   return (
     <article className="quiz-card">
@@ -83,6 +227,56 @@ export default function QuizCard({ quiz, quizKey, edition, selectedChoiceId, onS
       ) : (
         <p className="result-pill pending">Choose one answer to lock this quiz.</p>
       )}
+
+      <section className="feedback-panel">
+        <p className="feedback-title">Rate this quiz card</p>
+        <div className="feedback-stars" role="group" aria-label="Quiz rating">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              className={`feedback-star ${rating !== undefined && star <= rating ? "active" : ""}`}
+              onClick={() => onRatingSelect(star)}
+              disabled={feedbackStatus === "saving" || !canSubmitFeedback}
+              aria-label={`${star} star${star === 1 ? "" : "s"}`}
+              aria-pressed={rating === star}
+            >
+              {star}
+            </button>
+          ))}
+        </div>
+
+        <label className="feedback-comment-label" htmlFor={`${quizKey}-feedback-comment`}>
+          Optional comment
+        </label>
+        <textarea
+          id={`${quizKey}-feedback-comment`}
+          className="feedback-comment"
+          value={comment}
+          onChange={(event) => onCommentChange(event.target.value.slice(0, COMMENT_MAX_LENGTH))}
+          placeholder="What should we improve?"
+          maxLength={COMMENT_MAX_LENGTH}
+          disabled={feedbackStatus === "saving" || !canSubmitFeedback}
+        />
+        <p className="feedback-comment-count">{remainingCommentCharacters} characters left</p>
+
+        <div className="feedback-actions">
+          <button
+            type="button"
+            className="feedback-submit"
+            disabled={!canSubmitFeedback || !rating || feedbackStatus === "saving"}
+            onClick={() => void onSubmitFeedback()}
+          >
+            {submitButtonLabel}
+          </button>
+          {feedbackMessage ? (
+            <p className={`feedback-message ${feedbackStatus === "error" ? "error" : "ok"}`}>{feedbackMessage}</p>
+          ) : null}
+          {!canSubmitFeedback ? (
+            <p className="feedback-message error">Feedback is unavailable for this quiz payload.</p>
+          ) : null}
+        </div>
+      </section>
 
       <details className="source-details">
         <summary className="source-summary">Show sources ({quiz.source.name})</summary>

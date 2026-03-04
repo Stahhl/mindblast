@@ -115,6 +115,7 @@ Then install and run:
 ```zsh
 cd src/apps/frontend
 pnpm install
+pnpm test
 pnpm dev
 ```
 
