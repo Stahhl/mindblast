@@ -1,0 +1,225 @@
+{
+  "date": "2026-03-04",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "d5aa3db3-f6f2-59ac-af34-d758cf11f554",
+      "type": "history_factoid_mcq_4",
+      "prompt": "When was Vermont admitted to the United States as the fourteenth state?",
+      "answer_fact_ids": [
+        "7d9f4f57-85d4-507b-8511-99bf31afd066",
+        "114c666e-1f41-5d28-aa7e-e420de00a9a2",
+        "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
+        "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f"
+      ],
+      "correct_answer_fact_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "time",
+        "prompt_style": "when",
+        "generation_method": "ai_native_factoid_v1"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1791
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "label": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+      "year": 51,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "1th-century",
+        "50s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "1th-century",
+        "temporal_decade": "50s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 51,
+          "temporal_century": "1th-century",
+          "temporal_decade": "50s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "114c666e-1f41-5d28-aa7e-e420de00a9a2",
+      "label": "Field Marshal C. G. E. Mannerheim, the 6th president of Finland, resigns from his position for health reasons.",
+      "year": 1946,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1940s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1940s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1946,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1940s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Field Marshal C. G. E. Mannerheim, the 6th president of Finland, resigns from his position for health reasons.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
+      "label": "Vermont is admitted to the United States as the fourteenth state.",
+      "year": 1791,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "18th-century",
+        "1790s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1790s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1791,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1790s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Vermont is admitted to the United States as the fourteenth state.",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
+      "label": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
+      "year": 1861,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1860s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1860s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1861,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1860s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "When was Vermont admitted to the United States as the fourteenth state?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "51 AD",
+      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066"
+    },
+    {
+      "id": "B",
+      "label": "1946",
+      "answer_fact_id": "114c666e-1f41-5d28-aa7e-e420de00a9a2"
+    },
+    {
+      "id": "C",
+      "label": "1791",
+      "answer_fact_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b"
+    },
+    {
+      "id": "D",
+      "label": "1861",
+      "answer_fact_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f"
+    }
+  ],
+  "correct_choice_id": "C",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/4",
+    "retrieved_at": "2026-03-04T06:09:41Z",
+    "events_used": [
+      {
+        "event_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+        "text": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+        "year": 51,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/AD_51"
+      },
+      {
+        "event_id": "114c666e-1f41-5d28-aa7e-e420de00a9a2",
+        "text": "Field Marshal C. G. E. Mannerheim, the 6th president of Finland, resigns from his position for health reasons.",
+        "year": 1946,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Carl_Gustaf_Emil_Mannerheim"
+      },
+      {
+        "event_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
+        "text": "Vermont is admitted to the United States as the fourteenth state.",
+        "year": 1791,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Vermont"
+      },
+      {
+        "event_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
+        "text": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
+        "year": 1861,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Flags_of_the_Confederate_States_of_America"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-04T06:09:41Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1",
+    "pipeline_version": "phase5_5_v1",
+    "generation_method": "ai_native_factoid_v1"
+  }
+}

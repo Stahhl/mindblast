@@ -1,0 +1,134 @@
+{
+  "date": "2026-03-04",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "80040456-a981-5bf4-b38d-d5aa4108de22",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "7d9f4f57-85d4-507b-8511-99bf31afd066",
+        "bcea3434-0e81-5e3e-9d09-f8f6c428c24a"
+      ],
+      "correct_answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      }
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "label": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+      "year": 51,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "1th-century",
+        "50s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "1th-century",
+        "temporal_decade": "50s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 51,
+          "temporal_century": "1th-century",
+          "temporal_decade": "50s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+        "embedding_status": "not_generated"
+      }
+    },
+    {
+      "id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a",
+      "label": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
+      "year": 1813,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "19th-century",
+        "1810s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1810s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1813,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1810s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
+        "embedding_status": "not_generated"
+      }
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+      "year": 51,
+      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066"
+    },
+    {
+      "id": "B",
+      "label": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
+      "year": 1813,
+      "answer_fact_id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/4",
+    "retrieved_at": "2026-03-04T06:09:41Z",
+    "events_used": [
+      {
+        "event_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+        "text": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+        "year": 51,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/AD_51"
+      },
+      {
+        "event_id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a",
+        "text": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
+        "year": 1813,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Cyril_VI_of_Constantinople"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-04T06:09:41Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
