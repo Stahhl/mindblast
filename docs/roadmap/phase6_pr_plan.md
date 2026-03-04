@@ -54,23 +54,23 @@ Exit criteria:
 ## PR3: Abuse Controls and Security Hardening
 
 Scope:
-- [ ] Add layered rate limits:
-  - [ ] per client (`5/hour`, `20/day` initial)
-  - [ ] per IP (`60/hour` initial)
-  - [ ] global circuit breaker (`5000/hour` initial)
-- [ ] Enforce per `(client_id, question_id, feedback_date_utc)` one-create semantics.
-- [ ] Add App Check verification for production requests.
-- [ ] Add strict CORS/origin allowlist (staging + production domains).
-- [ ] Add Firestore rules:
-  - [ ] deny direct client writes to `quiz_feedback`
-- [ ] Add structured rejection logs:
-  - [ ] `invalid_payload`
-  - [ ] `rate_limited`
-  - [ ] `app_check_failed`
-- [ ] Add feature flags:
-  - [ ] disable comments
-  - [ ] disable all feedback writes
-- [ ] Add backend tests for rate-limited and gated request paths.
+- [x] Add layered rate limits:
+  - [x] per client (`5/hour`, `20/day` initial)
+  - [x] per IP (`60/hour` initial)
+  - [x] global circuit breaker (`5000/hour` initial)
+- [x] Enforce per `(client_id, question_id, feedback_date_utc)` one-create semantics.
+- [x] Add App Check verification for production requests.
+- [x] Add strict CORS/origin allowlist (staging + production domains).
+- [x] Add Firestore rules:
+  - [x] deny direct client writes to `quiz_feedback`
+- [x] Add structured rejection logs:
+  - [x] `invalid_payload`
+  - [x] `rate_limited`
+  - [x] `app_check_failed`
+- [x] Add feature flags:
+  - [x] disable comments
+  - [x] disable all feedback writes
+- [x] Add backend tests for rate-limited and gated request paths.
 
 Exit criteria:
 - Basic scripted spam attempts are throttled and do not cause unbounded write growth.

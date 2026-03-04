@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Feedback writes are backend-only in Phase 6.
+    match /quiz_feedback/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /quiz_feedback_rate_limits/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

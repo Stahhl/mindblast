@@ -49,6 +49,17 @@ function requireInteger(payload: Record<string, unknown>, field: string): number
 }
 
 export function validateSubmitFeedbackPayload(payload: unknown): SubmitFeedbackPayload {
+  return validateSubmitFeedbackPayloadWithOptions(payload, { commentsEnabled: true });
+}
+
+export interface SubmitFeedbackValidationOptions {
+  commentsEnabled: boolean;
+}
+
+export function validateSubmitFeedbackPayloadWithOptions(
+  payload: unknown,
+  options: SubmitFeedbackValidationOptions,
+): SubmitFeedbackPayload {
   assertObject(payload);
 
   for (const key of Object.keys(payload)) {
@@ -95,15 +106,19 @@ export function validateSubmitFeedbackPayload(payload: unknown): SubmitFeedbackP
   const commentRaw = payload.comment;
   let comment: string | undefined;
   if (commentRaw !== undefined) {
-    if (typeof commentRaw !== "string") {
-      throw new ValidationError("comment must be a string");
-    }
-    const trimmed = commentRaw.trim();
-    if (trimmed.length > 500) {
-      throw new ValidationError("comment must be at most 500 characters");
-    }
-    if (trimmed.length > 0) {
-      comment = trimmed;
+    if (!options.commentsEnabled) {
+      comment = undefined;
+    } else {
+      if (typeof commentRaw !== "string") {
+        throw new ValidationError("comment must be a string");
+      }
+      const trimmed = commentRaw.trim();
+      if (trimmed.length > 500) {
+        throw new ValidationError("comment must be at most 500 characters");
+      }
+      if (trimmed.length > 0) {
+        comment = trimmed;
+      }
     }
   }
 

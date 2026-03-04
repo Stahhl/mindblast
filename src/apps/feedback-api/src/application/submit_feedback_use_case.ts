@@ -1,11 +1,14 @@
 import type { FeedbackRecord, SubmitFeedbackResult } from "../domain/feedback";
 import type { ClockPort, FeedbackRepositoryPort, IdGeneratorPort } from "./ports";
-import { validateSubmitFeedbackPayload } from "./validation";
+import { validateSubmitFeedbackPayloadWithOptions } from "./validation";
 
 export interface SubmitFeedbackUseCaseDependencies {
   repository: FeedbackRepositoryPort;
   clock: ClockPort;
   idGenerator: IdGeneratorPort;
+  featureFlags: {
+    commentsEnabled: boolean;
+  };
 }
 
 export interface SubmitFeedbackUseCaseInput {
@@ -17,7 +20,9 @@ export async function submitFeedbackUseCase(
   input: SubmitFeedbackUseCaseInput,
   deps: SubmitFeedbackUseCaseDependencies,
 ): Promise<SubmitFeedbackResult> {
-  const normalized = validateSubmitFeedbackPayload(input.payload);
+  const normalized = validateSubmitFeedbackPayloadWithOptions(input.payload, {
+    commentsEnabled: deps.featureFlags.commentsEnabled,
+  });
 
   const nowIso = deps.clock.nowIsoUtc();
   const feedbackDateUtc = nowIso.slice(0, 10);

@@ -74,6 +74,7 @@ describe("submitFeedbackUseCase", () => {
         repository,
         clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
         idGenerator: new DeterministicIdGenerator(),
+        featureFlags: { commentsEnabled: true },
       },
     );
 
@@ -101,6 +102,7 @@ describe("submitFeedbackUseCase", () => {
         repository,
         clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
         idGenerator,
+        featureFlags: { commentsEnabled: true },
       },
     );
     const second = await submitFeedbackUseCase(
@@ -112,6 +114,7 @@ describe("submitFeedbackUseCase", () => {
         repository,
         clock: new FixedClock("2026-03-04T11:00:00.000Z", "2026-03-04T11:00:00.000Z"),
         idGenerator,
+        featureFlags: { commentsEnabled: true },
       },
     );
 
@@ -138,8 +141,47 @@ describe("submitFeedbackUseCase", () => {
           repository,
           clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
           idGenerator: new DeterministicIdGenerator(),
+          featureFlags: { commentsEnabled: true },
         },
       ),
     ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  test("strips comment when comments are disabled", async () => {
+    const repository = new InMemoryFeedbackRepository();
+    const result = await submitFeedbackUseCase(
+      {
+        payload: payload({ comment: "this should be dropped" }),
+        clientId: "client-1",
+      },
+      {
+        repository,
+        clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
+        idGenerator: new DeterministicIdGenerator(),
+        featureFlags: { commentsEnabled: false },
+      },
+    );
+
+    const stored = repository.records.get(result.feedback_id);
+    expect(stored?.comment).toBeUndefined();
+  });
+
+  test("accepts non-string comment payload when comments are disabled", async () => {
+    const repository = new InMemoryFeedbackRepository();
+    const result = await submitFeedbackUseCase(
+      {
+        payload: payload({ comment: 12345 }),
+        clientId: "client-1",
+      },
+      {
+        repository,
+        clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
+        idGenerator: new DeterministicIdGenerator(),
+        featureFlags: { commentsEnabled: false },
+      },
+    );
+
+    const stored = repository.records.get(result.feedback_id);
+    expect(stored?.comment).toBeUndefined();
   });
 });

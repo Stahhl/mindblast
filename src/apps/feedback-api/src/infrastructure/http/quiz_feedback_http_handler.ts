@@ -1,11 +1,20 @@
 import { ValidationError } from "../../application/errors";
+import type { FeedbackRuntimeConfig } from "../../application/runtime_config";
 import {
   submitFeedbackUseCase,
   type SubmitFeedbackUseCaseDependencies,
 } from "../../application/submit_feedback_use_case";
+import type {
+  AuditLoggerPort,
+  RateLimitDecision,
+  RateLimiterPort,
+  RequestAttestationVerifierPort,
+} from "../../application/ports";
 import { getOrCreateClientId } from "../web/client_identity_provider";
 
 const QUIZ_FEEDBACK_PATHS = new Set(["/api/quiz-feedback", "/quiz-feedback"]);
+const ALLOWED_METHODS = "POST, OPTIONS";
+const ALLOWED_HEADERS = "Content-Type, X-Firebase-AppCheck";
 
 interface RequestLike {
   method: string;
@@ -21,6 +30,14 @@ interface ResponseLike {
   setHeader(name: string, value: string): void;
 }
 
+export interface QuizFeedbackHttpHandlerDependencies {
+  useCase: SubmitFeedbackUseCaseDependencies;
+  rateLimiter: RateLimiterPort;
+  appCheckVerifier: RequestAttestationVerifierPort;
+  auditLogger: AuditLoggerPort;
+  runtimeConfig: FeedbackRuntimeConfig;
+}
+
 function isJsonContentType(contentType: string | undefined): boolean {
   return typeof contentType === "string" && contentType.toLowerCase().includes("application/json");
 }
@@ -30,6 +47,32 @@ function normalizePath(path: string): string {
     return path.slice(0, -1);
   }
   return path;
+}
+
+function normalizeHeader(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+  return value;
+}
+
+function parseIpAddress(request: RequestLike): string {
+  const forwardedFor = normalizeHeader(request.headers["x-forwarded-for"]);
+  if (typeof forwardedFor === "string" && forwardedFor.trim()) {
+    return forwardedFor.split(",")[0]?.trim() || "unknown";
+  }
+
+  const realIp = normalizeHeader(request.headers["x-real-ip"]);
+  if (typeof realIp === "string" && realIp.trim()) {
+    return realIp.trim();
+  }
+
+  const cfIp = normalizeHeader(request.headers["cf-connecting-ip"]);
+  if (typeof cfIp === "string" && cfIp.trim()) {
+    return cfIp.trim();
+  }
+
+  return "unknown";
 }
 
 function extractBody(request: RequestLike): unknown {
@@ -42,20 +85,156 @@ function extractBody(request: RequestLike): unknown {
   return {};
 }
 
-export function createQuizFeedbackHttpHandler(deps: SubmitFeedbackUseCaseDependencies) {
-  return async (request: RequestLike, response: ResponseLike): Promise<void> => {
-    if (request.method !== "POST") {
-      response.status(405).json({ ok: false, error: "method_not_allowed" });
-      return;
-    }
+function extractContentLength(request: RequestLike): number {
+  const raw = normalizeHeader(request.headers["content-length"]);
+  if (!raw || !raw.trim()) {
+    return 0;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    return 0;
+  }
+  return parsed;
+}
 
-    if (!QUIZ_FEEDBACK_PATHS.has(normalizePath(request.path))) {
+function isOriginAllowed(origin: string | undefined, runtimeConfig: FeedbackRuntimeConfig): boolean {
+  if (!origin || !origin.trim()) {
+    return !runtimeConfig.security.requireOrigin;
+  }
+  return runtimeConfig.security.allowedOrigins.includes(origin);
+}
+
+function applyCorsHeaders(response: ResponseLike, origin: string | undefined): void {
+  if (!origin) {
+    return;
+  }
+  response.setHeader("Access-Control-Allow-Origin", origin);
+  response.setHeader("Vary", "Origin");
+  response.setHeader("Access-Control-Allow-Methods", ALLOWED_METHODS);
+  response.setHeader("Access-Control-Allow-Headers", ALLOWED_HEADERS);
+  response.setHeader("Access-Control-Max-Age", "3600");
+}
+
+function reject(
+  response: ResponseLike,
+  auditLogger: AuditLoggerPort,
+  statusCode: number,
+  reason: string,
+  payload: Record<string, unknown>,
+  context: Record<string, unknown> = {},
+): void {
+  auditLogger.reject(reason, {
+    status_code: statusCode,
+    ...context,
+  });
+  response.status(statusCode).json(payload);
+}
+
+async function checkRateLimits(
+  request: RequestLike,
+  deps: QuizFeedbackHttpHandlerDependencies,
+  clientId: string,
+): Promise<RateLimitDecision> {
+  const ipAddress = parseIpAddress(request);
+  return deps.rateLimiter.checkAndConsume([
+    {
+      key: `client:${clientId}`,
+      label: "client_hourly",
+      limit: deps.runtimeConfig.rateLimits.clientHourly,
+      windowSeconds: 3600,
+    },
+    {
+      key: `client:${clientId}`,
+      label: "client_daily",
+      limit: deps.runtimeConfig.rateLimits.clientDaily,
+      windowSeconds: 86400,
+    },
+    {
+      key: `ip:${ipAddress}`,
+      label: "ip_hourly",
+      limit: deps.runtimeConfig.rateLimits.ipHourly,
+      windowSeconds: 3600,
+    },
+    {
+      key: "global",
+      label: "global_hourly",
+      limit: deps.runtimeConfig.rateLimits.globalHourly,
+      windowSeconds: 3600,
+    },
+  ]);
+}
+
+export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDependencies) {
+  return async (request: RequestLike, response: ResponseLike): Promise<void> => {
+    const path = normalizePath(request.path);
+    const origin = normalizeHeader(request.headers.origin);
+
+    if (!QUIZ_FEEDBACK_PATHS.has(path)) {
       response.status(404).json({ ok: false, error: "not_found" });
       return;
     }
 
+    if (request.method === "OPTIONS") {
+      if (!isOriginAllowed(origin, deps.runtimeConfig)) {
+        reject(response, deps.auditLogger, 403, "forbidden_origin", { ok: false, error: "forbidden_origin" }, { origin });
+        return;
+      }
+      applyCorsHeaders(response, origin);
+      response.status(204).json({});
+      return;
+    }
+
+    if (request.method !== "POST") {
+      reject(response, deps.auditLogger, 405, "method_not_allowed", { ok: false, error: "method_not_allowed" }, { method: request.method });
+      return;
+    }
+
+    if (!isOriginAllowed(origin, deps.runtimeConfig)) {
+      reject(response, deps.auditLogger, 403, "forbidden_origin", { ok: false, error: "forbidden_origin" }, { origin });
+      return;
+    }
+    applyCorsHeaders(response, origin);
+
+    if (!deps.runtimeConfig.featureFlags.writeEnabled) {
+      reject(response, deps.auditLogger, 503, "writes_disabled", { ok: false, error: "writes_disabled" });
+      return;
+    }
+
+    const appCheckToken = request.get("x-firebase-appcheck") || normalizeHeader(request.headers["x-firebase-appcheck"]);
+    const appCheckDecision = await deps.appCheckVerifier.verifyToken(appCheckToken);
+    if (!appCheckDecision.ok) {
+      reject(
+        response,
+        deps.auditLogger,
+        403,
+        "app_check_failed",
+        { ok: false, error: "app_check_failed" },
+        { app_check_reason: appCheckDecision.reason || "unknown" },
+      );
+      return;
+    }
+
+    const contentLength = extractContentLength(request);
+    if (contentLength > deps.runtimeConfig.security.maxRequestBytes) {
+      reject(
+        response,
+        deps.auditLogger,
+        413,
+        "invalid_payload",
+        { ok: false, error: "invalid_payload", details: "payload too large" },
+        { content_length: contentLength },
+      );
+      return;
+    }
+
     if (!isJsonContentType(request.get("content-type"))) {
-      response.status(400).json({ ok: false, error: "invalid_payload", details: "content-type must be application/json" });
+      reject(
+        response,
+        deps.auditLogger,
+        400,
+        "invalid_payload",
+        { ok: false, error: "invalid_payload", details: "content-type must be application/json" },
+      );
       return;
     }
 
@@ -70,22 +249,53 @@ export function createQuizFeedbackHttpHandler(deps: SubmitFeedbackUseCaseDepende
         },
       );
 
+      const rateLimitDecision = await checkRateLimits(request, deps, clientId);
+      if (!rateLimitDecision.allowed) {
+        if (rateLimitDecision.retryAfterSeconds) {
+          response.setHeader("Retry-After", String(rateLimitDecision.retryAfterSeconds));
+        }
+        reject(
+          response,
+          deps.auditLogger,
+          429,
+          "rate_limited",
+          { ok: false, error: "rate_limited" },
+          {
+            limit_reason: rateLimitDecision.reason || "unknown",
+            retry_after_seconds: rateLimitDecision.retryAfterSeconds || 0,
+          },
+        );
+        return;
+      }
+
       const result = await submitFeedbackUseCase(
         {
           payload,
           clientId,
         },
-        deps,
+        deps.useCase,
       );
 
       response.status(200).json(result);
     } catch (error) {
       if (error instanceof SyntaxError) {
-        response.status(400).json({ ok: false, error: "invalid_payload", details: "body must be valid JSON" });
+        reject(
+          response,
+          deps.auditLogger,
+          400,
+          "invalid_payload",
+          { ok: false, error: "invalid_payload", details: "body must be valid JSON" },
+        );
         return;
       }
       if (error instanceof ValidationError) {
-        response.status(400).json({ ok: false, error: "invalid_payload", details: error.message });
+        reject(
+          response,
+          deps.auditLogger,
+          400,
+          "invalid_payload",
+          { ok: false, error: "invalid_payload", details: error.message },
+        );
         return;
       }
 
