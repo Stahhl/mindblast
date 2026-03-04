@@ -24,7 +24,8 @@
       },
       "selection_rules": {
         "distractor_same_year_allowed": false
-      }
+      },
+      "human_id": "Q26"
     }
   ],
   "answer_facts": [
@@ -55,7 +56,8 @@
       "vector_metadata": {
         "text_for_embedding": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A64"
     },
     {
       "id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a",
@@ -84,7 +86,8 @@
       "vector_metadata": {
         "text_for_embedding": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A65"
     }
   ],
   "question": "Which event happened earlier?",
@@ -93,13 +96,15 @@
       "id": "A",
       "label": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
       "year": 51,
-      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066"
+      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "human_id": "A64"
     },
     {
       "id": "B",
       "label": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
       "year": 1813,
-      "answer_fact_id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a"
+      "answer_fact_id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a",
+      "human_id": "A65"
     }
   ],
   "correct_choice_id": "A",

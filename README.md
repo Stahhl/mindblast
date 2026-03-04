@@ -15,6 +15,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - `history_factoid_mcq_4` AI-native rewrite path is behind `FACTOID_AI_PIPELINE_ENABLED` (disabled by default)
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields
 - discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
+- support artifact: `quizzes/human_id_lookup.json` (`Q...`/`A...` alias lookup)
 - output committed as JSON to this repository
 
 ## Repository Structure
@@ -117,6 +118,14 @@ cd /Users/stahl/dev/mindblast
 uv sync --locked --no-dev --python 3.12
 uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4,history_factoid_mcq_4"
 ```
+
+Backfill human-friendly IDs for already generated quiz files:
+
+```zsh
+uv run --python 3.12 python scripts/generate_quiz.py --backfill-human-ids --output-dir quizzes
+```
+
+This backfill mode can also normalize legacy schema v1 quiz payloads to v2.
 
 ## Python Tests (uv)
 

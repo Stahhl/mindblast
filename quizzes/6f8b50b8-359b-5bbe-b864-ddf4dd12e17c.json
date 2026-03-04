@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1870
-      }
+      },
+      "human_id": "Q18"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "Battle of Adwa: An Ethiopian army defeats an outnumbered Italian force, ending the First Italo-Ethiopian War.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A47"
     },
     {
       "id": "fc9c1c70-400a-5239-a5f7-52f3b98ed8c0",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Australian Army is formed.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A48"
     },
     {
       "id": "0098ba18-b9b5-5a25-836e-da4805f55c25",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "Cold War: Klaus Fuchs is convicted of spying for the Soviet Union by disclosing top secret atomic bomb data.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A45"
     },
     {
       "id": "2a963c5d-e426-5e32-a694-e4095d963810",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "Marshal F. S. L\u00f3pez dies during the Battle of Cerro Cor\u00e1 thus marking the end of the Paraguayan War.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A49"
     }
   ],
   "question": "Which event happened in 1870?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "Battle of Adwa: An Ethiopian army defeats an outnumbered Italian force, ending the First Italo-Ethiopian War.",
-      "answer_fact_id": "dba8b2ba-85f9-56dd-a959-14b75953b970"
+      "answer_fact_id": "dba8b2ba-85f9-56dd-a959-14b75953b970",
+      "human_id": "A47"
     },
     {
       "id": "B",
       "label": "The Australian Army is formed.",
-      "answer_fact_id": "fc9c1c70-400a-5239-a5f7-52f3b98ed8c0"
+      "answer_fact_id": "fc9c1c70-400a-5239-a5f7-52f3b98ed8c0",
+      "human_id": "A48"
     },
     {
       "id": "C",
       "label": "Cold War: Klaus Fuchs is convicted of spying for the Soviet Union by disclosing top secret atomic bomb data.",
-      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25"
+      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25",
+      "human_id": "A45"
     },
     {
       "id": "D",
       "label": "Marshal F. S. L\u00f3pez dies during the Battle of Cerro Cor\u00e1 thus marking the end of the Paraguayan War.",
-      "answer_fact_id": "2a963c5d-e426-5e32-a694-e4095d963810"
+      "answer_fact_id": "2a963c5d-e426-5e32-a694-e4095d963810",
+      "human_id": "A49"
     }
   ],
   "correct_choice_id": "D",

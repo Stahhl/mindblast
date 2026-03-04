@@ -30,7 +30,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 2005
-      }
+      },
+      "human_id": "Q19"
     }
   ],
   "answer_facts": [
@@ -62,7 +63,8 @@
       "vector_metadata": {
         "text_for_embedding": "In Roper v. Simmons, the U.S. Supreme Court rules that the execution of juveniles found guilty of any crime is unconstitutional.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A50"
     },
     {
       "id": "0098ba18-b9b5-5a25-836e-da4805f55c25",
@@ -92,7 +94,8 @@
       "vector_metadata": {
         "text_for_embedding": "Cold War: Klaus Fuchs is convicted of spying for the Soviet Union by disclosing top secret atomic bomb data.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A45"
     },
     {
       "id": "2a963c5d-e426-5e32-a694-e4095d963810",
@@ -122,7 +125,8 @@
       "vector_metadata": {
         "text_for_embedding": "Marshal F. S. L\u00f3pez dies during the Battle of Cerro Cor\u00e1 thus marking the end of the Paraguayan War.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A49"
     },
     {
       "id": "dba8b2ba-85f9-56dd-a959-14b75953b970",
@@ -152,7 +156,8 @@
       "vector_metadata": {
         "text_for_embedding": "Battle of Adwa: An Ethiopian army defeats an outnumbered Italian force, ending the First Italo-Ethiopian War.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A47"
     }
   ],
   "question": "When did this happen: In Roper v. Simmons, the U.S. Supreme Court rules that the execution of juveniles found guilty of any crime is unconstitutional?",
@@ -160,22 +165,26 @@
     {
       "id": "A",
       "label": "2005",
-      "answer_fact_id": "3c17db85-d638-53e3-865b-65267dbca47b"
+      "answer_fact_id": "3c17db85-d638-53e3-865b-65267dbca47b",
+      "human_id": "A50"
     },
     {
       "id": "B",
       "label": "1950",
-      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25"
+      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25",
+      "human_id": "A45"
     },
     {
       "id": "C",
       "label": "1870",
-      "answer_fact_id": "2a963c5d-e426-5e32-a694-e4095d963810"
+      "answer_fact_id": "2a963c5d-e426-5e32-a694-e4095d963810",
+      "human_id": "A49"
     },
     {
       "id": "D",
       "label": "1896",
-      "answer_fact_id": "dba8b2ba-85f9-56dd-a959-14b75953b970"
+      "answer_fact_id": "dba8b2ba-85f9-56dd-a959-14b75953b970",
+      "human_id": "A47"
     }
   ],
   "correct_choice_id": "A",

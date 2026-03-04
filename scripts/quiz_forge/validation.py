@@ -52,6 +52,9 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
         answer_fact_id = choice.get("answer_fact_id")
         if not isinstance(answer_fact_id, str) or not answer_fact_id.strip():
             raise ValueError("choice.answer_fact_id must be a non-empty string.")
+        choice_human_id = choice.get("human_id")
+        if choice_human_id is not None and not _is_valid_human_id(choice_human_id, "A"):
+            raise ValueError("choice.human_id must match A<integer> when present.")
 
         ids.append(choice_id)
 
@@ -117,6 +120,17 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
     return quiz_type, choices
 
 
+def _is_valid_human_id(value: Any, prefix: str) -> bool:
+    if not isinstance(value, str):
+        return False
+    if not value.startswith(prefix):
+        return False
+    suffix = value[len(prefix) :]
+    if not suffix.isdigit():
+        return False
+    return int(suffix) >= 1
+
+
 def _validate_answer_facts(quiz: dict[str, Any]) -> dict[str, dict[str, Any]]:
     answer_facts = quiz.get("answer_facts")
     if not isinstance(answer_facts, list) or not answer_facts:
@@ -139,6 +153,9 @@ def _validate_answer_facts(quiz: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise ValueError(f"answer_facts[{idx}].label must be a non-empty string.")
         if not isinstance(year, int):
             raise ValueError(f"answer_facts[{idx}].year must be an integer.")
+        human_id = fact.get("human_id")
+        if human_id is not None and not _is_valid_human_id(human_id, "A"):
+            raise ValueError(f"answer_facts[{idx}].human_id must match A<integer> when present.")
 
         tags = fact.get("tags")
         if not isinstance(tags, list) or not tags or not all(isinstance(tag, str) and tag.strip() for tag in tags):
@@ -201,6 +218,9 @@ def _validate_questions(
 
     if not isinstance(question_id, str) or not question_id.strip():
         raise ValueError("questions[0].id must be a non-empty string.")
+    question_human_id = question.get("human_id")
+    if question_human_id is not None and not _is_valid_human_id(question_human_id, "Q"):
+        raise ValueError("questions[0].human_id must match Q<integer> when present.")
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("questions[0].prompt must be a non-empty string.")
     if question_type != quiz_type:
@@ -233,6 +253,23 @@ def _validate_questions(
         raise ValueError("correct_choice_id must match one of the legacy choices.")
     if correct_choice["answer_fact_id"] != correct_answer_fact_id:
         raise ValueError("questions[0].correct_answer_fact_id must match legacy correct choice.")
+
+    answer_fact_human_ids = {
+        fact_id: fact.get("human_id")
+        for fact_id, fact in facts_by_id.items()
+    }
+    has_choice_human_ids = any(choice.get("human_id") is not None for choice in legacy_choices)
+    has_answer_fact_human_ids = any(human_id is not None for human_id in answer_fact_human_ids.values())
+    if has_choice_human_ids != has_answer_fact_human_ids:
+        raise ValueError("choice and answer_fact human ids must either both be present or both be absent.")
+    if has_choice_human_ids and has_answer_fact_human_ids:
+        for idx, choice in enumerate(legacy_choices):
+            choice_human_id = choice.get("human_id")
+            answer_fact_human_id = answer_fact_human_ids.get(choice["answer_fact_id"])
+            if choice_human_id != answer_fact_human_id:
+                raise ValueError(
+                    f"choices[{idx}].human_id must match answer_facts human_id for choices[{idx}].answer_fact_id."
+                )
 
     tags = question.get("tags")
     if not isinstance(tags, list) or not tags or not all(isinstance(tag, str) and tag.strip() for tag in tags):

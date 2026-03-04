@@ -24,7 +24,8 @@
       },
       "selection_rules": {
         "distractor_same_year_allowed": false
-      }
+      },
+      "human_id": "Q9"
     }
   ],
   "answer_facts": [
@@ -55,7 +56,8 @@
       "vector_metadata": {
         "text_for_embedding": "The New York Philharmonic performs in Pyongyang, North Korea; this is the first event of its kind to take place in North Korea.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A24"
     },
     {
       "id": "7bfbee3c-3044-52f8-bf11-e598de5c9841",
@@ -84,7 +86,8 @@
       "vector_metadata": {
         "text_for_embedding": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A25"
     }
   ],
   "question": "Which event happened earlier?",
@@ -93,13 +96,15 @@
       "id": "A",
       "label": "The New York Philharmonic performs in Pyongyang, North Korea; this is the first event of its kind to take place in North Korea.",
       "year": 2008,
-      "answer_fact_id": "a259c8aa-d19e-57ad-a065-f1207dae2c27"
+      "answer_fact_id": "a259c8aa-d19e-57ad-a065-f1207dae2c27",
+      "human_id": "A24"
     },
     {
       "id": "B",
       "label": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
       "year": 1914,
-      "answer_fact_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841"
+      "answer_fact_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841",
+      "human_id": "A25"
     }
   ],
   "correct_choice_id": "B",
@@ -125,5 +130,10 @@
   "metadata": {
     "version": 2,
     "normalized_model": "question_answer_facts_v1"
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-02-26T06:17:05Z"
   }
 }

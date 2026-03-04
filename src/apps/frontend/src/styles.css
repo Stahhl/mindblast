@@ -309,6 +309,14 @@ h1 {
   color: var(--ink-muted);
 }
 
+.quiz-human-id {
+  margin: 0.35rem 0 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--ink-muted) 88%, #000000);
+}
+
 .quiz-header h2 {
   margin: 0.35rem 0 0;
   font-size: 1.1rem;
@@ -357,6 +365,18 @@ h1 {
 .choice-label {
   line-height: 1.25;
   font-size: 0.95rem;
+}
+
+.choice-body {
+  display: grid;
+  gap: 0.14rem;
+}
+
+.choice-human-id {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
 }
 
 .choice.selected {

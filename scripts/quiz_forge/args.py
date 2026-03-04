@@ -60,6 +60,14 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help="How many quizzes to generate per quiz type for this run.",
     )
+    parser.add_argument(
+        "--backfill-human-ids",
+        action="store_true",
+        help=(
+            "Assign missing Q/A human IDs to existing quiz files and update "
+            "quizzes/human_id_lookup.json without generating new quizzes."
+        ),
+    )
     return parser.parse_args()
 
 

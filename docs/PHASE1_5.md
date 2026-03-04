@@ -88,9 +88,56 @@ Example:
 }
 ```
 
+### Human ID Lookup
+- Path: `quizzes/human_id_lookup.json`
+- Append-only lookup for support/debugging aliases:
+  - question aliases: `Q<integer>` -> question UUID + quiz file path
+  - answer aliases: `A<integer>` -> answer-fact UUID
+- Counters only advance when a new quiz file is generated.
+- No rewrite on no-op reruns.
+
+Example:
+```json
+{
+  "metadata": {
+    "version": 1,
+    "updated_at": "2026-02-22T06:00:00Z"
+  },
+  "counters": {
+    "question": 412,
+    "answer": 992
+  },
+  "question_uuid_to_human_id": {
+    "33b21f44-4fab-5a57-88dd-c7ed41b5126f": "Q412"
+  },
+  "answer_uuid_to_human_id": {
+    "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d": "A991",
+    "5f9bc15e-1614-5278-b166-6d4f2964f823": "A992"
+  },
+  "questions": {
+    "Q412": {
+      "question_id": "33b21f44-4fab-5a57-88dd-c7ed41b5126f",
+      "quiz_file": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json",
+      "date": "2026-02-22",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    }
+  },
+  "answers": {
+    "A991": {
+      "answer_fact_id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d",
+      "label": "The RMS Titanic sinks in the Atlantic Ocean.",
+      "year": 1912
+    }
+  }
+}
+```
+
 ## Generation Rules
 - Write/update the date index for the target date only after quiz payload validation succeeds.
 - Update `quizzes/latest.json` only when the target date is newer than the currently referenced date.
+- Update `quizzes/human_id_lookup.json` only when at least one new quiz file is created.
+- Backfill mode (`--backfill-human-ids`) may normalize legacy `metadata.version = 1` quiz payloads to v2 before assigning human IDs.
 - If a rerun is for the same date and content is unchanged, do not create an unnecessary commit.
 - Fail closed if index files would reference missing quiz files.
 - During schema migration, index files may reference a mix of quiz payload versions (`metadata.version` 1 and 2).

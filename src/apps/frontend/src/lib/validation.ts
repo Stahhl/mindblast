@@ -16,6 +16,14 @@ function isQuizType(value: unknown): value is QuizType {
   return isNonEmptyString(value) && KNOWN_TYPES.has(value as QuizType);
 }
 
+function isHumanId(value: unknown, prefix: "Q" | "A"): value is string {
+  if (!isNonEmptyString(value) || !value.startsWith(prefix)) {
+    return false;
+  }
+  const suffix = value.slice(prefix.length);
+  return /^\d+$/.test(suffix) && Number.parseInt(suffix, 10) >= 1;
+}
+
 function validateSource(source: unknown, expectedLength: number): asserts source is QuizSource {
   assert(source && typeof source === "object", "quiz.source must be an object");
 
@@ -63,6 +71,12 @@ function validateCommonQuizShape(quiz: unknown): asserts quiz is QuizPayload {
     const choiceValue = choice as Record<string, unknown>;
     assert(isNonEmptyString(choiceValue.id), `quiz.choices[${idx}].id must be a non-empty string`);
     assert(isNonEmptyString(choiceValue.label), `quiz.choices[${idx}].label must be a non-empty string`);
+    if (choiceValue.human_id !== undefined) {
+      assert(
+        isHumanId(choiceValue.human_id, "A"),
+        `quiz.choices[${idx}].human_id must match A<integer> when present`
+      );
+    }
   });
 
   const uniqueIds = new Set(quizValue.choices.map((choice) => (choice as { id: string }).id));
@@ -104,6 +118,12 @@ function validateNormalizedModel(quizValue: Record<string, unknown>): void {
   answerFacts.forEach((fact, idx) => {
     assert(fact && typeof fact === "object", `quiz.answer_facts[${idx}] must be an object`);
     assert(isNonEmptyString(fact.id), `quiz.answer_facts[${idx}].id must be a non-empty string`);
+    if (fact.human_id !== undefined) {
+      assert(
+        isHumanId(fact.human_id, "A"),
+        `quiz.answer_facts[${idx}].human_id must match A<integer> when present`
+      );
+    }
     assert(isNonEmptyString(fact.label), `quiz.answer_facts[${idx}].label must be a non-empty string`);
     assert(Number.isInteger(fact.year), `quiz.answer_facts[${idx}].year must be an integer`);
     assert(Array.isArray(fact.tags), `quiz.answer_facts[${idx}].tags must be an array`);
@@ -136,6 +156,12 @@ function validateNormalizedModel(quizValue: Record<string, unknown>): void {
   const question = quizValue.questions[0] as Record<string, unknown>;
   assert(question && typeof question === "object", "quiz.questions[0] must be an object");
   assert(isNonEmptyString(question.id), "quiz.questions[0].id must be a non-empty string");
+  if (question.human_id !== undefined) {
+    assert(
+      isHumanId(question.human_id, "Q"),
+      "quiz.questions[0].human_id must match Q<integer> when present"
+    );
+  }
   assert(isQuizType(question.type), "quiz.questions[0].type must be a known quiz type");
   assert(isNonEmptyString(question.prompt), "quiz.questions[0].prompt must be a non-empty string");
   assert(
@@ -183,6 +209,28 @@ function validateNormalizedModel(quizValue: Record<string, unknown>): void {
     JSON.stringify(choiceAnswerFactIds) === JSON.stringify(question.answer_fact_ids),
     "quiz.choices[*].answer_fact_id order must match quiz.questions[0].answer_fact_ids"
   );
+
+  const factHumanIdById = new Map<string, string | undefined>();
+  answerFacts.forEach((fact) => {
+    factHumanIdById.set(fact.id as string, fact.human_id as string | undefined);
+  });
+
+  const choiceHumanIds = (quizValue.choices as Array<Record<string, unknown>>).map((choice) => choice.human_id);
+  const hasChoiceHumanIds = choiceHumanIds.some((value) => value !== undefined);
+  const hasFactHumanIds = answerFacts.some((fact) => fact.human_id !== undefined);
+  assert(
+    hasChoiceHumanIds === hasFactHumanIds,
+    "quiz.choices[*].human_id and quiz.answer_facts[*].human_id must either both be present or both absent"
+  );
+  if (hasChoiceHumanIds && hasFactHumanIds) {
+    (quizValue.choices as Array<Record<string, unknown>>).forEach((choice, idx) => {
+      const expectedHumanId = factHumanIdById.get(choice.answer_fact_id as string);
+      assert(
+        choice.human_id === expectedHumanId,
+        `quiz.choices[${idx}].human_id must match the linked answer_fact human_id`
+      );
+    });
+  }
 }
 
 function validateWhichCameFirst(quiz: QuizPayload): void {

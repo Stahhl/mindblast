@@ -54,6 +54,7 @@ Common fields for all types:
 - `answer_facts`: non-empty reusable answer-fact array.
 - `question`: non-empty string (legacy compatibility mirror of `questions[0].prompt`).
 - `choices`: non-empty array (legacy compatibility view).
+- `choices[*].human_id` (optional): stable human-facing answer alias in `A<integer>` format.
 - `correct_choice_id`: one of the choice ids (legacy compatibility view).
 - `source.name`, `source.url`, `source.retrieved_at`: non-empty strings.
 - `source.events_used`: array of source events (`event_id`, `text`, `year`, `wikipedia_url`).
@@ -65,6 +66,7 @@ Common fields for all types:
 
 `questions[0]` requirements:
 - `id`: non-empty deterministic UUID string.
+- `human_id` (optional): stable human-facing question alias in `Q<integer>` format.
 - `type`: equals top-level quiz `type`.
 - `prompt`: non-empty string and equal to top-level `question`.
 - `answer_fact_ids`: ordered list of fact ids used by the question.
@@ -75,6 +77,7 @@ Common fields for all types:
 
 `answer_facts` requirements:
 - Each fact includes `id`, `label`, integer `year`, `tags`, `facets`, `match`, `vector_metadata`.
+- `answer_facts[*].human_id` (optional) must use `A<integer>` and align with linked choice `human_id`.
 - `vector_metadata.text_for_embedding` and `vector_metadata.embedding_status` must be non-empty strings.
 - Fact ids must be unique.
 - `questions[0].answer_fact_ids` must reference existing fact ids.
@@ -88,6 +91,7 @@ Common fields for all types:
   "questions": [
     {
       "id": "33b21f44-4fab-5a57-88dd-c7ed41b5126f",
+      "human_id": "Q412",
       "type": "which_came_first",
       "prompt": "Which event happened earlier?",
       "answer_fact_ids": [
@@ -103,6 +107,7 @@ Common fields for all types:
   "answer_facts": [
     {
       "id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d",
+      "human_id": "A991",
       "label": "The RMS Titanic sinks in the Atlantic Ocean.",
       "year": 1912,
       "tags": ["history", "history_mcq_4", "role:correct", "20th-century", "1910s"],
@@ -126,6 +131,7 @@ Common fields for all types:
     },
     {
       "id": "5f9bc15e-1614-5278-b166-6d4f2964f823",
+      "human_id": "A992",
       "label": "Apollo 11 lands on the Moon.",
       "year": 1969,
       "tags": ["history", "which_came_first", "role:distractor", "20th-century", "1960s"],
@@ -150,8 +156,8 @@ Common fields for all types:
   ],
   "question": "Which event happened earlier?",
   "choices": [
-    { "id": "A", "label": "The RMS Titanic sinks in the Atlantic Ocean.", "year": 1912, "answer_fact_id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d" },
-    { "id": "B", "label": "Apollo 11 lands on the Moon.", "year": 1969, "answer_fact_id": "5f9bc15e-1614-5278-b166-6d4f2964f823" }
+    { "id": "A", "human_id": "A991", "label": "The RMS Titanic sinks in the Atlantic Ocean.", "year": 1912, "answer_fact_id": "3cdde5a2-a6b1-5df8-a804-2c0502a2ef5d" },
+    { "id": "B", "human_id": "A992", "label": "Apollo 11 lands on the Moon.", "year": 1969, "answer_fact_id": "5f9bc15e-1614-5278-b166-6d4f2964f823" }
   ],
   "correct_choice_id": "A",
   "source": {
@@ -188,17 +194,18 @@ Common fields for all types:
 Migration note:
 - Existing historical files may still have `metadata.version = 1`.
 - New generation output must use the v2 contract above.
+- Running the human-id backfill mode may normalize legacy v1 payloads to v2.
 
 `which_came_first` requirements:
 - Exactly 2 choices.
-- Each choice includes `id`, `label`, integer `year`, and `answer_fact_id`.
+- Each choice includes `id`, `label`, integer `year`, and `answer_fact_id`; optional `human_id` uses `A<integer>`.
 - Choice years must be distinct.
 - `question` must be: `Which event happened earlier?`
 - `source.events_used` must contain exactly 2 entries.
 
 `history_mcq_4` requirements:
 - Exactly 4 choices.
-- Each choice includes `id`, `label`, and `answer_fact_id`.
+- Each choice includes `id`, `label`, and `answer_fact_id`; optional `human_id` uses `A<integer>`.
 - Choices must not include `year`.
 - `question` must follow: `Which event happened in <year>?`
 - `source.events_used` must contain exactly 4 entries.
@@ -211,6 +218,8 @@ Migration note:
 - Choice labels must be non-empty.
 - `correct_choice_id` must match one of the choice ids.
 - `choices[*].answer_fact_id` must be non-empty and aligned with `questions[0].answer_fact_ids` order.
+- If present, `questions[0].human_id` must match `Q<integer>`.
+- If present, `choices[*].human_id` and `answer_facts[*].human_id` must match `A<integer>` and align per `answer_fact_id`.
 - Source attribution must be present and non-empty.
 - `source.events_used` entries must include non-empty `event_id`, `text`, integer `year`, and non-empty `wikipedia_url`.
 - `generation.mode` must be `daily` when `generation.edition` is `1`.

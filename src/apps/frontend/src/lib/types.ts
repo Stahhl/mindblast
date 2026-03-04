@@ -65,6 +65,7 @@ interface QuizBase {
 
 export interface QuizQuestionModel {
   id: string;
+  human_id?: string;
   type: QuizType;
   prompt: string;
   answer_fact_ids: string[];
@@ -76,6 +77,7 @@ export interface QuizQuestionModel {
 
 export interface QuizAnswerFact {
   id: string;
+  human_id?: string;
   label: string;
   year: number;
   tags: string[];
@@ -89,13 +91,17 @@ export interface QuizAnswerFact {
 
 export interface WhichCameFirstChoice {
   id: string;
+  human_id?: string;
   label: string;
   year: number;
+  answer_fact_id?: string;
 }
 
 export interface HistoryMcqChoice {
   id: string;
+  human_id?: string;
   label: string;
+  answer_fact_id?: string;
 }
 
 export interface WhichCameFirstQuiz extends QuizBase {

@@ -31,7 +31,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1791
-      }
+      },
+      "human_id": "Q28"
     }
   ],
   "answer_facts": [
@@ -63,7 +64,8 @@
       "vector_metadata": {
         "text_for_embedding": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A64"
     },
     {
       "id": "114c666e-1f41-5d28-aa7e-e420de00a9a2",
@@ -93,7 +95,8 @@
       "vector_metadata": {
         "text_for_embedding": "Field Marshal C. G. E. Mannerheim, the 6th president of Finland, resigns from his position for health reasons.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A69"
     },
     {
       "id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
@@ -123,7 +126,8 @@
       "vector_metadata": {
         "text_for_embedding": "Vermont is admitted to the United States as the fourteenth state.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A70"
     },
     {
       "id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
@@ -153,7 +157,8 @@
       "vector_metadata": {
         "text_for_embedding": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A68"
     }
   ],
   "question": "When was Vermont admitted to the United States as the fourteenth state?",
@@ -161,22 +166,26 @@
     {
       "id": "A",
       "label": "51 AD",
-      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066"
+      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "human_id": "A64"
     },
     {
       "id": "B",
       "label": "1946",
-      "answer_fact_id": "114c666e-1f41-5d28-aa7e-e420de00a9a2"
+      "answer_fact_id": "114c666e-1f41-5d28-aa7e-e420de00a9a2",
+      "human_id": "A69"
     },
     {
       "id": "C",
       "label": "1791",
-      "answer_fact_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b"
+      "answer_fact_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
+      "human_id": "A70"
     },
     {
       "id": "D",
       "label": "1861",
-      "answer_fact_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f"
+      "answer_fact_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
+      "human_id": "A68"
     }
   ],
   "correct_choice_id": "C",

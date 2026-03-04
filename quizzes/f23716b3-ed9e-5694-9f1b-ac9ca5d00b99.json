@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1936
-      }
+      },
+      "human_id": "Q10"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A25"
     },
     {
       "id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A26"
     },
     {
       "id": "5ed74817-f18d-553d-9270-688fdf1eaa83",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A27"
     },
     {
       "id": "2311e83d-2929-524c-ab80-d8ccefcc3be8",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A28"
     }
   ],
   "question": "Which event happened in 1936?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
-      "answer_fact_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841"
+      "answer_fact_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841",
+      "human_id": "A25"
     },
     {
       "id": "B",
       "label": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
-      "answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c"
+      "answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+      "human_id": "A26"
     },
     {
       "id": "C",
       "label": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
-      "answer_fact_id": "5ed74817-f18d-553d-9270-688fdf1eaa83"
+      "answer_fact_id": "5ed74817-f18d-553d-9270-688fdf1eaa83",
+      "human_id": "A27"
     },
     {
       "id": "D",
       "label": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
-      "answer_fact_id": "2311e83d-2929-524c-ab80-d8ccefcc3be8"
+      "answer_fact_id": "2311e83d-2929-524c-ab80-d8ccefcc3be8",
+      "human_id": "A28"
     }
   ],
   "correct_choice_id": "B",
@@ -206,5 +215,10 @@
   "metadata": {
     "version": 2,
     "normalized_model": "question_answer_facts_v1"
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-02-26T06:17:05Z"
   }
 }

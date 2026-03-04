@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1606
-      }
+      },
+      "human_id": "Q11"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Janszoon voyage of 1605\u201306 becomes the first European expedition to set foot on Australia, although it is mistaken as a part of New Guinea.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A29"
     },
     {
       "id": "34e1cb6c-541c-57fa-b2d4-cf3bdee72e46",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "Adolf Hitler orders the Luftwaffe to be re-formed, violating the provisions of the Treaty of Versailles.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A30"
     },
     {
       "id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A26"
     },
     {
       "id": "87ef38a9-ee29-5cd9-b2f8-5696d8e16f68",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "World War II: US troops reclaim the Philippine island of Corregidor from the Japanese.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A31"
     }
   ],
   "question": "Which event happened in 1606?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "The Janszoon voyage of 1605\u201306 becomes the first European expedition to set foot on Australia, although it is mistaken as a part of New Guinea.",
-      "answer_fact_id": "6745b7aa-7a09-5332-a7d7-3ac146ef0ede"
+      "answer_fact_id": "6745b7aa-7a09-5332-a7d7-3ac146ef0ede",
+      "human_id": "A29"
     },
     {
       "id": "B",
       "label": "Adolf Hitler orders the Luftwaffe to be re-formed, violating the provisions of the Treaty of Versailles.",
-      "answer_fact_id": "34e1cb6c-541c-57fa-b2d4-cf3bdee72e46"
+      "answer_fact_id": "34e1cb6c-541c-57fa-b2d4-cf3bdee72e46",
+      "human_id": "A30"
     },
     {
       "id": "C",
       "label": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
-      "answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c"
+      "answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+      "human_id": "A26"
     },
     {
       "id": "D",
       "label": "World War II: US troops reclaim the Philippine island of Corregidor from the Japanese.",
-      "answer_fact_id": "87ef38a9-ee29-5cd9-b2f8-5696d8e16f68"
+      "answer_fact_id": "87ef38a9-ee29-5cd9-b2f8-5696d8e16f68",
+      "human_id": "A31"
     }
   ],
   "correct_choice_id": "A",

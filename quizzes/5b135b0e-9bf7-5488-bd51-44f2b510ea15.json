@@ -9,12 +9,16 @@
     {
       "id": "A",
       "label": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
-      "year": 1607
+      "year": 1607,
+      "answer_fact_id": "487d09a7-3a5a-559f-9994-9c27753c6519",
+      "human_id": "A12"
     },
     {
       "id": "B",
       "label": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
-      "year": 1597
+      "year": 1597,
+      "answer_fact_id": "163cd735-8dec-547f-b85d-6ed2a5d63954",
+      "human_id": "A13"
     }
   ],
   "correct_choice_id": "B",
@@ -24,11 +28,13 @@
     "retrieved_at": "2026-02-24T06:16:32Z",
     "events_used": [
       {
+        "event_id": "487d09a7-3a5a-559f-9994-9c27753c6519",
         "text": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
         "year": 1607,
         "wikipedia_url": "https://en.wikipedia.org/wiki/L'Orfeo"
       },
       {
+        "event_id": "163cd735-8dec-547f-b85d-6ed2a5d63954",
         "text": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
         "year": 1597,
         "wikipedia_url": "https://en.wikipedia.org/wiki/Cudgel_War"
@@ -36,11 +42,98 @@
     ]
   },
   "metadata": {
-    "version": 1
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
   },
   "generation": {
     "mode": "daily",
     "edition": 1,
     "generated_at": "2026-02-24T06:16:32Z"
-  }
+  },
+  "questions": [
+    {
+      "id": "1d7fbb1a-54a9-5cc8-8f4b-19fe07331d2c",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "487d09a7-3a5a-559f-9994-9c27753c6519",
+        "163cd735-8dec-547f-b85d-6ed2a5d63954"
+      ],
+      "correct_answer_fact_id": "163cd735-8dec-547f-b85d-6ed2a5d63954",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q5"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "487d09a7-3a5a-559f-9994-9c27753c6519",
+      "label": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
+      "year": 1607,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "17th-century",
+        "1600s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "17th-century",
+        "temporal_decade": "1600s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1607,
+          "temporal_century": "17th-century",
+          "temporal_decade": "1600s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A12"
+    },
+    {
+      "id": "163cd735-8dec-547f-b85d-6ed2a5d63954",
+      "label": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
+      "year": 1597,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "16th-century",
+        "1590s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "16th-century",
+        "temporal_decade": "1590s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1597,
+          "temporal_century": "16th-century",
+          "temporal_decade": "1590s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A13"
+    }
+  ]
 }

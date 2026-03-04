@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1960
-      }
+      },
+      "human_id": "Q12"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "A total of 279 female students aged between 10 and 17 are kidnapped by bandits in the Zamfara kidnapping in Zamfara State, Nigeria.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A32"
     },
     {
       "id": "6745b7aa-7a09-5332-a7d7-3ac146ef0ede",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Janszoon voyage of 1605\u201306 becomes the first European expedition to set foot on Australia, although it is mistaken as a part of New Guinea.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A29"
     },
     {
       "id": "26e38baa-3a26-5f4d-a767-d17931d9b8e9",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "Indian Air Force fighter-jets target Jaish-e-Mohammed terrorist training camps in Balakot, Pakistan.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A33"
     },
     {
       "id": "b24d2315-53a4-5d42-9a32-47df444d2c03",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "A New York-bound Alitalia airliner crashes into a cemetery in Shannon, Ireland, shortly after takeoff, killing 34 of the 52 persons on board.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A34"
     }
   ],
   "question": "Which event happened in 1960?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "A total of 279 female students aged between 10 and 17 are kidnapped by bandits in the Zamfara kidnapping in Zamfara State, Nigeria.",
-      "answer_fact_id": "b14b51ae-82f0-5a33-9eae-b748b7718826"
+      "answer_fact_id": "b14b51ae-82f0-5a33-9eae-b748b7718826",
+      "human_id": "A32"
     },
     {
       "id": "B",
       "label": "The Janszoon voyage of 1605\u201306 becomes the first European expedition to set foot on Australia, although it is mistaken as a part of New Guinea.",
-      "answer_fact_id": "6745b7aa-7a09-5332-a7d7-3ac146ef0ede"
+      "answer_fact_id": "6745b7aa-7a09-5332-a7d7-3ac146ef0ede",
+      "human_id": "A29"
     },
     {
       "id": "C",
       "label": "Indian Air Force fighter-jets target Jaish-e-Mohammed terrorist training camps in Balakot, Pakistan.",
-      "answer_fact_id": "26e38baa-3a26-5f4d-a767-d17931d9b8e9"
+      "answer_fact_id": "26e38baa-3a26-5f4d-a767-d17931d9b8e9",
+      "human_id": "A33"
     },
     {
       "id": "D",
       "label": "A New York-bound Alitalia airliner crashes into a cemetery in Shannon, Ireland, shortly after takeoff, killing 34 of the 52 persons on board.",
-      "answer_fact_id": "b24d2315-53a4-5d42-9a32-47df444d2c03"
+      "answer_fact_id": "b24d2315-53a4-5d42-9a32-47df444d2c03",
+      "human_id": "A34"
     }
   ],
   "correct_choice_id": "D",

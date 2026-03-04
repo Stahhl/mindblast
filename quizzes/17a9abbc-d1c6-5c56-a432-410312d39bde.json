@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1861
-      }
+      },
+      "human_id": "Q27"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A64"
     },
     {
       "id": "6ca0e932-b4b6-5caf-8f99-2f424ad140ca",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "William McKinley inaugurated president for second time; Theodore Roosevelt is vice president.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A66"
     },
     {
       "id": "913786c9-fa10-5dea-8885-9b19ae131b6f",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Collinwood school fire, Collinwood near Cleveland, Ohio, kills 174 people.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A67"
     },
     {
       "id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A68"
     }
   ],
   "question": "Which event happened in 1861?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
-      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066"
+      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "human_id": "A64"
     },
     {
       "id": "B",
       "label": "William McKinley inaugurated president for second time; Theodore Roosevelt is vice president.",
-      "answer_fact_id": "6ca0e932-b4b6-5caf-8f99-2f424ad140ca"
+      "answer_fact_id": "6ca0e932-b4b6-5caf-8f99-2f424ad140ca",
+      "human_id": "A66"
     },
     {
       "id": "C",
       "label": "The Collinwood school fire, Collinwood near Cleveland, Ohio, kills 174 people.",
-      "answer_fact_id": "913786c9-fa10-5dea-8885-9b19ae131b6f"
+      "answer_fact_id": "913786c9-fa10-5dea-8885-9b19ae131b6f",
+      "human_id": "A67"
     },
     {
       "id": "D",
       "label": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
-      "answer_fact_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f"
+      "answer_fact_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
+      "human_id": "A68"
     }
   ],
   "correct_choice_id": "D",

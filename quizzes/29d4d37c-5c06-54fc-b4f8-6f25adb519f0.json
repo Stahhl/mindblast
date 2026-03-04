@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1959
-      }
+      },
+      "human_id": "Q16"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "Space Shuttle Atlantis is launched on STS-36.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A42"
     },
     {
       "id": "0463da94-b1fc-5a27-8f76-0a765fb20801",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A40"
     },
     {
       "id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A43"
     },
     {
       "id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A44"
     }
   ],
   "question": "Which event happened in 1959?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "Space Shuttle Atlantis is launched on STS-36.",
-      "answer_fact_id": "c07204e1-6753-593b-9a38-936c59b28fce"
+      "answer_fact_id": "c07204e1-6753-593b-9a38-936c59b28fce",
+      "human_id": "A42"
     },
     {
       "id": "B",
       "label": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
-      "answer_fact_id": "0463da94-b1fc-5a27-8f76-0a765fb20801"
+      "answer_fact_id": "0463da94-b1fc-5a27-8f76-0a765fb20801",
+      "human_id": "A40"
     },
     {
       "id": "C",
       "label": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
-      "answer_fact_id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8"
+      "answer_fact_id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8",
+      "human_id": "A43"
     },
     {
       "id": "D",
       "label": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
-      "answer_fact_id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca"
+      "answer_fact_id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca",
+      "human_id": "A44"
     }
   ],
   "correct_choice_id": "D",

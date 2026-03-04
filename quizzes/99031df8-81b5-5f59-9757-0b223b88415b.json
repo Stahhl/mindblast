@@ -24,7 +24,8 @@
       },
       "selection_rules": {
         "distractor_same_year_allowed": false
-      }
+      },
+      "human_id": "Q17"
     }
   ],
   "answer_facts": [
@@ -55,7 +56,8 @@
       "vector_metadata": {
         "text_for_embedding": "Cold War: Klaus Fuchs is convicted of spying for the Soviet Union by disclosing top secret atomic bomb data.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A45"
     },
     {
       "id": "159c25e0-b717-525d-b320-0b626e7eb28d",
@@ -84,7 +86,8 @@
       "vector_metadata": {
         "text_for_embedding": "Bosnia and Herzegovina declares its independence from Socialist Federal Republic of Yugoslavia.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A46"
     }
   ],
   "question": "Which event happened earlier?",
@@ -93,13 +96,15 @@
       "id": "A",
       "label": "Cold War: Klaus Fuchs is convicted of spying for the Soviet Union by disclosing top secret atomic bomb data.",
       "year": 1950,
-      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25"
+      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25",
+      "human_id": "A45"
     },
     {
       "id": "B",
       "label": "Bosnia and Herzegovina declares its independence from Socialist Federal Republic of Yugoslavia.",
       "year": 1992,
-      "answer_fact_id": "159c25e0-b717-525d-b320-0b626e7eb28d"
+      "answer_fact_id": "159c25e0-b717-525d-b320-0b626e7eb28d",
+      "human_id": "A46"
     }
   ],
   "correct_choice_id": "A",

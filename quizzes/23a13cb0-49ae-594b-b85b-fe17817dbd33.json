@@ -9,12 +9,16 @@
     {
       "id": "A",
       "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
-      "year": 1770
+      "year": 1770,
+      "answer_fact_id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+      "human_id": "A1"
     },
     {
       "id": "B",
       "label": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
-      "year": 1288
+      "year": 1288,
+      "answer_fact_id": "89384a85-8db6-52b4-a816-9ffc34c79ac8",
+      "human_id": "A2"
     }
   ],
   "correct_choice_id": "B",
@@ -24,11 +28,13 @@
     "retrieved_at": "2026-02-22T06:10:45Z",
     "events_used": [
       {
+        "event_id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
         "text": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
         "year": 1770,
         "wikipedia_url": "https://en.wikipedia.org/wiki/North_End%2C_Boston"
       },
       {
+        "event_id": "89384a85-8db6-52b4-a816-9ffc34c79ac8",
         "text": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
         "year": 1288,
         "wikipedia_url": "https://en.wikipedia.org/wiki/Franciscans"
@@ -36,11 +42,98 @@
     ]
   },
   "metadata": {
-    "version": 1
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
   },
   "generation": {
     "mode": "daily",
     "edition": 1,
     "generated_at": "2026-02-22T06:10:45Z"
-  }
+  },
+  "questions": [
+    {
+      "id": "bcdf8161-5029-578f-970c-54e87cfe0085",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+        "89384a85-8db6-52b4-a816-9ffc34c79ac8"
+      ],
+      "correct_answer_fact_id": "89384a85-8db6-52b4-a816-9ffc34c79ac8",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q1"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+      "year": 1770,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "18th-century",
+        "1770s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1770s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1770,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1770s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A1"
+    },
+    {
+      "id": "89384a85-8db6-52b4-a816-9ffc34c79ac8",
+      "label": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
+      "year": 1288,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "13th-century",
+        "1280s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "13th-century",
+        "temporal_decade": "1280s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1288,
+          "temporal_century": "13th-century",
+          "temporal_decade": "1280s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A2"
+    }
+  ]
 }

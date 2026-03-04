@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 2013
-      }
+      },
+      "human_id": "Q24"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "American Revolutionary War: The Continental Army is routed at the Battle of Brier Creek near Savannah, Georgia.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A58"
     },
     {
       "id": "1621b306-721d-5228-93b3-5c24bc20120f",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Ottoman Caliphate is abolished, when the Caliph Abd\u00fclmecid II of the Ottoman dynasty is deposed. The last remnant of the old monarchy gives way to the reformed Turkey of Kemal Atat\u00fcrk.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A60"
     },
     {
       "id": "d99de79b-c1bb-5f72-a480-484fdf2c93c7",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "Oil is discovered in Saudi Arabia.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A61"
     },
     {
       "id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "A bomb blast in Karachi, Pakistan, kills at least 48 people and injured 200 others in a predominantly Shia Muslim area.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A62"
     }
   ],
   "question": "Which event happened in 2013?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "American Revolutionary War: The Continental Army is routed at the Battle of Brier Creek near Savannah, Georgia.",
-      "answer_fact_id": "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba"
+      "answer_fact_id": "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba",
+      "human_id": "A58"
     },
     {
       "id": "B",
       "label": "The Ottoman Caliphate is abolished, when the Caliph Abd\u00fclmecid II of the Ottoman dynasty is deposed. The last remnant of the old monarchy gives way to the reformed Turkey of Kemal Atat\u00fcrk.",
-      "answer_fact_id": "1621b306-721d-5228-93b3-5c24bc20120f"
+      "answer_fact_id": "1621b306-721d-5228-93b3-5c24bc20120f",
+      "human_id": "A60"
     },
     {
       "id": "C",
       "label": "Oil is discovered in Saudi Arabia.",
-      "answer_fact_id": "d99de79b-c1bb-5f72-a480-484fdf2c93c7"
+      "answer_fact_id": "d99de79b-c1bb-5f72-a480-484fdf2c93c7",
+      "human_id": "A61"
     },
     {
       "id": "D",
       "label": "A bomb blast in Karachi, Pakistan, kills at least 48 people and injured 200 others in a predominantly Shia Muslim area.",
-      "answer_fact_id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391"
+      "answer_fact_id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391",
+      "human_id": "A62"
     }
   ],
   "correct_choice_id": "D",

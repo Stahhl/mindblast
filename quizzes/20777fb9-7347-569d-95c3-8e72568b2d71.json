@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1943
-      }
+      },
+      "human_id": "Q14"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A37"
     },
     {
       "id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A35"
     },
     {
       "id": "2ff7e684-3666-59c8-bf98-bcab240d582f",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A38"
     },
     {
       "id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "Martin Kamen and Sam Ruben discover carbon-14.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A39"
     }
   ],
   "question": "Which event happened in 1943?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
-      "answer_fact_id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5"
+      "answer_fact_id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5",
+      "human_id": "A37"
     },
     {
       "id": "B",
       "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
-      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada"
+      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+      "human_id": "A35"
     },
     {
       "id": "C",
       "label": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
-      "answer_fact_id": "2ff7e684-3666-59c8-bf98-bcab240d582f"
+      "answer_fact_id": "2ff7e684-3666-59c8-bf98-bcab240d582f",
+      "human_id": "A38"
     },
     {
       "id": "D",
       "label": "Martin Kamen and Sam Ruben discover carbon-14.",
-      "answer_fact_id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2"
+      "answer_fact_id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2",
+      "human_id": "A39"
     }
   ],
   "correct_choice_id": "A",

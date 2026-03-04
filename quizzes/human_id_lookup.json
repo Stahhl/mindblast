@@ -1,0 +1,662 @@
+{
+  "metadata": {
+    "version": 1,
+    "updated_at": "2026-03-04T10:26:06Z"
+  },
+  "counters": {
+    "question": 28,
+    "answer": 70
+  },
+  "question_uuid_to_human_id": {
+    "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
+    "65fb504c-3fa9-5663-87a3-59fc8593d801": "Q2",
+    "72bbfad6-9b72-56fe-a694-f79e332390b3": "Q3",
+    "91372567-da5b-56f2-b5cf-d14f5b96af9d": "Q4",
+    "1d7fbb1a-54a9-5cc8-8f4b-19fe07331d2c": "Q5",
+    "f9e057e3-50ce-5ec9-9cee-564990faa152": "Q6",
+    "cfdcfd06-29ae-5302-9644-e2d9530285c0": "Q7",
+    "3fa89cdd-5ace-5408-87aa-1710a34ffa5a": "Q8",
+    "3729afd9-f315-5d64-ab36-567de2e2ea2d": "Q9",
+    "fda6071a-ecce-5842-89c0-372535ac4d56": "Q10",
+    "2557e80f-46f7-5cea-a8f3-b47c68a7c2aa": "Q11",
+    "61cfd9e1-f820-5218-b8fd-61e2c8cb7770": "Q12",
+    "bf6aa707-a686-5a84-adf1-b45a6a46bf82": "Q13",
+    "5efd7d32-a6cb-54e8-aa03-1eef60fbbdc1": "Q14",
+    "05bd5de1-4a58-5998-a54b-cae727f9f5b5": "Q15",
+    "3232ff14-fd82-5ee7-8fe2-7c61453e068d": "Q16",
+    "2fa05fe5-f767-587a-9686-01c26fac7850": "Q17",
+    "c44d32c4-f058-5ba5-90a9-78428744799a": "Q18",
+    "2a2596c2-c1a6-5ba3-9112-b1727addf17d": "Q19",
+    "ec766753-2837-57f0-a565-673916b9304e": "Q20",
+    "511febec-9069-5d58-a6df-3b5341ef52df": "Q21",
+    "8fc8b18a-2afd-5d8b-80e3-adf98586beab": "Q22",
+    "e4e1336f-48dc-5de1-8346-c025c20c5b9a": "Q23",
+    "429c26d0-98e6-58dc-b284-b714d3dffbba": "Q24",
+    "7063f9f7-fcb3-5967-9d17-f9a1d2ecdf80": "Q25",
+    "80040456-a981-5bf4-b38d-d5aa4108de22": "Q26",
+    "cff068dc-77ae-5ec6-bfac-3adf425fe0d3": "Q27",
+    "d5aa3db3-f6f2-59ac-af34-d758cf11f554": "Q28"
+  },
+  "answer_uuid_to_human_id": {
+    "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
+    "89384a85-8db6-52b4-a816-9ffc34c79ac8": "A2",
+    "353ad408-ccea-5237-be3e-5faf94ebf93d": "A3",
+    "995ef172-b972-5cf5-b96f-6805a9709693": "A4",
+    "12ca82a9-f9d5-58db-a5b7-3744e2361b10": "A5",
+    "01515ce9-b6a5-50d3-bf24-c05b7bd03e23": "A6",
+    "732cb99a-b4a5-5670-8d3c-d609873b847d": "A7",
+    "58624f19-5471-5a56-9a54-2b7075792dee": "A8",
+    "68a53412-c6ad-5c65-b3c4-0c9246ff0ed6": "A9",
+    "87bec0d1-cfa3-5f79-89b7-f4fd53b84b5c": "A10",
+    "827c280d-a51c-5565-860c-41f776932730": "A11",
+    "487d09a7-3a5a-559f-9994-9c27753c6519": "A12",
+    "163cd735-8dec-547f-b85d-6ed2a5d63954": "A13",
+    "8f6111dd-2a9a-5113-9d95-59ffed713e82": "A14",
+    "d19cda90-a4d1-59bd-9baa-d866cbc9455f": "A15",
+    "01badeda-4981-5cc4-b207-befb12ace329": "A16",
+    "a2a9c991-bad1-56e6-b16d-d1b9134382dc": "A17",
+    "cd6f7f23-b33c-5725-b708-c3c5ee2fb5f3": "A18",
+    "6b93b776-3445-57ac-8c0e-158c227a5c9d": "A19",
+    "19622839-9fa9-5ba8-b16d-0fa0183e453e": "A20",
+    "e1224e79-0411-55fe-863d-775f2cd05773": "A21",
+    "e8144664-8150-5f79-a53e-4845e1057903": "A22",
+    "85ae45ac-8584-59bd-a93f-8d0f82a61ed1": "A23",
+    "a259c8aa-d19e-57ad-a065-f1207dae2c27": "A24",
+    "7bfbee3c-3044-52f8-bf11-e598de5c9841": "A25",
+    "2fd6715b-01cd-581f-9cfd-8f35632e678c": "A26",
+    "5ed74817-f18d-553d-9270-688fdf1eaa83": "A27",
+    "2311e83d-2929-524c-ab80-d8ccefcc3be8": "A28",
+    "6745b7aa-7a09-5332-a7d7-3ac146ef0ede": "A29",
+    "34e1cb6c-541c-57fa-b2d4-cf3bdee72e46": "A30",
+    "87ef38a9-ee29-5cd9-b2f8-5696d8e16f68": "A31",
+    "b14b51ae-82f0-5a33-9eae-b748b7718826": "A32",
+    "26e38baa-3a26-5f4d-a767-d17931d9b8e9": "A33",
+    "b24d2315-53a4-5d42-9a32-47df444d2c03": "A34",
+    "75ea40c4-146f-5d66-983b-b97a8bf3fada": "A35",
+    "114979c5-f478-59b8-ad59-5b5b07afa107": "A36",
+    "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5": "A37",
+    "2ff7e684-3666-59c8-bf98-bcab240d582f": "A38",
+    "2d84eacf-4b11-54b4-a5f7-98a472dcaad2": "A39",
+    "0463da94-b1fc-5a27-8f76-0a765fb20801": "A40",
+    "92599f03-21c2-5040-88dc-34dca11e1aee": "A41",
+    "c07204e1-6753-593b-9a38-936c59b28fce": "A42",
+    "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8": "A43",
+    "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca": "A44",
+    "0098ba18-b9b5-5a25-836e-da4805f55c25": "A45",
+    "159c25e0-b717-525d-b320-0b626e7eb28d": "A46",
+    "dba8b2ba-85f9-56dd-a959-14b75953b970": "A47",
+    "fc9c1c70-400a-5239-a5f7-52f3b98ed8c0": "A48",
+    "2a963c5d-e426-5e32-a694-e4095d963810": "A49",
+    "3c17db85-d638-53e3-865b-65267dbca47b": "A50",
+    "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3": "A51",
+    "4d72a07c-0fd1-5dca-837e-c9b5541480e1": "A52",
+    "93b10610-5222-53d3-bf34-48b69c08b025": "A53",
+    "b1dba7d7-bb50-5053-bfef-02a0422aa0b0": "A54",
+    "9b1b4531-2a5b-58aa-947a-174649cece94": "A55",
+    "a555aae0-d866-5b62-b034-4ac743230d40": "A56",
+    "fee4fb20-26f5-5224-8d2e-3283a1ba72b7": "A57",
+    "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba": "A58",
+    "19512475-160f-5230-aaa2-d61842b5a854": "A59",
+    "1621b306-721d-5228-93b3-5c24bc20120f": "A60",
+    "d99de79b-c1bb-5f72-a480-484fdf2c93c7": "A61",
+    "a0968825-bbe3-5c28-aadf-2ef4a30b1391": "A62",
+    "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0": "A63",
+    "7d9f4f57-85d4-507b-8511-99bf31afd066": "A64",
+    "bcea3434-0e81-5e3e-9d09-f8f6c428c24a": "A65",
+    "6ca0e932-b4b6-5caf-8f99-2f424ad140ca": "A66",
+    "913786c9-fa10-5dea-8885-9b19ae131b6f": "A67",
+    "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f": "A68",
+    "114c666e-1f41-5d28-aa7e-e420de00a9a2": "A69",
+    "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b": "A70"
+  },
+  "questions": {
+    "Q1": {
+      "question_id": "bcdf8161-5029-578f-970c-54e87cfe0085",
+      "quiz_file": "quizzes/23a13cb0-49ae-594b-b85b-fe17817dbd33.json",
+      "date": "2026-02-22",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q2": {
+      "question_id": "65fb504c-3fa9-5663-87a3-59fc8593d801",
+      "quiz_file": "quizzes/105a2ad2-2d37-59df-81f9-666ddb3b48cc.json",
+      "date": "2026-02-22",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q3": {
+      "question_id": "72bbfad6-9b72-56fe-a694-f79e332390b3",
+      "quiz_file": "quizzes/b5289ee9-991e-5901-896d-dcba4fc791ad.json",
+      "date": "2026-02-23",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q4": {
+      "question_id": "91372567-da5b-56f2-b5cf-d14f5b96af9d",
+      "quiz_file": "quizzes/137b933b-c96b-5794-b985-4e60a04f1b8d.json",
+      "date": "2026-02-23",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q5": {
+      "question_id": "1d7fbb1a-54a9-5cc8-8f4b-19fe07331d2c",
+      "quiz_file": "quizzes/5b135b0e-9bf7-5488-bd51-44f2b510ea15.json",
+      "date": "2026-02-24",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q6": {
+      "question_id": "f9e057e3-50ce-5ec9-9cee-564990faa152",
+      "quiz_file": "quizzes/c1fb48e1-228a-59f3-bf74-2173c28fc853.json",
+      "date": "2026-02-24",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q7": {
+      "question_id": "cfdcfd06-29ae-5302-9644-e2d9530285c0",
+      "quiz_file": "quizzes/c5f11e16-b92a-5ae2-986b-676656eeec3f.json",
+      "date": "2026-02-25",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q8": {
+      "question_id": "3fa89cdd-5ace-5408-87aa-1710a34ffa5a",
+      "quiz_file": "quizzes/1afc27fe-d294-5c4e-a8b3-ed422db7e2f6.json",
+      "date": "2026-02-25",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q9": {
+      "question_id": "3729afd9-f315-5d64-ab36-567de2e2ea2d",
+      "quiz_file": "quizzes/3934f72e-918b-517c-bd68-8ddf34c42f23.json",
+      "date": "2026-02-26",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q10": {
+      "question_id": "fda6071a-ecce-5842-89c0-372535ac4d56",
+      "quiz_file": "quizzes/f23716b3-ed9e-5694-9f1b-ac9ca5d00b99.json",
+      "date": "2026-02-26",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q11": {
+      "question_id": "2557e80f-46f7-5cea-a8f3-b47c68a7c2aa",
+      "quiz_file": "quizzes/b5b223a8-0f1c-5dd9-9a15-968df285b094.json",
+      "date": "2026-02-26",
+      "quiz_type": "history_mcq_4",
+      "edition": 2
+    },
+    "Q12": {
+      "question_id": "61cfd9e1-f820-5218-b8fd-61e2c8cb7770",
+      "quiz_file": "quizzes/66700298-8ee5-5a7f-bce7-d966d73fbeee.json",
+      "date": "2026-02-26",
+      "quiz_type": "history_mcq_4",
+      "edition": 3
+    },
+    "Q13": {
+      "question_id": "bf6aa707-a686-5a84-adf1-b45a6a46bf82",
+      "quiz_file": "quizzes/29b794fc-98a4-5c43-9135-2b2ea2a6d0ee.json",
+      "date": "2026-02-27",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q14": {
+      "question_id": "5efd7d32-a6cb-54e8-aa03-1eef60fbbdc1",
+      "quiz_file": "quizzes/20777fb9-7347-569d-95c3-8e72568b2d71.json",
+      "date": "2026-02-27",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q15": {
+      "question_id": "05bd5de1-4a58-5998-a54b-cae727f9f5b5",
+      "quiz_file": "quizzes/f2f2f232-8762-5449-ae23-e0c1800738d9.json",
+      "date": "2026-02-28",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q16": {
+      "question_id": "3232ff14-fd82-5ee7-8fe2-7c61453e068d",
+      "quiz_file": "quizzes/29d4d37c-5c06-54fc-b4f8-6f25adb519f0.json",
+      "date": "2026-02-28",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q17": {
+      "question_id": "2fa05fe5-f767-587a-9686-01c26fac7850",
+      "quiz_file": "quizzes/99031df8-81b5-5f59-9757-0b223b88415b.json",
+      "date": "2026-03-01",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q18": {
+      "question_id": "c44d32c4-f058-5ba5-90a9-78428744799a",
+      "quiz_file": "quizzes/6f8b50b8-359b-5bbe-b864-ddf4dd12e17c.json",
+      "date": "2026-03-01",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q19": {
+      "question_id": "2a2596c2-c1a6-5ba3-9112-b1727addf17d",
+      "quiz_file": "quizzes/14547764-d2ce-5804-863b-3d337b7238e3.json",
+      "date": "2026-03-01",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q20": {
+      "question_id": "ec766753-2837-57f0-a565-673916b9304e",
+      "quiz_file": "quizzes/80797fb9-7fd5-5a65-9ca5-50ffea167346.json",
+      "date": "2026-03-02",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q21": {
+      "question_id": "511febec-9069-5d58-a6df-3b5341ef52df",
+      "quiz_file": "quizzes/955af0f1-b11a-50e3-898a-dc46d9f1e5d6.json",
+      "date": "2026-03-02",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q22": {
+      "question_id": "8fc8b18a-2afd-5d8b-80e3-adf98586beab",
+      "quiz_file": "quizzes/785b279e-0aae-5212-9ca3-c025cb2100f4.json",
+      "date": "2026-03-02",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q23": {
+      "question_id": "e4e1336f-48dc-5de1-8346-c025c20c5b9a",
+      "quiz_file": "quizzes/5e784c30-491b-573a-a0ab-2b4bcf864472.json",
+      "date": "2026-03-03",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q24": {
+      "question_id": "429c26d0-98e6-58dc-b284-b714d3dffbba",
+      "quiz_file": "quizzes/fcb6f774-647b-5d9e-b218-1d241c7cc413.json",
+      "date": "2026-03-03",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q25": {
+      "question_id": "7063f9f7-fcb3-5967-9d17-f9a1d2ecdf80",
+      "quiz_file": "quizzes/01a9175a-0c23-5376-adee-c3bc5d421424.json",
+      "date": "2026-03-03",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q26": {
+      "question_id": "80040456-a981-5bf4-b38d-d5aa4108de22",
+      "quiz_file": "quizzes/48c00bc2-6b2d-580e-989a-c579b1b2296f.json",
+      "date": "2026-03-04",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q27": {
+      "question_id": "cff068dc-77ae-5ec6-bfac-3adf425fe0d3",
+      "quiz_file": "quizzes/17a9abbc-d1c6-5c56-a432-410312d39bde.json",
+      "date": "2026-03-04",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q28": {
+      "question_id": "d5aa3db3-f6f2-59ac-af34-d758cf11f554",
+      "quiz_file": "quizzes/37413169-2fec-561b-8d14-3fdcd786406e.json",
+      "date": "2026-03-04",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    }
+  },
+  "answers": {
+    "A1": {
+      "answer_fact_id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+      "year": 1770
+    },
+    "A2": {
+      "answer_fact_id": "89384a85-8db6-52b4-a816-9ffc34c79ac8",
+      "label": "The Franciscan Girolamo Maschi is elected pope, choosing the name Nicholas IV.",
+      "year": 1288
+    },
+    "A3": {
+      "answer_fact_id": "353ad408-ccea-5237-be3e-5faf94ebf93d",
+      "label": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states.",
+      "year": 1889
+    },
+    "A4": {
+      "answer_fact_id": "995ef172-b972-5cf5-b96f-6805a9709693",
+      "label": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans.",
+      "year": 1899
+    },
+    "A5": {
+      "answer_fact_id": "12ca82a9-f9d5-58db-a5b7-3744e2361b10",
+      "label": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908.",
+      "year": 1904
+    },
+    "A6": {
+      "answer_fact_id": "01515ce9-b6a5-50d3-bf24-c05b7bd03e23",
+      "label": "Saddam Hussein begins the Anfal genocide against Kurds and Assyrians in northern Iraq.",
+      "year": 1988
+    },
+    "A7": {
+      "answer_fact_id": "732cb99a-b4a5-5670-8d3c-d609873b847d",
+      "label": "Iran hostage crisis: Supreme Leader Ayatollah Ruhollah Khomeini states that Iran's parliament will decide the fate of the American embassy hostages.",
+      "year": 1980
+    },
+    "A8": {
+      "answer_fact_id": "58624f19-5471-5a56-9a54-2b7075792dee",
+      "label": "Berbice slave uprising in Guyana: The first major slave revolt in South America.",
+      "year": 1763
+    },
+    "A9": {
+      "answer_fact_id": "68a53412-c6ad-5c65-b3c4-0c9246ff0ed6",
+      "label": "J. S. Bach leads his Tafel-Music Shepherd Cantata for the birthday of Christian, Duke of Saxe-Weissenfels.",
+      "year": 1725
+    },
+    "A10": {
+      "answer_fact_id": "87bec0d1-cfa3-5f79-89b7-f4fd53b84b5c",
+      "label": "American Revolutionary War: Baron von Steuben arrives at Valley Forge, Pennsylvania, to help train the Continental Army.",
+      "year": 1778
+    },
+    "A11": {
+      "answer_fact_id": "827c280d-a51c-5565-860c-41f776932730",
+      "label": "The French Riviera is hit by a large earthquake, killing around 2,000.",
+      "year": 1887
+    },
+    "A12": {
+      "answer_fact_id": "487d09a7-3a5a-559f-9994-9c27753c6519",
+      "label": "L'Orfeo by Claudio Monteverdi, one of the first works recognized as an opera, receives its premi\u00e8re performance.",
+      "year": 1607
+    },
+    "A13": {
+      "answer_fact_id": "163cd735-8dec-547f-b85d-6ed2a5d63954",
+      "label": "The last battle of the Cudgel War takes place on the Santavuori Hill in Ilmajoki, Ostrobothnia.",
+      "year": 1597
+    },
+    "A14": {
+      "answer_fact_id": "8f6111dd-2a9a-5113-9d95-59ffed713e82",
+      "label": "Nancy Astor becomes the first woman to speak in the House of Commons of the United Kingdom following her election as a Member of Parliament (MP) three months earlier.",
+      "year": 1920
+    },
+    "A15": {
+      "answer_fact_id": "d19cda90-a4d1-59bd-9baa-d866cbc9455f",
+      "label": "The Governor-General of Korea establishes a clinic called Jahyewon in Sorokdo to segregate Hansen's disease patients.",
+      "year": 1916
+    },
+    "A16": {
+      "answer_fact_id": "01badeda-4981-5cc4-b207-befb12ace329",
+      "label": "Estonian Declaration of Independence.",
+      "year": 1918
+    },
+    "A17": {
+      "answer_fact_id": "a2a9c991-bad1-56e6-b16d-d1b9134382dc",
+      "label": "Seven hundred ninety-one Romanian Jewish refugees and crew members are killed after the MV Struma is torpedoed by the Soviet Navy.",
+      "year": 1942
+    },
+    "A18": {
+      "answer_fact_id": "cd6f7f23-b33c-5725-b708-c3c5ee2fb5f3",
+      "label": "Disbandment of the Warsaw Pact at a meeting of its members in Budapest.",
+      "year": 1991
+    },
+    "A19": {
+      "answer_fact_id": "6b93b776-3445-57ac-8c0e-158c227a5c9d",
+      "label": "Marie-Ad\u00e9la\u00efde, the eldest of six daughters of Guillaume IV, becomes the first reigning Grand Duchess of Luxembourg.",
+      "year": 1912
+    },
+    "A20": {
+      "answer_fact_id": "19622839-9fa9-5ba8-b16d-0fa0183e453e",
+      "label": "American-Israeli extremist Baruch Goldstein commits a mass shooting at the Cave of the Patriarchs mausoleum, leaving 29 dead and over 100 injured before he is disarmed and beaten to death by survivors.",
+      "year": 1994
+    },
+    "A21": {
+      "answer_fact_id": "e1224e79-0411-55fe-863d-775f2cd05773",
+      "label": "Hiram Rhodes Revels, a Republican from Mississippi, is sworn into the United States Senate, becoming the first African American ever to sit in Congress.",
+      "year": 1870
+    },
+    "A22": {
+      "answer_fact_id": "e8144664-8150-5f79-a53e-4845e1057903",
+      "label": "Alitalia Flight 1553 crashes at Genoa Cristoforo Colombo Airport in Genoa, Italy, killing four.",
+      "year": 1999
+    },
+    "A23": {
+      "answer_fact_id": "85ae45ac-8584-59bd-a93f-8d0f82a61ed1",
+      "label": "Soldiers of the Bangladesh Rifles mutiny at their headquarters in Pilkhana, Dhaka, Bangladesh, resulting in 74 deaths, including 57 army officials.",
+      "year": 2009
+    },
+    "A24": {
+      "answer_fact_id": "a259c8aa-d19e-57ad-a065-f1207dae2c27",
+      "label": "The New York Philharmonic performs in Pyongyang, North Korea; this is the first event of its kind to take place in North Korea.",
+      "year": 2008
+    },
+    "A25": {
+      "answer_fact_id": "7bfbee3c-3044-52f8-bf11-e598de5c9841",
+      "label": "HMHS\u00a0Britannic, sister to the RMS\u00a0Titanic, is launched at Harland and Wolff shipyard in Belfast.",
+      "year": 1914
+    },
+    "A26": {
+      "answer_fact_id": "2fd6715b-01cd-581f-9cfd-8f35632e678c",
+      "label": "In the February 26 Incident, young nationalist Japanese military officers assassinate multiple cabinet statesmen and start a rebellion in downtown Tokyo, which is ended 3 days later.",
+      "year": 1936
+    },
+    "A27": {
+      "answer_fact_id": "5ed74817-f18d-553d-9270-688fdf1eaa83",
+      "label": "The Beach Pneumatic Transit in New York City, intended as a demonstration for a subway line, opens.",
+      "year": 1870
+    },
+    "A28": {
+      "answer_fact_id": "2311e83d-2929-524c-ab80-d8ccefcc3be8",
+      "label": "Japan and Korea sign the Treaty of Kangwha, which grants Japanese citizens extraterritoriality rights in Korea, opens three Korean ports to Japanese trade, and ends Korea's status as a tributary state of Qing dynasty China.",
+      "year": 1876
+    },
+    "A29": {
+      "answer_fact_id": "6745b7aa-7a09-5332-a7d7-3ac146ef0ede",
+      "label": "The Janszoon voyage of 1605\u201306 becomes the first European expedition to set foot on Australia, although it is mistaken as a part of New Guinea.",
+      "year": 1606
+    },
+    "A30": {
+      "answer_fact_id": "34e1cb6c-541c-57fa-b2d4-cf3bdee72e46",
+      "label": "Adolf Hitler orders the Luftwaffe to be re-formed, violating the provisions of the Treaty of Versailles.",
+      "year": 1935
+    },
+    "A31": {
+      "answer_fact_id": "87ef38a9-ee29-5cd9-b2f8-5696d8e16f68",
+      "label": "World War II: US troops reclaim the Philippine island of Corregidor from the Japanese.",
+      "year": 1945
+    },
+    "A32": {
+      "answer_fact_id": "b14b51ae-82f0-5a33-9eae-b748b7718826",
+      "label": "A total of 279 female students aged between 10 and 17 are kidnapped by bandits in the Zamfara kidnapping in Zamfara State, Nigeria.",
+      "year": 2021
+    },
+    "A33": {
+      "answer_fact_id": "26e38baa-3a26-5f4d-a767-d17931d9b8e9",
+      "label": "Indian Air Force fighter-jets target Jaish-e-Mohammed terrorist training camps in Balakot, Pakistan.",
+      "year": 2019
+    },
+    "A34": {
+      "answer_fact_id": "b24d2315-53a4-5d42-9a32-47df444d2c03",
+      "label": "A New York-bound Alitalia airliner crashes into a cemetery in Shannon, Ireland, shortly after takeoff, killing 34 of the 52 persons on board.",
+      "year": 1960
+    },
+    "A35": {
+      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+      "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
+      "year": 907
+    },
+    "A36": {
+      "answer_fact_id": "114979c5-f478-59b8-ad59-5b5b07afa107",
+      "label": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
+      "year": 1988
+    },
+    "A37": {
+      "answer_fact_id": "6fc2760b-c26d-5925-9326-e4d9f1a7bfd5",
+      "label": "The Holocaust: In Berlin, the Gestapo arrest 1,800 Jewish men with German wives, leading to the Rosenstrasse protest.",
+      "year": 1943
+    },
+    "A38": {
+      "answer_fact_id": "2ff7e684-3666-59c8-bf98-bcab240d582f",
+      "label": "World War II: During the Battle of the Java Sea, an Allied strike force is defeated by a Japanese task force in the Java Sea in the Dutch East Indies.",
+      "year": 1942
+    },
+    "A39": {
+      "answer_fact_id": "2d84eacf-4b11-54b4-a5f7-98a472dcaad2",
+      "label": "Martin Kamen and Sam Ruben discover carbon-14.",
+      "year": 1940
+    },
+    "A40": {
+      "answer_fact_id": "0463da94-b1fc-5a27-8f76-0a765fb20801",
+      "label": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
+      "year": 1983
+    },
+    "A41": {
+      "answer_fact_id": "92599f03-21c2-5040-88dc-34dca11e1aee",
+      "label": "A Turkish military memorandum results in the collapse of the coalition government in Turkey.",
+      "year": 1997
+    },
+    "A42": {
+      "answer_fact_id": "c07204e1-6753-593b-9a38-936c59b28fce",
+      "label": "Space Shuttle Atlantis is launched on STS-36.",
+      "year": 1990
+    },
+    "A43": {
+      "answer_fact_id": "14bbd7c5-dc67-52eb-ae22-9c93aa2873b8",
+      "label": "Bureau of Alcohol, Tobacco and Firearms (ATF) agents raid the Branch Davidian church in Waco, Texas with a warrant to arrest the group's leader David Koresh, starting a 51-day standoff.",
+      "year": 1993
+    },
+    "A44": {
+      "answer_fact_id": "6f2fa7dc-5588-5bf0-a0c4-7bef6c3b48ca",
+      "label": "Discoverer 1, an American spy satellite that is the first object intended to achieve a polar orbit, is launched but fails to achieve orbit.",
+      "year": 1959
+    },
+    "A45": {
+      "answer_fact_id": "0098ba18-b9b5-5a25-836e-da4805f55c25",
+      "label": "Cold War: Klaus Fuchs is convicted of spying for the Soviet Union by disclosing top secret atomic bomb data.",
+      "year": 1950
+    },
+    "A46": {
+      "answer_fact_id": "159c25e0-b717-525d-b320-0b626e7eb28d",
+      "label": "Bosnia and Herzegovina declares its independence from Socialist Federal Republic of Yugoslavia.",
+      "year": 1992
+    },
+    "A47": {
+      "answer_fact_id": "dba8b2ba-85f9-56dd-a959-14b75953b970",
+      "label": "Battle of Adwa: An Ethiopian army defeats an outnumbered Italian force, ending the First Italo-Ethiopian War.",
+      "year": 1896
+    },
+    "A48": {
+      "answer_fact_id": "fc9c1c70-400a-5239-a5f7-52f3b98ed8c0",
+      "label": "The Australian Army is formed.",
+      "year": 1901
+    },
+    "A49": {
+      "answer_fact_id": "2a963c5d-e426-5e32-a694-e4095d963810",
+      "label": "Marshal F. S. L\u00f3pez dies during the Battle of Cerro Cor\u00e1 thus marking the end of the Paraguayan War.",
+      "year": 1870
+    },
+    "A50": {
+      "answer_fact_id": "3c17db85-d638-53e3-865b-65267dbca47b",
+      "label": "In Roper v. Simmons, the U.S. Supreme Court rules that the execution of juveniles found guilty of any crime is unconstitutional.",
+      "year": 2005
+    },
+    "A51": {
+      "answer_fact_id": "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3",
+      "label": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
+      "year": 1962
+    },
+    "A52": {
+      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+      "label": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
+      "year": 537
+    },
+    "A53": {
+      "answer_fact_id": "93b10610-5222-53d3-bf34-48b69c08b025",
+      "label": "Texas Revolution: The Declaration of independence of the Republic of Texas from Mexico is adopted.",
+      "year": 1836
+    },
+    "A54": {
+      "answer_fact_id": "b1dba7d7-bb50-5053-bfef-02a0422aa0b0",
+      "label": "Signing of the Kandyan Convention treaty by British invaders and the leaders of the Kingdom of Kandy.",
+      "year": 1815
+    },
+    "A55": {
+      "answer_fact_id": "9b1b4531-2a5b-58aa-947a-174649cece94",
+      "label": "The Steel Workers Organizing Committee signs a collective bargaining agreement with U.S. Steel, leading to unionization of the United States steel industry.",
+      "year": 1937
+    },
+    "A56": {
+      "answer_fact_id": "a555aae0-d866-5b62-b034-4ac743230d40",
+      "label": "The College of Arms is formally incorporated by Royal Charter signed by King Richard III of England.",
+      "year": 1484
+    },
+    "A57": {
+      "answer_fact_id": "fee4fb20-26f5-5224-8d2e-3283a1ba72b7",
+      "label": "Space Shuttle Endeavour launches from the Kennedy Space Center on STS-67, carrying the ASTRO-2 spacelab observatory.",
+      "year": 1995
+    },
+    "A58": {
+      "answer_fact_id": "69ec1054-6fe0-5c31-9c4d-a07866bdd6ba",
+      "label": "American Revolutionary War: The Continental Army is routed at the Battle of Brier Creek near Savannah, Georgia.",
+      "year": 1779
+    },
+    "A59": {
+      "answer_fact_id": "19512475-160f-5230-aaa2-d61842b5a854",
+      "label": "US magazine Time publishes its first issue.",
+      "year": 1923
+    },
+    "A60": {
+      "answer_fact_id": "1621b306-721d-5228-93b3-5c24bc20120f",
+      "label": "The Ottoman Caliphate is abolished, when the Caliph Abd\u00fclmecid II of the Ottoman dynasty is deposed. The last remnant of the old monarchy gives way to the reformed Turkey of Kemal Atat\u00fcrk.",
+      "year": 1924
+    },
+    "A61": {
+      "answer_fact_id": "d99de79b-c1bb-5f72-a480-484fdf2c93c7",
+      "label": "Oil is discovered in Saudi Arabia.",
+      "year": 1938
+    },
+    "A62": {
+      "answer_fact_id": "a0968825-bbe3-5c28-aadf-2ef4a30b1391",
+      "label": "A bomb blast in Karachi, Pakistan, kills at least 48 people and injured 200 others in a predominantly Shia Muslim area.",
+      "year": 2013
+    },
+    "A63": {
+      "answer_fact_id": "ff7f8d7b-1951-59c9-85e7-1fd20d8e03e0",
+      "label": "Mughal Emperor Akbar defeats Sultan of Bengal Daud Khan Karrani's army at the Battle of Tukaroi.",
+      "year": 1575
+    },
+    "A64": {
+      "answer_fact_id": "7d9f4f57-85d4-507b-8511-99bf31afd066",
+      "label": "Nero, later to become Roman emperor, is given the title princeps iuventutis (head of the youth).",
+      "year": 51
+    },
+    "A65": {
+      "answer_fact_id": "bcea3434-0e81-5e3e-9d09-f8f6c428c24a",
+      "label": "Cyril VI of Constantinople is elected Ecumenical Patriarch of Constantinople.",
+      "year": 1813
+    },
+    "A66": {
+      "answer_fact_id": "6ca0e932-b4b6-5caf-8f99-2f424ad140ca",
+      "label": "William McKinley inaugurated president for second time; Theodore Roosevelt is vice president.",
+      "year": 1901
+    },
+    "A67": {
+      "answer_fact_id": "913786c9-fa10-5dea-8885-9b19ae131b6f",
+      "label": "The Collinwood school fire, Collinwood near Cleveland, Ohio, kills 174 people.",
+      "year": 1908
+    },
+    "A68": {
+      "answer_fact_id": "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f",
+      "label": "The first national flag of the Confederate States of America (the \"Stars and Bars\") is adopted.",
+      "year": 1861
+    },
+    "A69": {
+      "answer_fact_id": "114c666e-1f41-5d28-aa7e-e420de00a9a2",
+      "label": "Field Marshal C. G. E. Mannerheim, the 6th president of Finland, resigns from his position for health reasons.",
+      "year": 1946
+    },
+    "A70": {
+      "answer_fact_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
+      "label": "Vermont is admitted to the United States as the fourteenth state.",
+      "year": 1791
+    }
+  }
+}

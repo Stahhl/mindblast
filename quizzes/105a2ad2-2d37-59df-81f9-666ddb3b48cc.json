@@ -8,19 +8,27 @@
   "choices": [
     {
       "id": "A",
-      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution."
+      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+      "answer_fact_id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+      "human_id": "A1"
     },
     {
       "id": "B",
-      "label": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states."
+      "label": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states.",
+      "answer_fact_id": "353ad408-ccea-5237-be3e-5faf94ebf93d",
+      "human_id": "A3"
     },
     {
       "id": "C",
-      "label": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans."
+      "label": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans.",
+      "answer_fact_id": "995ef172-b972-5cf5-b96f-6805a9709693",
+      "human_id": "A4"
     },
     {
       "id": "D",
-      "label": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908."
+      "label": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908.",
+      "answer_fact_id": "12ca82a9-f9d5-58db-a5b7-3744e2361b10",
+      "human_id": "A5"
     }
   ],
   "correct_choice_id": "A",
@@ -30,21 +38,25 @@
     "retrieved_at": "2026-02-22T08:25:55Z",
     "events_used": [
       {
+        "event_id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
         "text": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
         "year": 1770,
         "wikipedia_url": "https://en.wikipedia.org/wiki/North_End%2C_Boston"
       },
       {
+        "event_id": "353ad408-ccea-5237-be3e-5faf94ebf93d",
         "text": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states.",
         "year": 1889,
         "wikipedia_url": "https://en.wikipedia.org/wiki/President_of_the_United_States"
       },
       {
+        "event_id": "995ef172-b972-5cf5-b96f-6805a9709693",
         "text": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans.",
         "year": 1899,
         "wikipedia_url": "https://en.wikipedia.org/wiki/Philippine_Revolutionary_Army"
       },
       {
+        "event_id": "12ca82a9-f9d5-58db-a5b7-3744e2361b10",
         "text": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908.",
         "year": 1904,
         "wikipedia_url": "https://en.wikipedia.org/wiki/South_Orkney_Islands"
@@ -52,11 +64,161 @@
     ]
   },
   "metadata": {
-    "version": 1
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
   },
   "generation": {
     "mode": "daily",
     "edition": 1,
     "generated_at": "2026-02-22T08:25:55Z"
-  }
+  },
+  "questions": [
+    {
+      "id": "65fb504c-3fa9-5663-87a3-59fc8593d801",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1770?",
+      "answer_fact_ids": [
+        "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+        "353ad408-ccea-5237-be3e-5faf94ebf93d",
+        "995ef172-b972-5cf5-b96f-6805a9709693",
+        "12ca82a9-f9d5-58db-a5b7-3744e2361b10"
+      ],
+      "correct_answer_fact_id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1770
+      },
+      "human_id": "Q2"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "2a62dc33-7d82-5122-a43b-3dfc98979bf4",
+      "label": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+      "year": 1770,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "18th-century",
+        "1770s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1770s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1770,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1770s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "British customs officer Ebenezer Richardson fires blindly into a crowd during a protest in North End, Boston, fatally wounding 11-year-old Christopher Seider; the first American fatality of the American Revolution.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A1"
+    },
+    {
+      "id": "353ad408-ccea-5237-be3e-5faf94ebf93d",
+      "label": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states.",
+      "year": 1889,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1880s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1880s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1889,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1880s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "President Grover Cleveland signs a bill admitting North Dakota, South Dakota, Montana and Washington as U.S. states.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A3"
+    },
+    {
+      "id": "995ef172-b972-5cf5-b96f-6805a9709693",
+      "label": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans.",
+      "year": 1899,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1890s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1890s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1899,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1890s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Filipino forces led by General Antonio Luna launch counterattacks for the first time against the American forces during the Philippine\u2013American War. The Filipinos fail to regain Manila from the Americans.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A4"
+    },
+    {
+      "id": "12ca82a9-f9d5-58db-a5b7-3744e2361b10",
+      "label": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908.",
+      "year": 1904,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1900s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1904,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The United Kingdom sells a meteorological station on the South Orkney Islands to Argentina; the islands are subsequently claimed by the United Kingdom in 1908.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A5"
+    }
+  ]
 }

@@ -29,12 +29,14 @@ export default function QuizCard({ quiz, quizKey, edition, selectedChoiceId, onS
   const hasAnswered = Boolean(selectedChoiceId);
   const correctChoice = quiz.choices.find((choice) => choice.id === quiz.correct_choice_id);
   const isCorrect = selectedChoiceId === quiz.correct_choice_id;
+  const questionHumanId = quiz.questions?.[0]?.human_id;
 
   return (
     <article className="quiz-card">
       <header className="quiz-header">
         <p className="quiz-type">{formatQuizType(quiz.type)}</p>
         <p className="quiz-type">Edition {edition}</p>
+        {questionHumanId ? <p className="quiz-human-id">#{questionHumanId}</p> : null}
         <h2>{quiz.question}</h2>
       </header>
 
@@ -65,7 +67,10 @@ export default function QuizCard({ quiz, quizKey, edition, selectedChoiceId, onS
               onClick={() => onSelectChoice(quizKey, choice.id)}
             >
               <span className="choice-id">{choice.id}</span>
-              <span className="choice-label">{choice.label}</span>
+              <span className="choice-body">
+                {choice.human_id ? <span className="choice-human-id">#{choice.human_id}</span> : null}
+                <span className="choice-label">{choice.label}</span>
+              </span>
             </button>
           );
         })}

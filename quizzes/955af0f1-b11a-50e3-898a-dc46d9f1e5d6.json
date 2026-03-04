@@ -27,7 +27,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1937
-      }
+      },
+      "human_id": "Q21"
     }
   ],
   "answer_facts": [
@@ -58,7 +59,8 @@
       "vector_metadata": {
         "text_for_embedding": "Texas Revolution: The Declaration of independence of the Republic of Texas from Mexico is adopted.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A53"
     },
     {
       "id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
@@ -87,7 +89,8 @@
       "vector_metadata": {
         "text_for_embedding": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A52"
     },
     {
       "id": "b1dba7d7-bb50-5053-bfef-02a0422aa0b0",
@@ -116,7 +119,8 @@
       "vector_metadata": {
         "text_for_embedding": "Signing of the Kandyan Convention treaty by British invaders and the leaders of the Kingdom of Kandy.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A54"
     },
     {
       "id": "9b1b4531-2a5b-58aa-947a-174649cece94",
@@ -145,7 +149,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Steel Workers Organizing Committee signs a collective bargaining agreement with U.S. Steel, leading to unionization of the United States steel industry.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A55"
     }
   ],
   "question": "Which event happened in 1937?",
@@ -153,22 +158,26 @@
     {
       "id": "A",
       "label": "Texas Revolution: The Declaration of independence of the Republic of Texas from Mexico is adopted.",
-      "answer_fact_id": "93b10610-5222-53d3-bf34-48b69c08b025"
+      "answer_fact_id": "93b10610-5222-53d3-bf34-48b69c08b025",
+      "human_id": "A53"
     },
     {
       "id": "B",
       "label": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
-      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1"
+      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+      "human_id": "A52"
     },
     {
       "id": "C",
       "label": "Signing of the Kandyan Convention treaty by British invaders and the leaders of the Kingdom of Kandy.",
-      "answer_fact_id": "b1dba7d7-bb50-5053-bfef-02a0422aa0b0"
+      "answer_fact_id": "b1dba7d7-bb50-5053-bfef-02a0422aa0b0",
+      "human_id": "A54"
     },
     {
       "id": "D",
       "label": "The Steel Workers Organizing Committee signs a collective bargaining agreement with U.S. Steel, leading to unionization of the United States steel industry.",
-      "answer_fact_id": "9b1b4531-2a5b-58aa-947a-174649cece94"
+      "answer_fact_id": "9b1b4531-2a5b-58aa-947a-174649cece94",
+      "human_id": "A55"
     }
   ],
   "correct_choice_id": "D",

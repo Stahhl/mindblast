@@ -30,7 +30,8 @@
       "selection_rules": {
         "distractor_same_year_allowed": false,
         "target_year": 1995
-      }
+      },
+      "human_id": "Q22"
     }
   ],
   "answer_facts": [
@@ -62,7 +63,8 @@
       "vector_metadata": {
         "text_for_embedding": "The College of Arms is formally incorporated by Royal Charter signed by King Richard III of England.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A56"
     },
     {
       "id": "fee4fb20-26f5-5224-8d2e-3283a1ba72b7",
@@ -92,7 +94,8 @@
       "vector_metadata": {
         "text_for_embedding": "Space Shuttle Endeavour launches from the Kennedy Space Center on STS-67, carrying the ASTRO-2 spacelab observatory.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A57"
     },
     {
       "id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
@@ -122,7 +125,8 @@
       "vector_metadata": {
         "text_for_embedding": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A52"
     },
     {
       "id": "9b1b4531-2a5b-58aa-947a-174649cece94",
@@ -152,7 +156,8 @@
       "vector_metadata": {
         "text_for_embedding": "The Steel Workers Organizing Committee signs a collective bargaining agreement with U.S. Steel, leading to unionization of the United States steel industry.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A55"
     }
   ],
   "question": "When did this happen: Space Shuttle Endeavour launches from the Kennedy Space Center on STS-67, carrying the ASTRO-2 spacelab observatory?",
@@ -160,22 +165,26 @@
     {
       "id": "A",
       "label": "1484",
-      "answer_fact_id": "a555aae0-d866-5b62-b034-4ac743230d40"
+      "answer_fact_id": "a555aae0-d866-5b62-b034-4ac743230d40",
+      "human_id": "A56"
     },
     {
       "id": "B",
       "label": "1995",
-      "answer_fact_id": "fee4fb20-26f5-5224-8d2e-3283a1ba72b7"
+      "answer_fact_id": "fee4fb20-26f5-5224-8d2e-3283a1ba72b7",
+      "human_id": "A57"
     },
     {
       "id": "C",
       "label": "537",
-      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1"
+      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+      "human_id": "A52"
     },
     {
       "id": "D",
       "label": "1937",
-      "answer_fact_id": "9b1b4531-2a5b-58aa-947a-174649cece94"
+      "answer_fact_id": "9b1b4531-2a5b-58aa-947a-174649cece94",
+      "human_id": "A55"
     }
   ],
   "correct_choice_id": "B",

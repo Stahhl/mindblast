@@ -24,7 +24,8 @@
       },
       "selection_rules": {
         "distractor_same_year_allowed": false
-      }
+      },
+      "human_id": "Q20"
     }
   ],
   "answer_facts": [
@@ -55,7 +56,8 @@
       "vector_metadata": {
         "text_for_embedding": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A51"
     },
     {
       "id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
@@ -84,7 +86,8 @@
       "vector_metadata": {
         "text_for_embedding": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A52"
     }
   ],
   "question": "Which event happened earlier?",
@@ -93,13 +96,15 @@
       "id": "A",
       "label": "In Burma, the army led by General Ne Win seizes power in a coup d'\u00e9tat.",
       "year": 1962,
-      "answer_fact_id": "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3"
+      "answer_fact_id": "3e69bd2c-db94-5dca-a12b-d4e38ee3c3e3",
+      "human_id": "A51"
     },
     {
       "id": "B",
       "label": "Siege of Rome: The Ostrogoth army under king Vitiges begins the siege of the capital. Belisarius conducts a delaying action outside the Flaminian Gate; he and a detachment of his bucellarii are almost cut off.",
       "year": 537,
-      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1"
+      "answer_fact_id": "4d72a07c-0fd1-5dca-837e-c9b5541480e1",
+      "human_id": "A52"
     }
   ],
   "correct_choice_id": "B",

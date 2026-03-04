@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import datetime as dt
 from pathlib import Path
 from typing import Any
@@ -20,15 +21,20 @@ from .constants import (
     GENERATION_MODE_EXTRA,
     QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_MCQ_4,
+    SUPPORTED_QUIZ_TYPES,
 )
 from .discovery import write_discovery_artifacts
 from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
 from .storage import (
+    apply_human_ids_to_quiz,
     build_output_path,
     find_existing_quiz_path,
+    iter_quiz_records,
+    load_human_id_lookup,
     list_quiz_records_for_date_type,
+    write_human_id_lookup,
     write_quiz_file,
 )
 from .validation import validate_quiz
@@ -76,8 +82,59 @@ def _build_generation_plan(
     return pending
 
 
+def _backfill_human_ids(output_dir: str) -> int:
+    lookup = load_human_id_lookup(output_dir)
+    records = iter_quiz_records(output_dir)
+    if not records:
+        print(f"No quiz files found in {output_dir}.")
+        return 0
+
+    type_order = {quiz_type: index for index, quiz_type in enumerate(SUPPORTED_QUIZ_TYPES)}
+    ordered_records = sorted(
+        records,
+        key=lambda record: (
+            record.date.isoformat(),
+            type_order.get(record.quiz_type, len(type_order)),
+            record.edition,
+            record.path.as_posix(),
+        ),
+    )
+
+    files_to_update: list[tuple[Path, str, int, dict[str, Any]]] = []
+    lookup_changed = False
+
+    for record in ordered_records:
+        updated_payload = copy.deepcopy(record.payload)
+        payload_or_lookup_changed = apply_human_ids_to_quiz(
+            quiz=updated_payload,
+            quiz_path=record.path,
+            lookup=lookup,
+        )
+        validate_quiz(updated_payload, record.date)
+        if updated_payload != record.payload:
+            files_to_update.append((record.path, record.quiz_type, record.edition, updated_payload))
+        if payload_or_lookup_changed:
+            lookup_changed = True
+
+    for path, quiz_type, edition, payload in files_to_update:
+        write_quiz_file(path, payload)
+        print(f"Backfilled human IDs for {quiz_type} edition {edition}: {path}")
+
+    if lookup_changed:
+        lookup_path = write_human_id_lookup(output_dir, lookup)
+        print(f"Updated human id lookup: {lookup_path}")
+
+    if not files_to_update and not lookup_changed:
+        print("No human id backfill changes needed.")
+
+    return 0
+
+
 def main() -> int:
     args = parse_args()
+    if getattr(args, "backfill_human_ids", False):
+        return _backfill_human_ids(args.output_dir)
+
     target_date = parse_target_date(args.date)
     quiz_types = parse_quiz_types(args.quiz_types)
     generation_mode = parse_generation_mode(args.mode)
@@ -93,6 +150,8 @@ def main() -> int:
         mode=generation_mode,
         count=generation_count,
     )
+    human_id_lookup = load_human_id_lookup(args.output_dir)
+    human_id_lookup_changed = False
 
     generated: list[tuple[str, int, Path, dict[str, Any]]] = []
     if pending:
@@ -158,6 +217,9 @@ def main() -> int:
                     else:
                         print(f"AI factoid pipeline fallback for history_factoid_mcq_4: {factoid_reason}")
 
+            if apply_human_ids_to_quiz(quiz=quiz, quiz_path=output_path, lookup=human_id_lookup):
+                human_id_lookup_changed = True
+
             validate_quiz(quiz, target_date)
             generated.append((quiz_type, edition, output_path, quiz))
 
@@ -208,6 +270,9 @@ def main() -> int:
     for quiz_type, edition, output_path, quiz in generated:
         write_quiz_file(output_path, quiz)
         print(f"Created quiz file for {quiz_type} edition {edition}: {output_path}")
+    if generated and human_id_lookup_changed:
+        lookup_path = write_human_id_lookup(args.output_dir, human_id_lookup)
+        print(f"Updated human id lookup: {lookup_path}")
 
     ai_orchestrator.finalize()
     ai_orchestrator.write_report()

@@ -24,7 +24,8 @@
       },
       "selection_rules": {
         "distractor_same_year_allowed": false
-      }
+      },
+      "human_id": "Q13"
     }
   ],
   "answer_facts": [
@@ -55,7 +56,8 @@
       "vector_metadata": {
         "text_for_embedding": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A35"
     },
     {
       "id": "114979c5-f478-59b8-ad59-5b5b07afa107",
@@ -84,7 +86,8 @@
       "vector_metadata": {
         "text_for_embedding": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A36"
     }
   ],
   "question": "Which event happened earlier?",
@@ -93,13 +96,15 @@
       "id": "A",
       "label": "Abaoji, chieftain of the Yila tribe, is named khagan of the Khitans.",
       "year": 907,
-      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada"
+      "answer_fact_id": "75ea40c4-146f-5d66-983b-b97a8bf3fada",
+      "human_id": "A35"
     },
     {
       "id": "B",
       "label": "Sumgait pogrom: The Armenian community in Sumgait, Azerbaijan is targeted in a violent pogrom.",
       "year": 1988,
-      "answer_fact_id": "114979c5-f478-59b8-ad59-5b5b07afa107"
+      "answer_fact_id": "114979c5-f478-59b8-ad59-5b5b07afa107",
+      "human_id": "A36"
     }
   ],
   "correct_choice_id": "A",

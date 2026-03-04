@@ -24,7 +24,8 @@
       },
       "selection_rules": {
         "distractor_same_year_allowed": false
-      }
+      },
+      "human_id": "Q15"
     }
   ],
   "answer_facts": [
@@ -55,7 +56,8 @@
       "vector_metadata": {
         "text_for_embedding": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A40"
     },
     {
       "id": "92599f03-21c2-5040-88dc-34dca11e1aee",
@@ -84,7 +86,8 @@
       "vector_metadata": {
         "text_for_embedding": "A Turkish military memorandum results in the collapse of the coalition government in Turkey.",
         "embedding_status": "not_generated"
-      }
+      },
+      "human_id": "A41"
     }
   ],
   "question": "Which event happened earlier?",
@@ -93,13 +96,15 @@
       "id": "A",
       "label": "The final episode of M*A*S*H airs, with almost 110 million viewers.",
       "year": 1983,
-      "answer_fact_id": "0463da94-b1fc-5a27-8f76-0a765fb20801"
+      "answer_fact_id": "0463da94-b1fc-5a27-8f76-0a765fb20801",
+      "human_id": "A40"
     },
     {
       "id": "B",
       "label": "A Turkish military memorandum results in the collapse of the coalition government in Turkey.",
       "year": 1997,
-      "answer_fact_id": "92599f03-21c2-5040-88dc-34dca11e1aee"
+      "answer_fact_id": "92599f03-21c2-5040-88dc-34dca11e1aee",
+      "human_id": "A41"
     }
   ],
   "correct_choice_id": "A",
