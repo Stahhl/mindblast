@@ -191,6 +191,7 @@ brew install gitleaks
 
 CI guardrail:
 - Workflow: `.github/workflows/secret-scan.yml` (gitleaks scan on PRs and `main` pushes)
+- Workflow: `.github/workflows/feedback-api-security.yml` (dependency audit + CodeQL for feedback backend changes)
 
 Review guardrail:
 - Code owners file: `.github/CODEOWNERS`
