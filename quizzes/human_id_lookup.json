@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-04T10:26:06Z"
+    "updated_at": "2026-03-05T06:11:26Z"
   },
   "counters": {
-    "question": 28,
-    "answer": 70
+    "question": 31,
+    "answer": 77
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -35,7 +35,10 @@
     "7063f9f7-fcb3-5967-9d17-f9a1d2ecdf80": "Q25",
     "80040456-a981-5bf4-b38d-d5aa4108de22": "Q26",
     "cff068dc-77ae-5ec6-bfac-3adf425fe0d3": "Q27",
-    "d5aa3db3-f6f2-59ac-af34-d758cf11f554": "Q28"
+    "d5aa3db3-f6f2-59ac-af34-d758cf11f554": "Q28",
+    "9292db99-c4bf-5ad7-8154-0cf39cbb5c5d": "Q29",
+    "0b50f3f2-6350-56a3-a763-d8f5e5fcf310": "Q30",
+    "4dc0235c-1e00-54ab-af83-93c43bb05d27": "Q31"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -107,7 +110,14 @@
     "913786c9-fa10-5dea-8885-9b19ae131b6f": "A67",
     "9b4e18cc-6a88-5bfb-a2f9-8de9d1910c8f": "A68",
     "114c666e-1f41-5d28-aa7e-e420de00a9a2": "A69",
-    "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b": "A70"
+    "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b": "A70",
+    "afef3593-6063-5c52-9df9-e125bec9d13c": "A71",
+    "60230016-e62c-579b-8688-13808c114560": "A72",
+    "c8dc379e-3a09-5b46-a65b-32d0314c7294": "A73",
+    "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de": "A74",
+    "d3679be1-ae6b-527f-97a0-c6a6fe017fb7": "A75",
+    "de2bfe70-b1f7-5726-b405-5298308980d9": "A76",
+    "df911288-c256-505f-bf38-e1675dea1486": "A77"
   },
   "questions": {
     "Q1": {
@@ -303,6 +313,27 @@
       "question_id": "d5aa3db3-f6f2-59ac-af34-d758cf11f554",
       "quiz_file": "quizzes/37413169-2fec-561b-8d14-3fdcd786406e.json",
       "date": "2026-03-04",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q29": {
+      "question_id": "9292db99-c4bf-5ad7-8154-0cf39cbb5c5d",
+      "quiz_file": "quizzes/0463a8ba-4e58-597c-ad75-b8706c13200b.json",
+      "date": "2026-03-05",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q30": {
+      "question_id": "0b50f3f2-6350-56a3-a763-d8f5e5fcf310",
+      "quiz_file": "quizzes/2e599c62-ca38-55e7-9321-d8add3bb256b.json",
+      "date": "2026-03-05",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q31": {
+      "question_id": "4dc0235c-1e00-54ab-af83-93c43bb05d27",
+      "quiz_file": "quizzes/eca71a2c-0dc3-53bb-8c96-56301b4c47ce.json",
+      "date": "2026-03-05",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -657,6 +688,41 @@
       "answer_fact_id": "35b4d0eb-d2e8-5bb9-acbb-7a9c04d3a42b",
       "label": "Vermont is admitted to the United States as the fourteenth state.",
       "year": 1791
+    },
+    "A71": {
+      "answer_fact_id": "afef3593-6063-5c52-9df9-e125bec9d13c",
+      "label": "World War II: Japanese forces capture Batavia, capital of Dutch East Indies, which is left undefended after the withdrawal of the KNIL garrison and Australian Blackforce battalion to Buitenzorg and Bandung.",
+      "year": 1942
+    },
+    "A72": {
+      "answer_fact_id": "60230016-e62c-579b-8688-13808c114560",
+      "label": "An Antonov An-148 crashes in Russia's Alexeyevsky District, Belgorod Oblast during a test flight, killing all seven aboard.",
+      "year": 2011
+    },
+    "A73": {
+      "answer_fact_id": "c8dc379e-3a09-5b46-a65b-32d0314c7294",
+      "label": "Air France Flight 212 crashes into La Grande Soufri\u00e8re, killing all 63 aboard.",
+      "year": 1968
+    },
+    "A74": {
+      "answer_fact_id": "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de",
+      "label": "Aeroflot Flight 191 crashes while landing at A\u015fgabat International Airport, killing 12.",
+      "year": 1963
+    },
+    "A75": {
+      "answer_fact_id": "d3679be1-ae6b-527f-97a0-c6a6fe017fb7",
+      "label": "Mefistofele, an opera by Arrigo Boito, receives its premiere performance at La Scala.",
+      "year": 1868
+    },
+    "A76": {
+      "answer_fact_id": "de2bfe70-b1f7-5726-b405-5298308980d9",
+      "label": "King Henry VII of England issues letters patent to John Cabot and his sons, authorising them to explore unknown lands.",
+      "year": 1496
+    },
+    "A77": {
+      "answer_fact_id": "df911288-c256-505f-bf38-e1675dea1486",
+      "label": "Nicolaus Copernicus's book On the Revolutions of the Heavenly Spheres is added to the Index of Forbidden Books 73 years after it was first published.",
+      "year": 1616
     }
   }
 }

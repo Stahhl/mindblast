@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-05",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "0b50f3f2-6350-56a3-a763-d8f5e5fcf310",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1868?",
+      "answer_fact_ids": [
+        "c8dc379e-3a09-5b46-a65b-32d0314c7294",
+        "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de",
+        "afef3593-6063-5c52-9df9-e125bec9d13c",
+        "d3679be1-ae6b-527f-97a0-c6a6fe017fb7"
+      ],
+      "correct_answer_fact_id": "d3679be1-ae6b-527f-97a0-c6a6fe017fb7",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1868
+      },
+      "human_id": "Q30"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "c8dc379e-3a09-5b46-a65b-32d0314c7294",
+      "label": "Air France Flight 212 crashes into La Grande Soufri\u00e8re, killing all 63 aboard.",
+      "year": 1968,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1960s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1968,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Air France Flight 212 crashes into La Grande Soufri\u00e8re, killing all 63 aboard.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A73"
+    },
+    {
+      "id": "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de",
+      "label": "Aeroflot Flight 191 crashes while landing at A\u015fgabat International Airport, killing 12.",
+      "year": 1963,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1960s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1963,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Aeroflot Flight 191 crashes while landing at A\u015fgabat International Airport, killing 12.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A74"
+    },
+    {
+      "id": "afef3593-6063-5c52-9df9-e125bec9d13c",
+      "label": "World War II: Japanese forces capture Batavia, capital of Dutch East Indies, which is left undefended after the withdrawal of the KNIL garrison and Australian Blackforce battalion to Buitenzorg and Bandung.",
+      "year": 1942,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1940s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1940s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1942,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1940s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "World War II: Japanese forces capture Batavia, capital of Dutch East Indies, which is left undefended after the withdrawal of the KNIL garrison and Australian Blackforce battalion to Buitenzorg and Bandung.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A71"
+    },
+    {
+      "id": "d3679be1-ae6b-527f-97a0-c6a6fe017fb7",
+      "label": "Mefistofele, an opera by Arrigo Boito, receives its premiere performance at La Scala.",
+      "year": 1868,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "19th-century",
+        "1860s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1860s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1868,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1860s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Mefistofele, an opera by Arrigo Boito, receives its premiere performance at La Scala.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A75"
+    }
+  ],
+  "question": "Which event happened in 1868?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Air France Flight 212 crashes into La Grande Soufri\u00e8re, killing all 63 aboard.",
+      "answer_fact_id": "c8dc379e-3a09-5b46-a65b-32d0314c7294",
+      "human_id": "A73"
+    },
+    {
+      "id": "B",
+      "label": "Aeroflot Flight 191 crashes while landing at A\u015fgabat International Airport, killing 12.",
+      "answer_fact_id": "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de",
+      "human_id": "A74"
+    },
+    {
+      "id": "C",
+      "label": "World War II: Japanese forces capture Batavia, capital of Dutch East Indies, which is left undefended after the withdrawal of the KNIL garrison and Australian Blackforce battalion to Buitenzorg and Bandung.",
+      "answer_fact_id": "afef3593-6063-5c52-9df9-e125bec9d13c",
+      "human_id": "A71"
+    },
+    {
+      "id": "D",
+      "label": "Mefistofele, an opera by Arrigo Boito, receives its premiere performance at La Scala.",
+      "answer_fact_id": "d3679be1-ae6b-527f-97a0-c6a6fe017fb7",
+      "human_id": "A75"
+    }
+  ],
+  "correct_choice_id": "D",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/5",
+    "retrieved_at": "2026-03-05T06:11:13Z",
+    "events_used": [
+      {
+        "event_id": "c8dc379e-3a09-5b46-a65b-32d0314c7294",
+        "text": "Air France Flight 212 crashes into La Grande Soufri\u00e8re, killing all 63 aboard.",
+        "year": 1968,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Air_France_Flight_212_(1968)"
+      },
+      {
+        "event_id": "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de",
+        "text": "Aeroflot Flight 191 crashes while landing at A\u015fgabat International Airport, killing 12.",
+        "year": 1963,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Aeroflot_Flight_191"
+      },
+      {
+        "event_id": "afef3593-6063-5c52-9df9-e125bec9d13c",
+        "text": "World War II: Japanese forces capture Batavia, capital of Dutch East Indies, which is left undefended after the withdrawal of the KNIL garrison and Australian Blackforce battalion to Buitenzorg and Bandung.",
+        "year": 1942,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/World_War_II"
+      },
+      {
+        "event_id": "d3679be1-ae6b-527f-97a0-c6a6fe017fb7",
+        "text": "Mefistofele, an opera by Arrigo Boito, receives its premiere performance at La Scala.",
+        "year": 1868,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Mefistofele"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-05T06:11:13Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
