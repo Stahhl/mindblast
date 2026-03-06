@@ -1,0 +1,234 @@
+{
+  "date": "2026-03-06",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "4ce224ca-5065-5522-939c-e7a08d8a9b0f",
+      "type": "history_factoid_mcq_4",
+      "prompt": "When were the International Unemployment Day demonstrations globally initiated by the Comintern?",
+      "answer_fact_ids": [
+        "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+        "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+        "59149f50-4744-58ec-b6c7-df7b03a4101c",
+        "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea"
+      ],
+      "correct_answer_fact_id": "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "time",
+        "prompt_style": "when",
+        "generation_method": "ai_native_factoid_v1"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1930
+      },
+      "human_id": "Q34"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+      "label": "Treaty of Paris of 1323 is signed.",
+      "year": 1323,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "14th-century",
+        "1320s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "14th-century",
+        "temporal_decade": "1320s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1323,
+          "temporal_century": "14th-century",
+          "temporal_decade": "1320s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Treaty of Paris of 1323 is signed.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A80"
+    },
+    {
+      "id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "label": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+      "year": 1901,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1900s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1901,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A78"
+    },
+    {
+      "id": "59149f50-4744-58ec-b6c7-df7b03a4101c",
+      "label": "The British ferry MS\u00a0Herald of Free Enterprise capsizes in about 90 seconds, killing 193.",
+      "year": 1987,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1980s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1980s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1987,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1980s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The British ferry MS\u00a0Herald of Free Enterprise capsizes in about 90 seconds, killing 193.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A83"
+    },
+    {
+      "id": "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea",
+      "label": "International Unemployment Day demonstrations globally initiated by the Comintern.",
+      "year": 1930,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1930s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1930s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1930,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1930s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "International Unemployment Day demonstrations globally initiated by the Comintern.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A84"
+    }
+  ],
+  "question": "When were the International Unemployment Day demonstrations globally initiated by the Comintern?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Year 1323",
+      "answer_fact_id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+      "human_id": "A80"
+    },
+    {
+      "id": "B",
+      "label": "Year 1901",
+      "answer_fact_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "human_id": "A78"
+    },
+    {
+      "id": "C",
+      "label": "Year 1987",
+      "answer_fact_id": "59149f50-4744-58ec-b6c7-df7b03a4101c",
+      "human_id": "A83"
+    },
+    {
+      "id": "D",
+      "label": "Year 1930",
+      "answer_fact_id": "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea",
+      "human_id": "A84"
+    }
+  ],
+  "correct_choice_id": "D",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/6",
+    "retrieved_at": "2026-03-06T06:09:59Z",
+    "events_used": [
+      {
+        "event_id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+        "text": "Treaty of Paris of 1323 is signed.",
+        "year": 1323,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Treaty_of_Paris_(1323)"
+      },
+      {
+        "event_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+        "text": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+        "year": 1901,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Wilhelm_II"
+      },
+      {
+        "event_id": "59149f50-4744-58ec-b6c7-df7b03a4101c",
+        "text": "The British ferry MS\u00a0Herald of Free Enterprise capsizes in about 90 seconds, killing 193.",
+        "year": 1987,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/MS_Herald_of_Free_Enterprise"
+      },
+      {
+        "event_id": "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea",
+        "text": "International Unemployment Day demonstrations globally initiated by the Comintern.",
+        "year": 1930,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/International_Unemployment_Day"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-06T06:09:59Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1",
+    "pipeline_version": "phase5_5_v1",
+    "generation_method": "ai_native_factoid_v1"
+  }
+}

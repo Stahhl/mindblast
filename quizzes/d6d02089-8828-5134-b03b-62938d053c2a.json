@@ -1,0 +1,139 @@
+{
+  "date": "2026-03-06",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "17e90516-a9aa-5f41-ab2f-621f7d9d37e0",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+        "f19f4c5b-37ba-5ec9-890d-1f5a4f8301d3"
+      ],
+      "correct_answer_fact_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q32"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "label": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+      "year": 1901,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "20th-century",
+        "1900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1900s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1901,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A78"
+    },
+    {
+      "id": "f19f4c5b-37ba-5ec9-890d-1f5a4f8301d3",
+      "label": "World War II: Soviet Air Forces bomb the evacuated town of Narva in German-occupied Estonia, destroying the entire historical Swedish-era town.",
+      "year": 1944,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "20th-century",
+        "1940s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1940s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1944,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1940s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "World War II: Soviet Air Forces bomb the evacuated town of Narva in German-occupied Estonia, destroying the entire historical Swedish-era town.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A79"
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+      "year": 1901,
+      "answer_fact_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "human_id": "A78"
+    },
+    {
+      "id": "B",
+      "label": "World War II: Soviet Air Forces bomb the evacuated town of Narva in German-occupied Estonia, destroying the entire historical Swedish-era town.",
+      "year": 1944,
+      "answer_fact_id": "f19f4c5b-37ba-5ec9-890d-1f5a4f8301d3",
+      "human_id": "A79"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/6",
+    "retrieved_at": "2026-03-06T06:09:59Z",
+    "events_used": [
+      {
+        "event_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+        "text": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+        "year": 1901,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Wilhelm_II"
+      },
+      {
+        "event_id": "f19f4c5b-37ba-5ec9-890d-1f5a4f8301d3",
+        "text": "World War II: Soviet Air Forces bomb the evacuated town of Narva in German-occupied Estonia, destroying the entire historical Swedish-era town.",
+        "year": 1944,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Soviet_Air_Forces"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-06T06:09:59Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

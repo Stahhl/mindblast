@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-06",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "fa080f0f-cf23-5578-8175-fd9f80e85fb9",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1323?",
+      "answer_fact_ids": [
+        "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+        "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1",
+        "b71ccd81-9983-5a9e-89c2-300a85741803",
+        "73d21df6-9d71-5a59-b5e6-d9dd0419651d"
+      ],
+      "correct_answer_fact_id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1323
+      },
+      "human_id": "Q33"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+      "label": "Treaty of Paris of 1323 is signed.",
+      "year": 1323,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "14th-century",
+        "1320s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "14th-century",
+        "temporal_decade": "1320s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1323,
+          "temporal_century": "14th-century",
+          "temporal_decade": "1320s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Treaty of Paris of 1323 is signed.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A80"
+    },
+    {
+      "id": "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1",
+      "label": "Georgy Malenkov succeeds Joseph Stalin as Premier of the Soviet Union and First Secretary of the Communist Party of the Soviet Union.",
+      "year": 1953,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1950s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1950s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1953,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1950s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Georgy Malenkov succeeds Joseph Stalin as Premier of the Soviet Union and First Secretary of the Communist Party of the Soviet Union.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A81"
+    },
+    {
+      "id": "b71ccd81-9983-5a9e-89c2-300a85741803",
+      "label": "Ghana becomes the first Sub-Saharan country to gain independence from the British.",
+      "year": 1957,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1950s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1950s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1957,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1950s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Ghana becomes the first Sub-Saharan country to gain independence from the British.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A82"
+    },
+    {
+      "id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "label": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+      "year": 1901,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1900s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1901,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A78"
+    }
+  ],
+  "question": "Which event happened in 1323?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Treaty of Paris of 1323 is signed.",
+      "answer_fact_id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+      "human_id": "A80"
+    },
+    {
+      "id": "B",
+      "label": "Georgy Malenkov succeeds Joseph Stalin as Premier of the Soviet Union and First Secretary of the Communist Party of the Soviet Union.",
+      "answer_fact_id": "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1",
+      "human_id": "A81"
+    },
+    {
+      "id": "C",
+      "label": "Ghana becomes the first Sub-Saharan country to gain independence from the British.",
+      "answer_fact_id": "b71ccd81-9983-5a9e-89c2-300a85741803",
+      "human_id": "A82"
+    },
+    {
+      "id": "D",
+      "label": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+      "answer_fact_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "human_id": "A78"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/6",
+    "retrieved_at": "2026-03-06T06:09:59Z",
+    "events_used": [
+      {
+        "event_id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+        "text": "Treaty of Paris of 1323 is signed.",
+        "year": 1323,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Treaty_of_Paris_(1323)"
+      },
+      {
+        "event_id": "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1",
+        "text": "Georgy Malenkov succeeds Joseph Stalin as Premier of the Soviet Union and First Secretary of the Communist Party of the Soviet Union.",
+        "year": 1953,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Georgy_Malenkov"
+      },
+      {
+        "event_id": "b71ccd81-9983-5a9e-89c2-300a85741803",
+        "text": "Ghana becomes the first Sub-Saharan country to gain independence from the British.",
+        "year": 1957,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Ghana"
+      },
+      {
+        "event_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+        "text": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+        "year": 1901,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Wilhelm_II"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-06T06:09:59Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

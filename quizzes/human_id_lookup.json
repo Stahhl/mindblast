@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-05T06:11:26Z"
+    "updated_at": "2026-03-06T06:10:12Z"
   },
   "counters": {
-    "question": 31,
-    "answer": 77
+    "question": 34,
+    "answer": 84
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -38,7 +38,10 @@
     "d5aa3db3-f6f2-59ac-af34-d758cf11f554": "Q28",
     "9292db99-c4bf-5ad7-8154-0cf39cbb5c5d": "Q29",
     "0b50f3f2-6350-56a3-a763-d8f5e5fcf310": "Q30",
-    "4dc0235c-1e00-54ab-af83-93c43bb05d27": "Q31"
+    "4dc0235c-1e00-54ab-af83-93c43bb05d27": "Q31",
+    "17e90516-a9aa-5f41-ab2f-621f7d9d37e0": "Q32",
+    "fa080f0f-cf23-5578-8175-fd9f80e85fb9": "Q33",
+    "4ce224ca-5065-5522-939c-e7a08d8a9b0f": "Q34"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -117,7 +120,14 @@
     "bc5c8103-f626-5d76-bbaa-0ff9ebb2c5de": "A74",
     "d3679be1-ae6b-527f-97a0-c6a6fe017fb7": "A75",
     "de2bfe70-b1f7-5726-b405-5298308980d9": "A76",
-    "df911288-c256-505f-bf38-e1675dea1486": "A77"
+    "df911288-c256-505f-bf38-e1675dea1486": "A77",
+    "73d21df6-9d71-5a59-b5e6-d9dd0419651d": "A78",
+    "f19f4c5b-37ba-5ec9-890d-1f5a4f8301d3": "A79",
+    "080c9344-e0e9-5337-a167-0e2f1cd630fe": "A80",
+    "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1": "A81",
+    "b71ccd81-9983-5a9e-89c2-300a85741803": "A82",
+    "59149f50-4744-58ec-b6c7-df7b03a4101c": "A83",
+    "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea": "A84"
   },
   "questions": {
     "Q1": {
@@ -334,6 +344,27 @@
       "question_id": "4dc0235c-1e00-54ab-af83-93c43bb05d27",
       "quiz_file": "quizzes/eca71a2c-0dc3-53bb-8c96-56301b4c47ce.json",
       "date": "2026-03-05",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q32": {
+      "question_id": "17e90516-a9aa-5f41-ab2f-621f7d9d37e0",
+      "quiz_file": "quizzes/d6d02089-8828-5134-b03b-62938d053c2a.json",
+      "date": "2026-03-06",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q33": {
+      "question_id": "fa080f0f-cf23-5578-8175-fd9f80e85fb9",
+      "quiz_file": "quizzes/8f3178d8-d59f-53c0-96fe-7a1a50f49212.json",
+      "date": "2026-03-06",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q34": {
+      "question_id": "4ce224ca-5065-5522-939c-e7a08d8a9b0f",
+      "quiz_file": "quizzes/1e8a1327-d930-540d-badc-eeadee38d544.json",
+      "date": "2026-03-06",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -723,6 +754,41 @@
       "answer_fact_id": "df911288-c256-505f-bf38-e1675dea1486",
       "label": "Nicolaus Copernicus's book On the Revolutions of the Heavenly Spheres is added to the Index of Forbidden Books 73 years after it was first published.",
       "year": 1616
+    },
+    "A78": {
+      "answer_fact_id": "73d21df6-9d71-5a59-b5e6-d9dd0419651d",
+      "label": "An anarchist assassin tries to kill German Emperor Wilhelm II.",
+      "year": 1901
+    },
+    "A79": {
+      "answer_fact_id": "f19f4c5b-37ba-5ec9-890d-1f5a4f8301d3",
+      "label": "World War II: Soviet Air Forces bomb the evacuated town of Narva in German-occupied Estonia, destroying the entire historical Swedish-era town.",
+      "year": 1944
+    },
+    "A80": {
+      "answer_fact_id": "080c9344-e0e9-5337-a167-0e2f1cd630fe",
+      "label": "Treaty of Paris of 1323 is signed.",
+      "year": 1323
+    },
+    "A81": {
+      "answer_fact_id": "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1",
+      "label": "Georgy Malenkov succeeds Joseph Stalin as Premier of the Soviet Union and First Secretary of the Communist Party of the Soviet Union.",
+      "year": 1953
+    },
+    "A82": {
+      "answer_fact_id": "b71ccd81-9983-5a9e-89c2-300a85741803",
+      "label": "Ghana becomes the first Sub-Saharan country to gain independence from the British.",
+      "year": 1957
+    },
+    "A83": {
+      "answer_fact_id": "59149f50-4744-58ec-b6c7-df7b03a4101c",
+      "label": "The British ferry MS\u00a0Herald of Free Enterprise capsizes in about 90 seconds, killing 193.",
+      "year": 1987
+    },
+    "A84": {
+      "answer_fact_id": "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea",
+      "label": "International Unemployment Day demonstrations globally initiated by the Comintern.",
+      "year": 1930
     }
   }
 }
