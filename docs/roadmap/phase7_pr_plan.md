@@ -3,6 +3,10 @@
 ## Objective
 Deliver Phase 7 in small, reviewable PRs that align directly with `docs/PHASE7.md` and keep abuse/cost risk bounded during rollout.
 
+Status snapshot (as of 2026-03-06):
+- Checked items are implemented and validated locally.
+- Unchecked items are pending environment rollout/verification.
+
 ## Dependency
 - Phase 6 feedback endpoint is live.
 - Phase 6.5 Terraform IAM/invoker parameterization is in place.
@@ -14,13 +18,14 @@ Maps to Phase 7 sections:
 - `Architecture`
 
 Scope:
-- [ ] Ensure Firebase Auth prerequisites are enabled per environment (including Identity Toolkit API where required).
-- [ ] Verify Terraform-driven invoker posture remains private by default (no public direct backend URL access).
-- [ ] Confirm environment config explicitly captures:
-  - [ ] App Check enforcement intent
-  - [ ] `/api/**` Hosting rewrite exposure intent
-  - [ ] auth-required mode intent
-- [ ] Update infra docs/examples to reflect Phase 7 auth-era baseline.
+- [x] Ensure Firebase Auth prerequisites are enabled per environment (including Identity Toolkit API where required).
+- [x] Verify Terraform-driven invoker posture remains private by default (no public direct backend URL access).
+- [x] Confirm environment config explicitly captures:
+  - [x] App Check enforcement intent
+  - [x] `/api/**` Hosting rewrite exposure intent
+  - [x] auth-required mode intent
+- [x] Update infra docs/examples to reflect Phase 7 auth-era baseline.
+- [ ] Verify Firebase Auth Google provider is enabled in both environments (manual console step).
 
 Exit criteria:
 - Auth and access prerequisites are source-controlled, documented, and reproducible via Terraform + environment config.
@@ -33,14 +38,14 @@ Maps to Phase 7 sections:
 - `Abuse and Cost Controls (Required)`
 
 Scope:
-- [ ] Add Firebase ID token verification for `POST /api/quiz-feedback`.
-- [ ] Enforce App Check verification on write path per environment policy.
-- [ ] Keep allowed-origin checks and existing rate limits in the request path.
-- [ ] Return contract-specific status codes:
-  - [ ] missing/invalid ID token -> `401`
-  - [ ] missing/invalid App Check -> `403`
-  - [ ] disallowed origin -> `403`
-- [ ] Add backend tests for auth/app-check failure and success paths.
+- [x] Add Firebase ID token verification for `POST /api/quiz-feedback`.
+- [x] Enforce App Check verification on write path per environment policy.
+- [x] Keep allowed-origin checks and existing rate limits in the request path.
+- [x] Return contract-specific status codes:
+  - [x] missing/invalid ID token -> `401`
+  - [x] missing/invalid App Check -> `403`
+  - [x] disallowed origin -> `403`
+- [x] Add backend tests for auth/app-check failure and success paths.
 
 Exit criteria:
 - Backend write path accepts only authenticated + attested requests, with contract-accurate error behavior.
@@ -52,14 +57,14 @@ Maps to Phase 7 sections:
 - `Validation Rules`
 
 Scope:
-- [ ] Add `schema_version = 2` to new/updated feedback writes.
-- [ ] Store authenticated identity fields:
-  - [ ] `auth_uid`
-  - [ ] `auth_provider`
-  - [ ] `auth_verified_at`
-- [ ] Switch upsert uniqueness key to `(auth_uid, question_id, feedback_date_utc)`.
-- [ ] Keep legacy `client_id` as compatibility-only during migration window.
-- [ ] Add tests for deterministic update semantics under authenticated identity.
+- [x] Add `schema_version = 2` to new/updated feedback writes.
+- [x] Store authenticated identity fields:
+  - [x] `auth_uid`
+  - [x] `auth_provider`
+  - [x] `auth_verified_at`
+- [x] Switch upsert uniqueness key to `(auth_uid, question_id, feedback_date_utc)`.
+- [x] Keep legacy `client_id` as compatibility-only during migration window.
+- [x] Add tests for deterministic update semantics under authenticated identity.
 
 Exit criteria:
 - Feedback uniqueness and update behavior are keyed by authenticated user identity.
@@ -70,14 +75,14 @@ Maps to Phase 7 sections:
 - `Frontend Behavior`
 
 Scope:
-- [ ] Add Firebase Auth client bootstrap for web.
-- [ ] Add minimal Google sign-in/sign-out UX for feedback actions.
-- [ ] Attach ID token + App Check token to feedback write requests.
-- [ ] Handle auth-required UX states:
-  - [ ] signed-out prompt
-  - [ ] token fetch failure
+- [x] Add Firebase Auth client bootstrap for web.
+- [x] Add minimal Google sign-in/sign-out UX for feedback actions.
+- [x] Attach ID token + App Check token to feedback write requests.
+- [x] Handle auth-required UX states:
+  - [x] signed-out prompt
+  - [x] token fetch failure
   - [ ] expired session retry
-- [ ] Preserve quiz play when auth/feedback path is unavailable.
+- [x] Preserve quiz play when auth/feedback path is unavailable.
 
 Exit criteria:
 - Signed-in users can submit/update feedback; signed-out users get clear guidance without breaking gameplay.
@@ -89,7 +94,7 @@ Maps to Phase 7 sections:
 
 Scope:
 - [ ] Re-enable staging Hosting rewrite `/api/** -> quizFeedbackApi`.
-- [ ] Verify direct backend URLs remain non-public.
+- [x] Verify direct backend URLs remain non-public.
 - [ ] Run staging smoke tests:
   - [ ] unauthenticated request rejected (`401`)
   - [ ] auth without valid App Check rejected (`403`)
@@ -136,7 +141,7 @@ Exit criteria:
 
 - [ ] Unauthenticated feedback writes are rejected in staging and production.
 - [ ] Authenticated + App Check verified users can create/update feedback.
-- [ ] Feedback upsert uniqueness is `(auth_uid, question_id, feedback_date_utc)`.
-- [ ] Direct backend URLs remain non-public.
-- [ ] Routing and IAM posture are source-controlled and reproducible.
+- [x] Feedback upsert uniqueness is `(auth_uid, question_id, feedback_date_utc)`.
+- [x] Direct backend URLs remain non-public.
+- [x] Routing and IAM posture are source-controlled and reproducible.
 - [ ] Runbook/docs reflect auth-era operations and rollback controls.

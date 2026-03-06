@@ -29,6 +29,7 @@ github_actions_service_account_id     = "mindblast-prod-gha"
 #   "firebase.googleapis.com",
 #   "firebasehosting.googleapis.com",
 #   "firestore.googleapis.com",
+#   "identitytoolkit.googleapis.com",
 #   "run.googleapis.com",
 #   "serviceusage.googleapis.com",
 # ]

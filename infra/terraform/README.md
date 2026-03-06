@@ -82,6 +82,7 @@ New default APIs:
 - `artifactregistry.googleapis.com`
 - `run.googleapis.com`
 - `firestore.googleapis.com`
+- `identitytoolkit.googleapis.com` (Firebase Auth backend API)
 
 New default CI service account roles:
 - `roles/cloudfunctions.admin`
@@ -89,6 +90,16 @@ New default CI service account roles:
 
 These are additive to the existing Hosting roles and are required before
 GitHub Actions (or local CLI) can deploy `quizFeedbackApi`.
+
+## Phase 7 Auth Infra Notes
+
+Phase 7 authenticated feedback depends on:
+- Firebase Auth enabled in each environment project.
+- `identitytoolkit.googleapis.com` enabled (managed in default `required_services`).
+
+Notes:
+- Terraform can ensure API enablement, but OAuth provider settings (for example Google sign-in)
+  are configured inside Firebase Auth and are not currently managed by this Terraform stack.
 
 Important billing prerequisite:
 - Firebase Functions v2 deployment requires projects on Blaze (pay-as-you-go).

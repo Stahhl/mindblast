@@ -45,6 +45,7 @@ variable "required_services" {
     "firebase.googleapis.com",
     "firebasehosting.googleapis.com",
     "firestore.googleapis.com",
+    "identitytoolkit.googleapis.com",
     "run.googleapis.com",
     "serviceusage.googleapis.com",
   ]
