@@ -2,6 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import type {
   AuditLoggerPort,
+  AuthIdentityDecision,
+  AuthIdentityVerifierPort,
   RateLimitCheck,
   RateLimitDecision,
   RateLimiterPort,
@@ -24,8 +26,8 @@ class FixedClock {
 }
 
 class DeterministicIdGenerator {
-  buildFeedbackId(input: { clientId: string; questionId: string; feedbackDateUtc: string }): string {
-    return `fdbk_${input.clientId}_${input.questionId}_${input.feedbackDateUtc}`;
+  buildFeedbackId(input: { authUid: string; questionId: string; feedbackDateUtc: string }): string {
+    return `fdbk_${input.authUid}_${input.questionId}_${input.feedbackDateUtc}`;
   }
 }
 
@@ -61,6 +63,22 @@ class StubAppCheckVerifier implements RequestAttestationVerifierPort {
   calls = 0;
 
   async verifyToken(_token: string | undefined): Promise<RequestAttestationDecision> {
+    this.calls += 1;
+    return this.decision;
+  }
+}
+
+class StubAuthVerifier implements AuthIdentityVerifierPort {
+  decision: AuthIdentityDecision = {
+    ok: true,
+    identity: {
+      uid: "uid-1",
+      providerId: "google.com",
+    },
+  };
+  calls = 0;
+
+  async verifyIdToken(_token: string | undefined): Promise<AuthIdentityDecision> {
     this.calls += 1;
     return this.decision;
   }
@@ -114,6 +132,7 @@ function buildRuntimeConfig(overrides: Partial<FeedbackRuntimeConfig> = {}): Fee
       globalHourly: 5000,
     },
     security: {
+      requireAuth: true,
       requireAppCheck: false,
       requireOrigin: false,
       allowedOrigins: ["https://mindblast.app", "https://staging.mindblast.app"],
@@ -156,6 +175,7 @@ function buildValidPayload(overrides: Partial<Record<string, unknown>> = {}): Re
 function buildRequest(overrides: Partial<FakeRequest> = {}): FakeRequest {
   const headers = {
     "content-type": "application/json",
+    authorization: "Bearer token-123",
     cookie: "mindblast_client_id=703e4c47-9040-4a17-bde9-fa4d40da7d3a",
     ...overrides.headers,
   };
@@ -176,6 +196,7 @@ function buildRequest(overrides: Partial<FakeRequest> = {}): FakeRequest {
 function createHandlerDeps(runtimeConfig: FeedbackRuntimeConfig) {
   const repository = new InMemoryFeedbackRepository();
   const rateLimiter = new StubRateLimiter();
+  const authVerifier = new StubAuthVerifier();
   const appCheckVerifier = new StubAppCheckVerifier();
   const auditLogger = new CapturingAuditLogger();
 
@@ -189,6 +210,7 @@ function createHandlerDeps(runtimeConfig: FeedbackRuntimeConfig) {
       },
     },
     rateLimiter,
+    authVerifier,
     appCheckVerifier,
     auditLogger,
     runtimeConfig,
@@ -198,6 +220,7 @@ function createHandlerDeps(runtimeConfig: FeedbackRuntimeConfig) {
     handler,
     repository,
     rateLimiter,
+    authVerifier,
     appCheckVerifier,
     auditLogger,
   };
@@ -237,6 +260,25 @@ describe("quiz feedback HTTP handler hardening", () => {
     expect(response.statusCode).toBe(403);
     expect(response.body).toEqual({ ok: false, error: "app_check_failed" });
     expect(deps.auditLogger.events[0]?.reason).toBe("app_check_failed");
+  });
+
+  test("rejects with unauthenticated when auth verifier denies", async () => {
+    const runtimeConfig = buildRuntimeConfig();
+    const deps = createHandlerDeps(runtimeConfig);
+    deps.authVerifier.decision = { ok: false, reason: "missing_id_token" };
+
+    const request = buildRequest({
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+    const response = new FakeResponse();
+
+    await deps.handler(request, response);
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toEqual({ ok: false, error: "unauthenticated" });
+    expect(deps.auditLogger.events[0]?.reason).toBe("unauthenticated");
   });
 
   test("rejects request from forbidden origin", async () => {
@@ -322,11 +364,12 @@ describe("quiz feedback HTTP handler hardening", () => {
     expect(response.body).toEqual({
       ok: true,
       mode: "created",
-      feedback_id: "fdbk_703e4c47-9040-4a17-bde9-fa4d40da7d3a_123e4567-e89b-42d3-a456-426614174000_2026-03-04",
+      feedback_id: "fdbk_uid-1_123e4567-e89b-42d3-a456-426614174000_2026-03-04",
     });
     const record = Array.from(deps.repository.records.values())[0];
     expect(record?.rating).toBe(4);
     expect(record?.comment).toBeUndefined();
+    expect(record?.auth_uid).toBe("uid-1");
   });
 
   test("logs invalid_payload for malformed body", async () => {

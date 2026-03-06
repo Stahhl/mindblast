@@ -139,6 +139,13 @@ describe("QuizCard feedback", () => {
         quizKey="history_mcq_4:1:quizzes/abc123.json"
         quizFile="quizzes/abc123.json"
         edition={1}
+        feedbackEnabled
+        feedbackBlockedMessage=""
+        getFeedbackRequestHeaders={() =>
+          Promise.resolve({
+            Authorization: "Bearer fake-token",
+            "X-Firebase-AppCheck": "fake-app-check",
+          })}
         selectedChoiceId={undefined}
         onSelectChoice={() => {}}
       />,
@@ -161,6 +168,9 @@ describe("QuizCard feedback", () => {
       question_human_id: "Q42",
       rating: 4,
       comment: "Useful question",
+    }, {
+      Authorization: "Bearer fake-token",
+      "X-Firebase-AppCheck": "fake-app-check",
     });
 
     expect(await screen.findByText("Feedback saved.")).toBeInTheDocument();
@@ -177,6 +187,13 @@ describe("QuizCard feedback", () => {
         quizKey="history_mcq_4:1:quizzes/abc123.json"
         quizFile="quizzes/abc123.json"
         edition={1}
+        feedbackEnabled
+        feedbackBlockedMessage=""
+        getFeedbackRequestHeaders={() =>
+          Promise.resolve({
+            Authorization: "Bearer fake-token",
+            "X-Firebase-AppCheck": "fake-app-check",
+          })}
         selectedChoiceId={undefined}
         onSelectChoice={() => {}}
       />,
@@ -199,6 +216,13 @@ describe("QuizCard feedback", () => {
         quizKey="history_mcq_4:1:quizzes/abc123.json"
         quizFile="quizzes/abc123.json"
         edition={1}
+        feedbackEnabled
+        feedbackBlockedMessage=""
+        getFeedbackRequestHeaders={() =>
+          Promise.resolve({
+            Authorization: "Bearer fake-token",
+            "X-Firebase-AppCheck": "fake-app-check",
+          })}
         selectedChoiceId={undefined}
         onSelectChoice={() => {}}
       />,
@@ -209,5 +233,31 @@ describe("QuizCard feedback", () => {
 
     expect(await screen.findByText("Could not submit feedback: rate_limited")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retry submit" })).toBeInTheDocument();
+  });
+
+  test("shows sign-in requirement when feedback is auth-gated", async () => {
+    const user = userEvent.setup();
+    render(
+      <QuizCard
+        quiz={sampleQuiz()}
+        quizKey="history_mcq_4:1:quizzes/abc123.json"
+        quizFile="quizzes/abc123.json"
+        edition={1}
+        feedbackEnabled={false}
+        feedbackBlockedMessage="Sign in to submit feedback."
+        getFeedbackRequestHeaders={() =>
+          Promise.resolve({
+            Authorization: "Bearer fake-token",
+            "X-Firebase-AppCheck": "fake-app-check",
+          })}
+        selectedChoiceId={undefined}
+        onSelectChoice={() => {}}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "4 stars" }));
+    expect(screen.getByRole("button", { name: "Submit feedback" })).toBeDisabled();
+    expect(screen.getByText("Sign in to submit feedback.")).toBeInTheDocument();
+    expect(submitFeedbackMock).not.toHaveBeenCalled();
   });
 });

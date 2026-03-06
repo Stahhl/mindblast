@@ -86,6 +86,36 @@ Optional fields:
 - Existing backend APIs from Phase 6 remain enabled.
 - Invoker and related IAM state managed via Terraform toggles from Phase 6.5.
 
+### Runtime Config (Current Implementation)
+
+Backend runtime flags:
+- `FEEDBACK_AUTH_ENFORCEMENT` (`auto|required|off`, default `auto`)
+- `FEEDBACK_APP_CHECK_ENFORCEMENT` (`auto|required|off`, default `auto`)
+
+Frontend runtime variables (Vite):
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET` (optional)
+- `VITE_FIREBASE_APPCHECK_SITE_KEY`
+- `VITE_FIREBASE_APPCHECK_DEBUG_TOKEN` (optional, local-only)
+
+GitHub Actions variable names wired in frontend deploy workflows:
+- Staging:
+  - `FIREBASE_WEB_API_KEY_STAGING`
+  - `FIREBASE_AUTH_DOMAIN_STAGING`
+  - `FIREBASE_WEB_APP_ID_STAGING`
+  - `FIREBASE_STORAGE_BUCKET_STAGING`
+  - `FIREBASE_APPCHECK_SITE_KEY_STAGING`
+  - `FIREBASE_APPCHECK_DEBUG_TOKEN_STAGING` (optional)
+- Production:
+  - `FIREBASE_WEB_API_KEY_PRODUCTION`
+  - `FIREBASE_AUTH_DOMAIN_PRODUCTION`
+  - `FIREBASE_WEB_APP_ID_PRODUCTION`
+  - `FIREBASE_STORAGE_BUCKET_PRODUCTION`
+  - `FIREBASE_APPCHECK_SITE_KEY_PRODUCTION`
+
 ## Frontend Behavior
 - Add minimal sign-in/sign-out UX (Google provider MVP).
 - Attach ID token and App Check token to feedback writes.

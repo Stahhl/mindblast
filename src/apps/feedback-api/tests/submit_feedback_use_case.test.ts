@@ -25,8 +25,8 @@ class FixedClock {
 }
 
 class DeterministicIdGenerator {
-  buildFeedbackId(input: { clientId: string; questionId: string; feedbackDateUtc: string }): string {
-    return `fdbk_${input.clientId}_${input.questionId}_${input.feedbackDateUtc}`;
+  buildFeedbackId(input: { authUid: string; questionId: string; feedbackDateUtc: string }): string {
+    return `fdbk_${input.authUid}_${input.questionId}_${input.feedbackDateUtc}`;
   }
 }
 
@@ -68,7 +68,8 @@ describe("submitFeedbackUseCase", () => {
     const result = await submitFeedbackUseCase(
       {
         payload: payload(),
-        clientId: "client-1",
+        authUid: "uid-1",
+        authProvider: "google.com",
       },
       {
         repository,
@@ -85,6 +86,10 @@ describe("submitFeedbackUseCase", () => {
     expect(stored).toBeDefined();
     expect(stored?.rating).toBe(4);
     expect(stored?.comment).toBe("Good question");
+    expect(stored?.schema_version).toBe(2);
+    expect(stored?.auth_uid).toBe("uid-1");
+    expect(stored?.auth_provider).toBe("google.com");
+    expect(stored?.auth_verified_at).toBe("2026-03-04T10:00:00.000Z");
     expect(stored?.created_at).toBe("2026-03-04T10:00:00.000Z");
     expect(stored?.updated_at).toBe("2026-03-04T10:00:00.000Z");
   });
@@ -96,7 +101,8 @@ describe("submitFeedbackUseCase", () => {
     const first = await submitFeedbackUseCase(
       {
         payload: payload({ rating: 2, comment: "initial" }),
-        clientId: "client-1",
+        authUid: "uid-1",
+        authProvider: "google.com",
       },
       {
         repository,
@@ -108,7 +114,8 @@ describe("submitFeedbackUseCase", () => {
     const second = await submitFeedbackUseCase(
       {
         payload: payload({ rating: 5, comment: "updated" }),
-        clientId: "client-1",
+        authUid: "uid-1",
+        authProvider: "google.com",
       },
       {
         repository,
@@ -134,9 +141,10 @@ describe("submitFeedbackUseCase", () => {
     await expect(
       submitFeedbackUseCase(
         {
-          payload: payload({ rating: 6 }),
-          clientId: "client-1",
-        },
+        payload: payload({ rating: 6 }),
+        authUid: "uid-1",
+        authProvider: "google.com",
+      },
         {
           repository,
           clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
@@ -152,7 +160,8 @@ describe("submitFeedbackUseCase", () => {
     const result = await submitFeedbackUseCase(
       {
         payload: payload({ comment: "this should be dropped" }),
-        clientId: "client-1",
+        authUid: "uid-1",
+        authProvider: "google.com",
       },
       {
         repository,
@@ -171,7 +180,8 @@ describe("submitFeedbackUseCase", () => {
     const result = await submitFeedbackUseCase(
       {
         payload: payload({ comment: 12345 }),
-        clientId: "client-1",
+        authUid: "uid-1",
+        authProvider: "google.com",
       },
       {
         repository,
@@ -183,5 +193,26 @@ describe("submitFeedbackUseCase", () => {
 
     const stored = repository.records.get(result.feedback_id);
     expect(stored?.comment).toBeUndefined();
+  });
+
+  test("persists legacy client_id when provided", async () => {
+    const repository = new InMemoryFeedbackRepository();
+    const result = await submitFeedbackUseCase(
+      {
+        payload: payload(),
+        authUid: "uid-1",
+        authProvider: "google.com",
+        legacyClientId: "legacy-cookie-id",
+      },
+      {
+        repository,
+        clock: new FixedClock("2026-03-04T10:00:00.000Z", "2026-03-04T10:00:00.000Z"),
+        idGenerator: new DeterministicIdGenerator(),
+        featureFlags: { commentsEnabled: true },
+      },
+    );
+
+    const stored = repository.records.get(result.feedback_id);
+    expect(stored?.client_id).toBe("legacy-cookie-id");
   });
 });

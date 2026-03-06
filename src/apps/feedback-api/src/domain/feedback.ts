@@ -12,7 +12,7 @@ export interface SubmitFeedbackPayload {
 }
 
 export interface FeedbackRecord {
-  schema_version: 1;
+  schema_version: 2;
   feedback_id: string;
   quiz_file: string;
   date: string;
@@ -22,11 +22,14 @@ export interface FeedbackRecord {
   question_human_id: string;
   rating: number;
   feedback_date_utc: string;
-  client_id: string;
+  auth_uid: string;
+  auth_provider: string;
+  auth_verified_at: string;
   created_at: string;
   updated_at: string;
   comment?: string;
   source: "web";
+  client_id?: string;
   user_agent_hash?: string;
 }
 

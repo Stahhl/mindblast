@@ -11,6 +11,7 @@ export interface FeedbackRateLimitConfig {
 }
 
 export interface FeedbackSecurityConfig {
+  requireAuth: boolean;
   requireAppCheck: boolean;
   requireOrigin: boolean;
   allowedOrigins: string[];
@@ -75,11 +76,23 @@ function parseAppCheckRequired(nodeEnv: string): boolean {
     return false;
   }
   if (mode === "auto") {
-    const projectId = (process.env.GCLOUD_PROJECT || "").trim().toLowerCase();
-    const isKnownStaging = projectId === "mindblast-staging";
-    return nodeEnv === "production" && !isKnownStaging;
+    return nodeEnv === "production";
   }
   throw new Error("FEEDBACK_APP_CHECK_ENFORCEMENT must be one of: auto|required|off");
+}
+
+function parseAuthRequired(nodeEnv: string): boolean {
+  const mode = (process.env.FEEDBACK_AUTH_ENFORCEMENT || "auto").trim().toLowerCase();
+  if (mode === "required") {
+    return true;
+  }
+  if (mode === "off") {
+    return false;
+  }
+  if (mode === "auto") {
+    return nodeEnv === "production";
+  }
+  throw new Error("FEEDBACK_AUTH_ENFORCEMENT must be one of: auto|required|off");
 }
 
 export function loadFeedbackRuntimeConfig(): FeedbackRuntimeConfig {
@@ -98,6 +111,7 @@ export function loadFeedbackRuntimeConfig(): FeedbackRuntimeConfig {
       globalHourly: envInt("FEEDBACK_RATE_LIMIT_GLOBAL_HOURLY", 5000),
     },
     security: {
+      requireAuth: parseAuthRequired(nodeEnv),
       requireAppCheck: parseAppCheckRequired(nodeEnv),
       requireOrigin: envBool("FEEDBACK_REQUIRE_ORIGIN", isProduction),
       allowedOrigins: parseAllowedOrigins(nodeEnv),

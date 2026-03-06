@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import QuizCard from "./components/QuizCard";
+import { createFeedbackAuthClient } from "./lib/auth/createAuthClient";
+import type { FeedbackAuthSnapshot } from "./lib/auth/types";
 import { loadDailyQuizzes } from "./lib/quizApi";
 import type { LoadedQuiz } from "./lib/types";
 
@@ -59,6 +61,22 @@ function environmentLabel(environment: AppEnvironment): string {
   return "Unknown";
 }
 
+function feedbackAuthStateLabel(snapshot: FeedbackAuthSnapshot): string {
+  if (snapshot.status === "authenticated") {
+    if (snapshot.email) {
+      return `Signed in as ${snapshot.email}`;
+    }
+    return "Signed in";
+  }
+  if (snapshot.status === "signed_out") {
+    return "Signed out";
+  }
+  if (snapshot.status === "loading") {
+    return "Checking session...";
+  }
+  return "Unavailable";
+}
+
 export default function App() {
   const [status, setStatus] = useState<Status>("loading");
   const [date, setDate] = useState<string>("");
@@ -68,9 +86,28 @@ export default function App() {
   const [errorsByType, setErrorsByType] = useState<Map<string, string>>(new Map());
   const [fatalError, setFatalError] = useState<string>("");
   const [answers, setAnswers] = useState<AnswerMap>({});
+  const feedbackAuthClient = useMemo(() => createFeedbackAuthClient(), []);
+  const [feedbackAuthSnapshot, setFeedbackAuthSnapshot] = useState<FeedbackAuthSnapshot>(() =>
+    feedbackAuthClient.getSnapshot(),
+  );
+  const [feedbackAuthBusy, setFeedbackAuthBusy] = useState(false);
+  const [feedbackAuthMessage, setFeedbackAuthMessage] = useState<string>("");
   const appEnvironment = useMemo(() => detectEnvironment(), []);
   const envLabel = useMemo(() => environmentLabel(appEnvironment), [appEnvironment]);
   const envClass = `env-${appEnvironment}`;
+  const feedbackEnabled = feedbackAuthSnapshot.status === "authenticated";
+  const feedbackBlockedMessage = useMemo(() => {
+    if (feedbackAuthSnapshot.status === "loading") {
+      return "Checking sign-in status...";
+    }
+    if (feedbackAuthSnapshot.status === "signed_out") {
+      return "Sign in to submit feedback.";
+    }
+    if (feedbackAuthSnapshot.status === "unavailable") {
+      return "Feedback auth is unavailable in this environment.";
+    }
+    return "";
+  }, [feedbackAuthSnapshot.status]);
 
   const score = useMemo(() => {
     if (!quizzes.length) {
@@ -162,6 +199,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    return feedbackAuthClient.subscribe((nextSnapshot) => {
+      setFeedbackAuthSnapshot(nextSnapshot);
+    });
+  }, [feedbackAuthClient]);
+
+  useEffect(() => {
     function onKeyDown(event: KeyboardEvent): void {
       if (event.defaultPrevented || event.repeat) {
         return;
@@ -208,6 +251,32 @@ export default function App() {
     const nextDate = shiftIsoDate(date, days);
     setDateInput(nextDate);
     void refresh(nextDate);
+  }
+
+  async function onSignIn(): Promise<void> {
+    setFeedbackAuthBusy(true);
+    setFeedbackAuthMessage("");
+    try {
+      await feedbackAuthClient.signInWithGoogle();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setFeedbackAuthMessage(`Sign-in failed: ${message}`);
+    } finally {
+      setFeedbackAuthBusy(false);
+    }
+  }
+
+  async function onSignOut(): Promise<void> {
+    setFeedbackAuthBusy(true);
+    setFeedbackAuthMessage("");
+    try {
+      await feedbackAuthClient.signOut();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setFeedbackAuthMessage(`Sign-out failed: ${message}`);
+    } finally {
+      setFeedbackAuthBusy(false);
+    }
   }
 
   const inArchiveMode = Boolean(date && latestDate && date !== latestDate);
@@ -277,6 +346,33 @@ export default function App() {
             </div>
             <p className="shortcut-hint">Shortcut: press T to jump to latest.</p>
           </div>
+
+          <section className="auth-controls">
+            <p className="auth-label">Feedback Auth</p>
+            <p className="auth-state">{feedbackAuthStateLabel(feedbackAuthSnapshot)}</p>
+            <div className="auth-actions">
+              {feedbackEnabled ? (
+                <button
+                  type="button"
+                  className="refresh-button secondary"
+                  onClick={() => void onSignOut()}
+                  disabled={feedbackAuthBusy}
+                >
+                  {feedbackAuthBusy ? "Working..." : "Sign out"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="refresh-button secondary"
+                  onClick={() => void onSignIn()}
+                  disabled={feedbackAuthBusy || feedbackAuthSnapshot.status === "unavailable"}
+                >
+                  {feedbackAuthBusy ? "Working..." : "Sign in with Google"}
+                </button>
+              )}
+            </div>
+            {feedbackAuthMessage ? <p className="auth-message">{feedbackAuthMessage}</p> : null}
+          </section>
         </div>
 
         <button type="button" className="refresh-button" onClick={() => void refresh(date)} disabled={status === "loading"}>
@@ -360,6 +456,9 @@ export default function App() {
               quizKey={quiz.key}
               quizFile={quiz.sourcePath}
               edition={quiz.edition}
+              feedbackEnabled={feedbackEnabled}
+              feedbackBlockedMessage={feedbackBlockedMessage}
+              getFeedbackRequestHeaders={() => feedbackAuthClient.getFeedbackRequestHeaders()}
               selectedChoiceId={answers[quiz.key]}
               onSelectChoice={onSelectChoice}
             />

@@ -171,6 +171,42 @@ h1 {
   color: var(--ink-muted);
 }
 
+.auth-controls {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card) 94%, #ffffff);
+  padding: 0.65rem 0.75rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.auth-label {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.auth-state {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.auth-message {
+  margin: 0;
+  color: var(--bad);
+  font-size: 0.82rem;
+}
+
 .refresh-button {
   border: 1px solid var(--line);
   background: var(--card);

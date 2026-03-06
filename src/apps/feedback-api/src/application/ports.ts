@@ -6,7 +6,7 @@ export interface ClockPort {
 }
 
 export interface IdGeneratorPort {
-  buildFeedbackId(input: { clientId: string; questionId: string; feedbackDateUtc: string }): string;
+  buildFeedbackId(input: { authUid: string; questionId: string; feedbackDateUtc: string }): string;
 }
 
 export interface FeedbackRepositoryPort {
@@ -37,6 +37,21 @@ export interface RequestAttestationDecision {
 
 export interface RequestAttestationVerifierPort {
   verifyToken(token: string | undefined): Promise<RequestAttestationDecision>;
+}
+
+export interface VerifiedAuthIdentity {
+  uid: string;
+  providerId: string;
+}
+
+export interface AuthIdentityDecision {
+  ok: boolean;
+  identity?: VerifiedAuthIdentity;
+  reason?: string;
+}
+
+export interface AuthIdentityVerifierPort {
+  verifyIdToken(token: string | undefined): Promise<AuthIdentityDecision>;
 }
 
 export interface AuditLoggerPort {

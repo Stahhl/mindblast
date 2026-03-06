@@ -6,15 +6,15 @@ import {
 } from "../../application/submit_feedback_use_case";
 import type {
   AuditLoggerPort,
+  AuthIdentityVerifierPort,
   RateLimitDecision,
   RateLimiterPort,
   RequestAttestationVerifierPort,
 } from "../../application/ports";
-import { getOrCreateClientId } from "../web/client_identity_provider";
 
 const QUIZ_FEEDBACK_PATHS = new Set(["/api/quiz-feedback", "/quiz-feedback"]);
 const ALLOWED_METHODS = "POST, OPTIONS";
-const ALLOWED_HEADERS = "Content-Type, X-Firebase-AppCheck";
+const ALLOWED_HEADERS = "Content-Type, Authorization, X-Firebase-AppCheck";
 
 interface RequestLike {
   method: string;
@@ -33,6 +33,7 @@ interface ResponseLike {
 export interface QuizFeedbackHttpHandlerDependencies {
   useCase: SubmitFeedbackUseCaseDependencies;
   rateLimiter: RateLimiterPort;
+  authVerifier: AuthIdentityVerifierPort;
   appCheckVerifier: RequestAttestationVerifierPort;
   auditLogger: AuditLoggerPort;
   runtimeConfig: FeedbackRuntimeConfig;
@@ -54,6 +55,32 @@ function normalizeHeader(value: string | string[] | undefined): string | undefin
     return value[0];
   }
   return value;
+}
+
+function parseBearerToken(authorizationHeader: string | undefined): string | undefined {
+  if (!authorizationHeader || !authorizationHeader.trim()) {
+    return undefined;
+  }
+
+  const [scheme, token] = authorizationHeader.trim().split(/\s+/, 2);
+  if (!scheme || !token || scheme.toLowerCase() !== "bearer") {
+    return undefined;
+  }
+  return token;
+}
+
+function readLegacyClientIdFromCookie(request: RequestLike): string | undefined {
+  const cookie = normalizeHeader(request.headers.cookie);
+  if (!cookie || !cookie.trim()) {
+    return undefined;
+  }
+  const parts = cookie.split(";").map((entry) => entry.trim());
+  const clientCookie = parts.find((entry) => entry.startsWith("mindblast_client_id="));
+  if (!clientCookie) {
+    return undefined;
+  }
+  const value = clientCookie.slice("mindblast_client_id=".length).trim();
+  return value || undefined;
 }
 
 function parseIpAddress(request: RequestLike): string {
@@ -133,19 +160,19 @@ function reject(
 async function checkRateLimits(
   request: RequestLike,
   deps: QuizFeedbackHttpHandlerDependencies,
-  clientId: string,
+  authUid: string,
 ): Promise<RateLimitDecision> {
   const ipAddress = parseIpAddress(request);
   return deps.rateLimiter.checkAndConsume([
     {
-      key: `client:${clientId}`,
-      label: "client_hourly",
+      key: `user:${authUid}`,
+      label: "user_hourly",
       limit: deps.runtimeConfig.rateLimits.clientHourly,
       windowSeconds: 3600,
     },
     {
-      key: `client:${clientId}`,
-      label: "client_daily",
+      key: `user:${authUid}`,
+      label: "user_daily",
       limit: deps.runtimeConfig.rateLimits.clientDaily,
       windowSeconds: 86400,
     },
@@ -200,6 +227,21 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
       return;
     }
 
+    const authHeader = request.get("authorization") || normalizeHeader(request.headers.authorization);
+    const idToken = parseBearerToken(authHeader);
+    const authDecision = await deps.authVerifier.verifyIdToken(idToken);
+    if (!authDecision.ok || !authDecision.identity) {
+      reject(
+        response,
+        deps.auditLogger,
+        401,
+        "unauthenticated",
+        { ok: false, error: "unauthenticated" },
+        { auth_reason: authDecision.reason || "unknown" },
+      );
+      return;
+    }
+
     const appCheckToken = request.get("x-firebase-appcheck") || normalizeHeader(request.headers["x-firebase-appcheck"]);
     const appCheckDecision = await deps.appCheckVerifier.verifyToken(appCheckToken);
     if (!appCheckDecision.ok) {
@@ -240,16 +282,9 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
 
     try {
       const payload = extractBody(request);
-      const clientId = getOrCreateClientId(
-        {
-          headers: request.headers,
-        },
-        {
-          setHeader: (name, value) => response.setHeader(name, value),
-        },
-      );
+      const legacyClientId = readLegacyClientIdFromCookie(request);
 
-      const rateLimitDecision = await checkRateLimits(request, deps, clientId);
+      const rateLimitDecision = await checkRateLimits(request, deps, authDecision.identity.uid);
       if (!rateLimitDecision.allowed) {
         if (rateLimitDecision.retryAfterSeconds) {
           response.setHeader("Retry-After", String(rateLimitDecision.retryAfterSeconds));
@@ -271,7 +306,9 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
       const result = await submitFeedbackUseCase(
         {
           payload,
-          clientId,
+          authUid: authDecision.identity.uid,
+          authProvider: authDecision.identity.providerId,
+          legacyClientId,
         },
         deps.useCase,
       );

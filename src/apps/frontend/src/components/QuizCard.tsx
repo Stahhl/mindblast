@@ -8,6 +8,9 @@ interface QuizCardProps {
   quizKey: string;
   quizFile: string;
   edition: number;
+  feedbackEnabled: boolean;
+  feedbackBlockedMessage?: string;
+  getFeedbackRequestHeaders: () => Promise<Record<string, string>>;
   selectedChoiceId: string | undefined;
   onSelectChoice: (quizKey: string, choiceId: string) => void;
 }
@@ -84,13 +87,24 @@ function writeDraft(questionId: string, draft: FeedbackDraft): void {
   );
 }
 
-export default function QuizCard({ quiz, quizKey, quizFile, edition, selectedChoiceId, onSelectChoice }: QuizCardProps) {
+export default function QuizCard({
+  quiz,
+  quizKey,
+  quizFile,
+  edition,
+  feedbackEnabled,
+  feedbackBlockedMessage,
+  getFeedbackRequestHeaders,
+  selectedChoiceId,
+  onSelectChoice,
+}: QuizCardProps) {
   const hasAnswered = Boolean(selectedChoiceId);
   const correctChoice = quiz.choices.find((choice) => choice.id === quiz.correct_choice_id);
   const isCorrect = selectedChoiceId === quiz.correct_choice_id;
   const questionHumanId = quiz.questions?.[0]?.human_id;
   const questionId = quiz.questions?.[0]?.id ?? "";
-  const canSubmitFeedback = Boolean(questionId && questionHumanId);
+  const hasFeedbackMetadata = Boolean(questionId && questionHumanId);
+  const canSubmitFeedback = hasFeedbackMetadata && feedbackEnabled;
   const [rating, setRating] = useState<number | undefined>(undefined);
   const [comment, setComment] = useState<string>("");
   const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("idle");
@@ -127,7 +141,17 @@ export default function QuizCard({ quiz, quizKey, quizFile, edition, selectedCho
   }
 
   async function onSubmitFeedback(): Promise<void> {
-    if (!canSubmitFeedback || feedbackStatus === "saving") {
+    if (feedbackStatus === "saving") {
+      return;
+    }
+    if (!hasFeedbackMetadata) {
+      setFeedbackStatus("error");
+      setFeedbackMessage("Feedback is unavailable for this quiz payload.");
+      return;
+    }
+    if (!feedbackEnabled) {
+      setFeedbackStatus("error");
+      setFeedbackMessage(feedbackBlockedMessage || "Sign in to submit feedback.");
       return;
     }
     if (!rating) {
@@ -139,6 +163,7 @@ export default function QuizCard({ quiz, quizKey, quizFile, edition, selectedCho
     setFeedbackStatus("saving");
     setFeedbackMessage("");
     try {
+      const feedbackRequestHeaders = await getFeedbackRequestHeaders();
       const response = await submitQuizFeedback({
         quiz_file: quizFile,
         date: quiz.date,
@@ -148,7 +173,7 @@ export default function QuizCard({ quiz, quizKey, quizFile, edition, selectedCho
         question_human_id: questionHumanId as string,
         rating,
         ...(comment.trim() ? { comment: comment.trim() } : {}),
-      });
+      }, feedbackRequestHeaders);
 
       if (response.mode === "created") {
         setFeedbackStatus("saved");
@@ -272,8 +297,11 @@ export default function QuizCard({ quiz, quizKey, quizFile, edition, selectedCho
           {feedbackMessage ? (
             <p className={`feedback-message ${feedbackStatus === "error" ? "error" : "ok"}`}>{feedbackMessage}</p>
           ) : null}
-          {!canSubmitFeedback ? (
+          {!hasFeedbackMetadata ? (
             <p className="feedback-message error">Feedback is unavailable for this quiz payload.</p>
+          ) : null}
+          {hasFeedbackMetadata && !feedbackEnabled && feedbackBlockedMessage ? (
+            <p className="feedback-message error">{feedbackBlockedMessage}</p>
           ) : null}
         </div>
       </section>

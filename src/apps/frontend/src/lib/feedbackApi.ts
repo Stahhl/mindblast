@@ -33,11 +33,13 @@ function buildErrorMessage(payload: ErrorPayload, fallback: string): string {
 
 export async function submitQuizFeedback(
   request: SubmitQuizFeedbackRequest,
+  authHeaders: Record<string, string> = {},
 ): Promise<SubmitQuizFeedbackSuccess> {
   const response = await fetch("/api/quiz-feedback", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...authHeaders,
     },
     body: JSON.stringify(request),
   });

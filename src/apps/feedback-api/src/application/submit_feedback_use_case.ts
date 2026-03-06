@@ -13,7 +13,9 @@ export interface SubmitFeedbackUseCaseDependencies {
 
 export interface SubmitFeedbackUseCaseInput {
   payload: unknown;
-  clientId: string;
+  authUid: string;
+  authProvider: string;
+  legacyClientId?: string;
 }
 
 export async function submitFeedbackUseCase(
@@ -27,13 +29,13 @@ export async function submitFeedbackUseCase(
   const nowIso = deps.clock.nowIsoUtc();
   const feedbackDateUtc = nowIso.slice(0, 10);
   const feedbackId = deps.idGenerator.buildFeedbackId({
-    clientId: input.clientId,
+    authUid: input.authUid,
     questionId: normalized.question_id,
     feedbackDateUtc,
   });
 
   const record: FeedbackRecord = {
-    schema_version: 1,
+    schema_version: 2,
     feedback_id: feedbackId,
     quiz_file: normalized.quiz_file,
     date: normalized.date,
@@ -43,11 +45,14 @@ export async function submitFeedbackUseCase(
     question_human_id: normalized.question_human_id,
     rating: normalized.rating,
     feedback_date_utc: feedbackDateUtc,
-    client_id: input.clientId,
+    auth_uid: input.authUid,
+    auth_provider: input.authProvider,
+    auth_verified_at: nowIso,
     created_at: nowIso,
     updated_at: nowIso,
     source: "web",
     ...(normalized.comment ? { comment: normalized.comment } : {}),
+    ...(input.legacyClientId ? { client_id: input.legacyClientId } : {}),
   };
 
   const upsert = await deps.repository.upsertById(feedbackId, record);

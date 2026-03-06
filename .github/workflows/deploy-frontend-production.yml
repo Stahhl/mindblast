@@ -36,6 +36,12 @@ jobs:
       FIREBASE_PROJECT_ID: mindblast-prod
       FIREBASE_HOSTING_TARGET: production
       VITE_APP_ENV: production
+      VITE_FIREBASE_API_KEY: ${{ vars.FIREBASE_WEB_API_KEY_PRODUCTION }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN_PRODUCTION }}
+      VITE_FIREBASE_PROJECT_ID: mindblast-prod
+      VITE_FIREBASE_APP_ID: ${{ vars.FIREBASE_WEB_APP_ID_PRODUCTION }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET_PRODUCTION }}
+      VITE_FIREBASE_APPCHECK_SITE_KEY: ${{ vars.FIREBASE_APPCHECK_SITE_KEY_PRODUCTION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
