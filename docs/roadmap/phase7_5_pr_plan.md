@@ -50,5 +50,5 @@ Exit criteria:
 ## Definition of Done
 
 - [x] Edge controls exist for staging and production feedback API routes.
-- [ ] Production route enablement requires edge controls to be active.
+- [x] Production route enablement requires edge controls to be active.
 - [x] Runbook includes phone-only containment steps.
