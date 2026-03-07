@@ -20,9 +20,12 @@ Exit criteria:
 ## PR2: Staging Edge Controls
 
 Scope:
-- [ ] Apply edge rate-limit/challenge rules for staging `/api/**`.
+- [x] Apply edge rate-limit/challenge rules for staging `/api/**`.
 - [ ] Verify normal signed-in feedback flow still works.
-- [ ] Verify abusive burst traffic is reduced before backend.
+- [x] Verify abusive burst traffic is reduced before backend.
+
+Validation snapshot (2026-03-07):
+- External burst to `staging.mindblast.app/api/quiz-feedback` returned `401` for first 5 requests, then `429` from Cloudflare edge.
 
 Exit criteria:
 - Staging demonstrates effective edge filtering with no product regression.
@@ -30,15 +33,18 @@ Exit criteria:
 ## PR3: Production Readiness Gate
 
 Scope:
-- [ ] Mirror edge policy to production.
+- [x] Mirror edge policy to production.
 - [ ] Validate emergency containment sequence.
 - [ ] Record telemetry checks and operational thresholds.
+
+Validation snapshot (2026-03-07):
+- External burst to `mindblast.app/api/quiz-feedback` returned `429` from Cloudflare edge, confirming policy applies to production host.
 
 Exit criteria:
 - Production exposure decision is backed by edge controls and tested incident handling.
 
 ## Definition of Done
 
-- [ ] Edge controls exist for staging and production feedback API routes.
+- [x] Edge controls exist for staging and production feedback API routes.
 - [ ] Production route enablement requires edge controls to be active.
 - [ ] Runbook includes phone-only containment steps.
