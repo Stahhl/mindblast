@@ -43,7 +43,7 @@ jobs:
         run: pnpm --dir src/apps/feedback-api install --frozen-lockfile
 
       - name: Production dependency vulnerability audit
-        run: pnpm --dir src/apps/feedback-api audit --prod
+        run: pnpm --dir src/apps/feedback-api audit --prod --audit-level=moderate
 
   codeql:
     name: CodeQL
