@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-06T06:10:12Z"
+    "updated_at": "2026-03-07T06:05:30Z"
   },
   "counters": {
-    "question": 34,
-    "answer": 84
+    "question": 37,
+    "answer": 90
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -41,7 +41,10 @@
     "4dc0235c-1e00-54ab-af83-93c43bb05d27": "Q31",
     "17e90516-a9aa-5f41-ab2f-621f7d9d37e0": "Q32",
     "fa080f0f-cf23-5578-8175-fd9f80e85fb9": "Q33",
-    "4ce224ca-5065-5522-939c-e7a08d8a9b0f": "Q34"
+    "4ce224ca-5065-5522-939c-e7a08d8a9b0f": "Q34",
+    "599a7e67-a7b3-59d1-9120-ba9b4e260634": "Q35",
+    "2b3bf345-5773-5820-8d03-bc158c102a4f": "Q36",
+    "960c7562-0378-5402-bf2b-1586f914ed0a": "Q37"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -127,7 +130,13 @@
     "fb6c3535-3c6c-5de5-86c7-7e8045dc19f1": "A81",
     "b71ccd81-9983-5a9e-89c2-300a85741803": "A82",
     "59149f50-4744-58ec-b6c7-df7b03a4101c": "A83",
-    "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea": "A84"
+    "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea": "A84",
+    "f68ef471-969e-5565-aa63-fb305a702764": "A85",
+    "69b8b9c5-f8e8-595b-aac7-4869d2925373": "A86",
+    "76d2669b-dc14-5ec8-a6c6-6e6450715838": "A87",
+    "244c9efc-4164-55af-9101-1e7ff027a35e": "A88",
+    "392597b4-fe89-5047-bb95-3b9b4471ddcb": "A89",
+    "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1": "A90"
   },
   "questions": {
     "Q1": {
@@ -365,6 +374,27 @@
       "question_id": "4ce224ca-5065-5522-939c-e7a08d8a9b0f",
       "quiz_file": "quizzes/1e8a1327-d930-540d-badc-eeadee38d544.json",
       "date": "2026-03-06",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q35": {
+      "question_id": "599a7e67-a7b3-59d1-9120-ba9b4e260634",
+      "quiz_file": "quizzes/2f64b96e-8514-5fd9-8e5f-91825476c6f8.json",
+      "date": "2026-03-07",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q36": {
+      "question_id": "2b3bf345-5773-5820-8d03-bc158c102a4f",
+      "quiz_file": "quizzes/45076018-302b-512f-816a-468a50012b01.json",
+      "date": "2026-03-07",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q37": {
+      "question_id": "960c7562-0378-5402-bf2b-1586f914ed0a",
+      "quiz_file": "quizzes/4aee9a8f-bd7c-51af-a73f-7442b16bcb66.json",
+      "date": "2026-03-07",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -789,6 +819,36 @@
       "answer_fact_id": "678c4ad4-3ee5-5c27-b199-2c1c49dec8ea",
       "label": "International Unemployment Day demonstrations globally initiated by the Comintern.",
       "year": 1930
+    },
+    "A85": {
+      "answer_fact_id": "f68ef471-969e-5565-aa63-fb305a702764",
+      "label": "Konrad III von Hohenstaufen is elected king of Germany at Coblenz in the presence of the papal legate Theodwin.",
+      "year": 1138
+    },
+    "A86": {
+      "answer_fact_id": "69b8b9c5-f8e8-595b-aac7-4869d2925373",
+      "label": "The short-lived socialist Labin Republic is proclaimed.",
+      "year": 1921
+    },
+    "A87": {
+      "answer_fact_id": "76d2669b-dc14-5ec8-a6c6-6e6450715838",
+      "label": "Alexander Graham Bell is granted a patent for an invention he calls the \"telephone\".",
+      "year": 1876
+    },
+    "A88": {
+      "answer_fact_id": "244c9efc-4164-55af-9101-1e7ff027a35e",
+      "label": "Shrigley abduction: 15-year old Ellen Turner is abducted by Edward Gibbon Wakefield, a future figure in the establishment of colonies in South Australia and New Zealand.",
+      "year": 1826
+    },
+    "A89": {
+      "answer_fact_id": "392597b4-fe89-5047-bb95-3b9b4471ddcb",
+      "label": "Senator Daniel Webster gives his \"Seventh of March\" speech endorsing the Compromise of 1850 in order to prevent a possible civil war.",
+      "year": 1850
+    },
+    "A90": {
+      "answer_fact_id": "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
+      "label": "Emperor Napoleon I of France wins the Battle of Craonne.",
+      "year": 1814
     }
   }
 }

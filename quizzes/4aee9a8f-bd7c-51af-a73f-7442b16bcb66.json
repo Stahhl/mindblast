@@ -1,0 +1,234 @@
+{
+  "date": "2026-03-07",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "960c7562-0378-5402-bf2b-1586f914ed0a",
+      "type": "history_factoid_mcq_4",
+      "prompt": "When did Emperor Napoleon I of France win the Battle of Craonne?",
+      "answer_fact_ids": [
+        "76d2669b-dc14-5ec8-a6c6-6e6450715838",
+        "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
+        "f68ef471-969e-5565-aa63-fb305a702764",
+        "244c9efc-4164-55af-9101-1e7ff027a35e"
+      ],
+      "correct_answer_fact_id": "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "time",
+        "prompt_style": "when",
+        "generation_method": "ai_native_factoid_v1"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1814
+      },
+      "human_id": "Q37"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "76d2669b-dc14-5ec8-a6c6-6e6450715838",
+      "label": "Alexander Graham Bell is granted a patent for an invention he calls the \"telephone\".",
+      "year": 1876,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1870s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1870s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1876,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1870s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Alexander Graham Bell is granted a patent for an invention he calls the \"telephone\".",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A87"
+    },
+    {
+      "id": "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
+      "label": "Emperor Napoleon I of France wins the Battle of Craonne.",
+      "year": 1814,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "19th-century",
+        "1810s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1810s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1814,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1810s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Emperor Napoleon I of France wins the Battle of Craonne.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A90"
+    },
+    {
+      "id": "f68ef471-969e-5565-aa63-fb305a702764",
+      "label": "Konrad III von Hohenstaufen is elected king of Germany at Coblenz in the presence of the papal legate Theodwin.",
+      "year": 1138,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "12th-century",
+        "1130s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "12th-century",
+        "temporal_decade": "1130s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1138,
+          "temporal_century": "12th-century",
+          "temporal_decade": "1130s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Konrad III von Hohenstaufen is elected king of Germany at Coblenz in the presence of the papal legate Theodwin.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A85"
+    },
+    {
+      "id": "244c9efc-4164-55af-9101-1e7ff027a35e",
+      "label": "Shrigley abduction: 15-year old Ellen Turner is abducted by Edward Gibbon Wakefield, a future figure in the establishment of colonies in South Australia and New Zealand.",
+      "year": 1826,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1820s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1820s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1826,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1820s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Shrigley abduction: 15-year old Ellen Turner is abducted by Edward Gibbon Wakefield, a future figure in the establishment of colonies in South Australia and New Zealand.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A88"
+    }
+  ],
+  "question": "When did Emperor Napoleon I of France win the Battle of Craonne?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "1876",
+      "answer_fact_id": "76d2669b-dc14-5ec8-a6c6-6e6450715838",
+      "human_id": "A87"
+    },
+    {
+      "id": "B",
+      "label": "1814",
+      "answer_fact_id": "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
+      "human_id": "A90"
+    },
+    {
+      "id": "C",
+      "label": "1138",
+      "answer_fact_id": "f68ef471-969e-5565-aa63-fb305a702764",
+      "human_id": "A85"
+    },
+    {
+      "id": "D",
+      "label": "1826",
+      "answer_fact_id": "244c9efc-4164-55af-9101-1e7ff027a35e",
+      "human_id": "A88"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/7",
+    "retrieved_at": "2026-03-07T06:05:21Z",
+    "events_used": [
+      {
+        "event_id": "76d2669b-dc14-5ec8-a6c6-6e6450715838",
+        "text": "Alexander Graham Bell is granted a patent for an invention he calls the \"telephone\".",
+        "year": 1876,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Alexander_Graham_Bell"
+      },
+      {
+        "event_id": "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
+        "text": "Emperor Napoleon I of France wins the Battle of Craonne.",
+        "year": 1814,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Craonne"
+      },
+      {
+        "event_id": "f68ef471-969e-5565-aa63-fb305a702764",
+        "text": "Konrad III von Hohenstaufen is elected king of Germany at Coblenz in the presence of the papal legate Theodwin.",
+        "year": 1138,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Conrad_III_of_Germany"
+      },
+      {
+        "event_id": "244c9efc-4164-55af-9101-1e7ff027a35e",
+        "text": "Shrigley abduction: 15-year old Ellen Turner is abducted by Edward Gibbon Wakefield, a future figure in the establishment of colonies in South Australia and New Zealand.",
+        "year": 1826,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Shrigley_abduction"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-07T06:05:21Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1",
+    "pipeline_version": "phase5_5_v1",
+    "generation_method": "ai_native_factoid_v1"
+  }
+}
