@@ -34,11 +34,15 @@ Exit criteria:
 
 Scope:
 - [x] Mirror edge policy to production.
-- [ ] Validate emergency containment sequence.
-- [ ] Record telemetry checks and operational thresholds.
+- [x] Validate emergency containment sequence.
+- [x] Record telemetry checks and operational thresholds.
 
 Validation snapshot (2026-03-07):
 - External burst to `mindblast.app/api/quiz-feedback` returned `429` from Cloudflare edge, confirming policy applies to production host.
+- Staging containment drill via CLI:
+  - set `FEEDBACK_WRITE_ENABLED=false` -> `POST /api/quiz-feedback` returned `503 writes_disabled`
+  - set `FEEDBACK_WRITE_ENABLED=true` -> unauthenticated `POST /api/quiz-feedback` returned `401 unauthenticated` (normal auth gate restored)
+- Telemetry thresholds and Discord-first alerting procedure documented in runbook.
 
 Exit criteria:
 - Production exposure decision is backed by edge controls and tested incident handling.

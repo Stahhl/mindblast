@@ -109,6 +109,51 @@ gcloud logging read \
   --project=mindblast-staging --limit=200 --format="value(jsonPayload.reason)"
 ```
 
+## Telemetry Thresholds (Discord-First)
+
+Channel:
+- send operational alerts to Discord using existing `DISCORD_WEBHOOK_URL`.
+
+Window:
+- evaluate every 10 minutes (`--freshness=10m`) for fast detection.
+
+Thresholds:
+- `5xx` ratio > `1%` over 10m: alert (`high`)
+- `429` ratio > `20%` over 10m: alert (`warning`) and inspect edge/backend limits
+- request volume > `3x` recent baseline (10m vs typical 10m window): alert (`warning`)
+- `writes_disabled` reject seen: alert immediately (`info` / incident marker)
+
+Sampling commands:
+
+```zsh
+# Status counts in the last 10 minutes
+gcloud logging read \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="quizfeedbackapi" AND logName:"run.googleapis.com%2Frequests"' \
+  --project=mindblast-staging --freshness=10m --limit=1000 --format="value(httpRequest.status)"
+
+# Reject reasons in the last 10 minutes
+gcloud logging read \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="quizfeedbackapi" AND jsonPayload.event="quiz_feedback_reject"' \
+  --project=mindblast-staging --freshness=10m --limit=1000 --format="value(jsonPayload.reason)"
+```
+
+Discord message template:
+
+```text
+mindblast feedback telemetry (staging, 10m)
+total: <n>
+2xx/4xx/5xx: <..>/<..>/<..>
+429 ratio: <x>%
+5xx ratio: <y>%
+writes_disabled events: <n>
+action: <none | monitor | contain>
+```
+
+Initial operating guidance:
+- if `5xx` threshold breaches, run emergency containment (`Feedback Emergency Toggle`) while investigating.
+- if only `429` breaches, verify edge rate-limit behavior before escalating.
+- keep Firebase/GCP billing alerts enabled as a cost backstop; telemetry alerts are the earlier signal.
+
 ## Known Failure Mode
 
 If `/api/quiz-feedback` returns Google Frontend HTML `403` (not JSON):

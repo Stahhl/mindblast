@@ -77,6 +77,7 @@ Defense in depth, in this order:
   - detection signals
   - threshold triggers
   - rollback/containment actions
+  - Discord-first operational alert path
 
 ## Rollback / Containment
 In order of fastest containment:
