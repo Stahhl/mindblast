@@ -25,6 +25,9 @@ jobs:
     env:
       FIREBASE_PROJECT_ID: mindblast-prod
       FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION != '' && secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION || secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION_ }}
+      FEEDBACK_AUTH_ENFORCEMENT: required
+      FEEDBACK_APP_CHECK_ENFORCEMENT: required
+      FEEDBACK_WRITE_ENABLED: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,6 +56,14 @@ jobs:
           key_file="${RUNNER_TEMP}/firebase-production.json"
           printf '%s' "${FIREBASE_SERVICE_ACCOUNT_JSON}" > "${key_file}"
           echo "GOOGLE_APPLICATION_CREDENTIALS=${key_file}" >> "${GITHUB_ENV}"
+
+      - name: Write feedback runtime env (production)
+        run: |
+          cat > src/apps/feedback-api/.env.${FIREBASE_PROJECT_ID} <<EOF
+          FEEDBACK_AUTH_ENFORCEMENT=${FEEDBACK_AUTH_ENFORCEMENT}
+          FEEDBACK_APP_CHECK_ENFORCEMENT=${FEEDBACK_APP_CHECK_ENFORCEMENT}
+          FEEDBACK_WRITE_ENABLED=${FEEDBACK_WRITE_ENABLED}
+          EOF
 
       - name: Deploy feedback API + Firestore config (production)
         run: |

@@ -44,7 +44,6 @@ Request requirements for `POST /api/quiz-feedback`:
 - `X-Firebase-AppCheck: <token>`
 
 Operational note:
-- The current deployment setup does not provide a stable runtime env-var toggle path
-  for `FEEDBACK_*` in Firebase-managed Cloud Run revisions.
-- Use a hotfix fallback change in
-  `src/application/runtime_config.ts` + function redeploy for emergency kill-switches.
+- Feedback API deploy workflows materialize environment-specific runtime config via
+  `.env.<project-id>` before `firebase deploy`, so `FEEDBACK_*` enforcement flags are
+  source-controlled through workflow config.

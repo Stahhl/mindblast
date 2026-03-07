@@ -105,8 +105,8 @@ Reject reasons (`quiz_feedback_reject`):
 
 ```zsh
 gcloud logging read \
-  'resource.type="cloud_run_revision" AND resource.labels.service_name="quizfeedbackapi" AND textPayload:"quiz_feedback_reject"' \
-  --project=mindblast-staging --limit=200 --format="value(textPayload)"
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="quizfeedbackapi" AND jsonPayload.event="quiz_feedback_reject"' \
+  --project=mindblast-staging --limit=200 --format="value(jsonPayload.reason)"
 ```
 
 ## Known Failure Mode
