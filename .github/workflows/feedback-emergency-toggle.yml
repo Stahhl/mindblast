@@ -1,0 +1,117 @@
+name: Feedback Emergency Toggle
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+      write_enabled:
+        description: "Set FEEDBACK_WRITE_ENABLED"
+        required: true
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+      confirmation:
+        description: "Type SHORT_CIRCUIT to continue"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: feedback-emergency-toggle-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  toggle:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SERVICE_ACCOUNT_STAGING_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING != '' && secrets.FIREBASE_SERVICE_ACCOUNT_STAGING || secrets.FIREBASE_SERVICE_ACCOUNT_STAGING_ }}
+      FIREBASE_SERVICE_ACCOUNT_PRODUCTION_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION != '' && secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION || secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION_ }}
+      FEEDBACK_AUTH_ENFORCEMENT: required
+      FEEDBACK_APP_CHECK_ENFORCEMENT: required
+      FEEDBACK_WRITE_ENABLED: ${{ inputs.write_enabled }}
+    steps:
+      - name: Validate confirmation gate
+        run: |
+          if [ "${{ inputs.confirmation }}" != "SHORT_CIRCUIT" ]; then
+            echo "Confirmation phrase mismatch. Aborting."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: src/apps/feedback-api/pnpm-lock.yaml
+
+      - name: Resolve target project and credentials
+        run: |
+          case "${{ inputs.environment }}" in
+            staging)
+              project_id="mindblast-staging"
+              sa_json="${FIREBASE_SERVICE_ACCOUNT_STAGING_JSON}"
+              ;;
+            production)
+              project_id="mindblast-prod"
+              sa_json="${FIREBASE_SERVICE_ACCOUNT_PRODUCTION_JSON}"
+              ;;
+            *)
+              echo "Unsupported environment: ${{ inputs.environment }}"
+              exit 1
+              ;;
+          esac
+
+          if [ -z "${sa_json}" ]; then
+            echo "Missing Firebase service account secret for ${{ inputs.environment }}."
+            exit 1
+          fi
+
+          key_file="${RUNNER_TEMP}/firebase-${{ inputs.environment }}.json"
+          printf '%s' "${sa_json}" > "${key_file}"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${key_file}" >> "${GITHUB_ENV}"
+          echo "FIREBASE_PROJECT_ID=${project_id}" >> "${GITHUB_ENV}"
+
+      - name: Write feedback runtime env
+        run: |
+          cat > "src/apps/feedback-api/.env.${FIREBASE_PROJECT_ID}" <<EOF
+          FEEDBACK_AUTH_ENFORCEMENT=${FEEDBACK_AUTH_ENFORCEMENT}
+          FEEDBACK_APP_CHECK_ENFORCEMENT=${FEEDBACK_APP_CHECK_ENFORCEMENT}
+          FEEDBACK_WRITE_ENABLED=${FEEDBACK_WRITE_ENABLED}
+          EOF
+
+      - name: Deploy feedback API (emergency toggle)
+        run: |
+          npx --yes firebase-tools@13 deploy \
+            --only functions:feedback-api:quizFeedbackApi \
+            --project "${FIREBASE_PROJECT_ID}"
+
+      - name: Summarize result
+        run: |
+          {
+            echo "### Feedback Emergency Toggle";
+            echo "";
+            echo "- environment: \`${{ inputs.environment }}\`";
+            echo "- project: \`${FIREBASE_PROJECT_ID}\`";
+            echo "- FEEDBACK_WRITE_ENABLED: \`${FEEDBACK_WRITE_ENABLED}\`";
+            echo "- FEEDBACK_AUTH_ENFORCEMENT: \`${FEEDBACK_AUTH_ENFORCEMENT}\`";
+            echo "- FEEDBACK_APP_CHECK_ENFORCEMENT: \`${FEEDBACK_APP_CHECK_ENFORCEMENT}\`";
+          } >> "${GITHUB_STEP_SUMMARY}"

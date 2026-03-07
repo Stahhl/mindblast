@@ -21,7 +21,7 @@ Exit criteria:
 
 Scope:
 - [x] Apply edge rate-limit/challenge rules for staging `/api/**`.
-- [ ] Verify normal signed-in feedback flow still works.
+- [x] Verify normal signed-in feedback flow still works.
 - [x] Verify abusive burst traffic is reduced before backend.
 
 Validation snapshot (2026-03-07):
@@ -47,4 +47,4 @@ Exit criteria:
 
 - [x] Edge controls exist for staging and production feedback API routes.
 - [ ] Production route enablement requires edge controls to be active.
-- [ ] Runbook includes phone-only containment steps.
+- [x] Runbook includes phone-only containment steps.

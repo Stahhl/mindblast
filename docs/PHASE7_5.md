@@ -80,7 +80,7 @@ Defense in depth, in this order:
 
 ## Rollback / Containment
 In order of fastest containment:
-1. Disable feedback writes (`FEEDBACK_WRITE_ENABLED=false`) and redeploy function.
+1. Run GitHub workflow `Feedback Emergency Toggle` with `write_enabled=false` (confirmation: `SHORT_CIRCUIT`).
 2. Disable `/api/**` Hosting rewrite for affected environment and deploy hosting.
 3. Tighten/enable emergency edge block rules.
 4. Revert invoker posture in Terraform if needed.

@@ -123,11 +123,33 @@ Production note:
 ## Rollback
 
 1. Emergency write stop:
-  - set `FEEDBACK_WRITE_ENABLED=false` in function runtime config path, redeploy function.
+  - trigger workflow `Feedback Emergency Toggle` with:
+    - `environment`: `staging` or `production`
+    - `write_enabled`: `false`
+    - `confirmation`: `SHORT_CIRCUIT`
+  - this redeploys `quizFeedbackApi` with `FEEDBACK_WRITE_ENABLED=false` and keeps auth/app-check enforcement required.
 2. Route rollback:
   - remove `/api/**` rewrite from target Hosting block in `firebase.json`, redeploy hosting.
 3. Access rollback:
   - keep `feedback_api_allow_public_invoker = false` and (if needed) disable hosting invoker grants via Terraform.
+
+## Phone-Only Containment Flow
+
+Use GitHub mobile/web UI:
+1. Open Actions -> `Feedback Emergency Toggle`.
+2. Click `Run workflow`.
+3. Select `environment`.
+4. Set `write_enabled=false`.
+5. Enter confirmation phrase: `SHORT_CIRCUIT`.
+6. Run workflow and wait for green completion.
+7. Verify `/api/quiz-feedback` returns `503` with `error: writes_disabled`.
+
+Recovery:
+1. Run `Feedback Emergency Toggle` again.
+2. Keep same `environment`.
+3. Set `write_enabled=true`.
+4. Enter `SHORT_CIRCUIT`.
+5. Verify normal signed-in feedback submit returns `200`.
 
 ## Incident Notes
 
