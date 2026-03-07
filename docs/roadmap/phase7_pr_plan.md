@@ -154,5 +154,5 @@ Exit criteria:
 - [ ] Authenticated + App Check verified users can create/update feedback.
 - [x] Feedback upsert uniqueness is `(auth_uid, question_id, feedback_date_utc)`.
 - [x] Routing and IAM posture are source-controlled and reproducible.
-- [ ] Runbook/docs reflect auth-era operations and rollback controls.
-- [ ] Production exposure decision is aligned with Phase 7.5 edge hardening policy.
+- [x] Runbook/docs reflect auth-era operations and rollback controls.
+- [x] Production exposure decision is aligned with Phase 7.5 edge hardening policy.

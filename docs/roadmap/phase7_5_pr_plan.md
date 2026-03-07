@@ -10,9 +10,9 @@ Deliver edge-level abuse and cost controls for feedback API traffic before produ
 ## PR1: Policy Definition and Source Control Baseline
 
 Scope:
-- [ ] Define approved invoker postures per environment.
-- [ ] Define required edge controls for production exposure.
-- [ ] Update runbook and environment docs with explicit risk statements.
+- [x] Define approved invoker postures per environment.
+- [x] Define required edge controls for production exposure.
+- [x] Update runbook and environment docs with explicit risk statements.
 
 Exit criteria:
 - Exposure rules and hardening gate are documented and reviewable.
