@@ -17,8 +17,8 @@ This directory stores provider-specific API contract snapshots used by `quiz-for
    - source URLs
    - request profile(s)
    - response parsing rules
-3. Provider code under `/Users/stahl/dev/mindblast/scripts/quiz_forge/ai/providers/` must reference these rules.
-4. Contract tests under `/Users/stahl/dev/mindblast/tests/quiz_forge/` must fail when code drifts from snapshot.
+3. Provider code under `scripts/quiz_forge/ai/providers/` must reference these rules.
+4. Contract tests under `tests/quiz_forge/` must fail when code drifts from snapshot.
 
 ## Review Trigger
 - Review snapshots whenever:

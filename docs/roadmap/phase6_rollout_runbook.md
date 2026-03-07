@@ -36,7 +36,7 @@ Use CI workflow:
 Or manual:
 
 ```zsh
-cd /Users/stahl/dev/mindblast
+cd <repo-root>
 npx --yes firebase-tools@13 deploy \
   --only functions:feedback-api:quizFeedbackApi,firestore:rules,firestore:indexes \
   --project mindblast-staging
@@ -66,7 +66,7 @@ Expected for a passing burst:
 Manual command:
 
 ```zsh
-cd /Users/stahl/dev/mindblast
+cd <repo-root>
 npx --yes firebase-tools@13 deploy \
   --only functions:feedback-api:quizFeedbackApi,firestore:rules,firestore:indexes \
   --project mindblast-prod
@@ -99,7 +99,7 @@ Current reliable path in this repo is a hotfix default change + fast redeploy.
 2. Redeploy function:
 
 ```zsh
-cd /Users/stahl/dev/mindblast
+cd <repo-root>
 npx --yes firebase-tools@13 deploy \
   --only functions:feedback-api:quizFeedbackApi \
   --project <target-project>
@@ -117,7 +117,7 @@ Note:
 Redeploy last known-good commit for backend + Firestore config:
 
 ```zsh
-cd /Users/stahl/dev/mindblast
+cd <repo-root>
 git checkout <known-good-sha>
 npx --yes firebase-tools@13 deploy \
   --only functions:feedback-api:quizFeedbackApi,firestore:rules,firestore:indexes \

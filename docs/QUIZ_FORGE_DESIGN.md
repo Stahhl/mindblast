@@ -64,7 +64,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 11. Commit and push only when new files are created.
 
 ## Data Contract Ownership
-- Contract lives in `/Users/stahl/dev/mindblast/docs/PHASE1.md`.
+- Contract lives in `docs/PHASE1.md`.
 - `quiz-forge` script must enforce all validation rules before commit.
 - Current schema version is `metadata.version = 2`.
 

@@ -119,6 +119,7 @@ terraform apply
 Terraform now exposes environment-level toggles for feedback API access/iam:
 - `manage_feedback_api_invoker_iam` (default `true` in envs)
 - `feedback_api_allow_public_invoker` (default `false`)
+- `feedback_api_additional_invoker_members` (default `[]`)
 - `feedback_api_cloud_run_service_name` (default `quizfeedbackapi`)
 - `feedback_api_region` (default `us-central1`)
 - `manage_feedback_api_runtime_project_roles` (default `false`)

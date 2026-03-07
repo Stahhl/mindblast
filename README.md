@@ -61,7 +61,9 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 │   ├── PHASE6.md
 │   ├── PHASE6_5.md
 │   ├── PHASE7.md
+│   ├── PHASE7_5.md
 │   ├── HOSTING_ROLLOUT.md
+│   ├── ENVIRONMENTS.md
 │   ├── QUIZ_FORGE_DESIGN.md
 │   ├── FUTURE_FEATURES.md
 │   ├── api_contracts/
@@ -84,7 +86,9 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 6 feedback API scope: `docs/PHASE6.md`
 - Phase 6.5 Terraform access/IAM parameterization: `docs/PHASE6_5.md`
 - Phase 7 auth scope: `docs/PHASE7.md`
+- Phase 7.5 edge hardening scope: `docs/PHASE7_5.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
+- Environment posture and risk model: `docs/ENVIRONMENTS.md`
 - Backend service architecture: `docs/BACKEND_SERVICE_DESIGN.md`
 - Terraform IaC setup: `infra/terraform/README.md`
 - Architecture and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
@@ -127,7 +131,7 @@ pnpm dev
 ## Local quiz-forge Run (uv)
 
 ```zsh
-cd /Users/stahl/dev/mindblast
+cd <repo-root>
 uv sync --locked --no-dev --python 3.12
 uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4,history_factoid_mcq_4"
 ```
@@ -143,7 +147,7 @@ This backfill mode can also normalize legacy schema v1 quiz payloads to v2.
 ## Python Tests (uv)
 
 ```zsh
-cd /Users/stahl/dev/mindblast
+cd <repo-root>
 uv sync --locked --dev --python 3.12
 uv run --python 3.12 pytest tests/quiz_forge
 ```
@@ -151,7 +155,7 @@ uv run --python 3.12 pytest tests/quiz_forge
 ## Feedback API Build + Tests (pnpm)
 
 ```zsh
-cd /Users/stahl/dev/mindblast/src/apps/feedback-api
+cd src/apps/feedback-api
 pnpm install
 pnpm test
 pnpm build

@@ -4,6 +4,10 @@ locals {
     for svc in var.required_services : svc
     if svc != "serviceusage.googleapis.com"
   ]
+  feedback_api_invoker_members_map = merge(
+    { for idx, member in var.feedback_api_additional_invoker_members : "extra_${idx}" => member },
+    var.feedback_api_allow_public_invoker ? { "public" = "allUsers" } : {},
+  )
 }
 
 resource "google_project" "this" {
@@ -77,25 +81,14 @@ resource "google_project_iam_member" "github_actions_roles" {
   member  = "serviceAccount:${google_service_account.github_actions[0].email}"
 }
 
-data "google_iam_policy" "feedback_api_invoker" {
-  count = var.manage_feedback_api_invoker_iam ? 1 : 0
+resource "google_cloud_run_service_iam_member" "feedback_api_invoker" {
+  for_each = var.manage_feedback_api_invoker_iam ? local.feedback_api_invoker_members_map : {}
 
-  dynamic "binding" {
-    for_each = var.feedback_api_allow_public_invoker ? [1] : []
-    content {
-      role    = "roles/run.invoker"
-      members = ["allUsers"]
-    }
-  }
-}
-
-resource "google_cloud_run_service_iam_policy" "feedback_api_invoker" {
-  count = var.manage_feedback_api_invoker_iam ? 1 : 0
-
-  project     = local.effective_project_id
-  location    = var.feedback_api_region
-  service     = var.feedback_api_cloud_run_service_name
-  policy_data = data.google_iam_policy.feedback_api_invoker[0].policy_data
+  project  = local.effective_project_id
+  location = var.feedback_api_region
+  service  = var.feedback_api_cloud_run_service_name
+  role     = "roles/run.invoker"
+  member   = each.value
 }
 
 resource "google_project_iam_member" "feedback_api_runtime_roles" {

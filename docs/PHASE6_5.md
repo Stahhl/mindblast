@@ -14,6 +14,7 @@ For an internet-facing and billable environment, we need deterministic, reviewab
 1. Add Terraform variables to manage feedback API Cloud Run invoker policy:
    - `manage_feedback_api_invoker_iam`
    - `feedback_api_allow_public_invoker`
+   - `feedback_api_additional_invoker_members`
    - `feedback_api_cloud_run_service_name`
    - `feedback_api_region`
 2. Add Terraform variables/resources for runtime service-account project roles:

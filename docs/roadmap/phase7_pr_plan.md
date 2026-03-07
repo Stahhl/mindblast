@@ -10,6 +10,7 @@ Status snapshot (as of 2026-03-06):
 ## Dependency
 - Phase 6 feedback endpoint is live.
 - Phase 6.5 Terraform IAM/invoker parameterization is in place.
+- Phase 7.5 (`docs/PHASE7_5.md`) handles edge hardening before production exposure.
 
 ## PR1: Infra Prerequisites and Access Baseline
 
@@ -25,7 +26,8 @@ Scope:
   - [x] `/api/**` Hosting rewrite exposure intent
   - [x] auth-required mode intent
 - [x] Update infra docs/examples to reflect Phase 7 auth-era baseline.
-- [ ] Verify Firebase Auth Google provider is enabled in both environments (manual console step).
+- [x] Verify Firebase Auth Google provider is enabled in staging (manual console step).
+- [x] Verify Firebase Auth Google provider is enabled in production (manual console step).
 
 Exit criteria:
 - Auth and access prerequisites are source-controlled, documented, and reproducible via Terraform + environment config.
@@ -93,7 +95,7 @@ Maps to Phase 7 sections:
 - `Rollout Plan`
 
 Scope:
-- [ ] Re-enable staging Hosting rewrite `/api/** -> quizFeedbackApi`.
+- [x] Re-enable staging Hosting rewrite `/api/** -> quizFeedbackApi`.
 - [x] Verify direct backend URLs remain non-public.
 - [ ] Run staging smoke tests:
   - [ ] unauthenticated request rejected (`401`)
@@ -101,7 +103,13 @@ Scope:
   - [ ] authenticated + valid App Check request accepted
   - [ ] rate limits still enforced
 - [ ] Capture log evidence for reject reasons and response-code distribution.
-- [ ] Update runbook with Phase 7 operational checks.
+- [x] Update runbook with Phase 7 operational checks.
+
+Current blocker:
+- With private Cloud Run invoker IAM, Firebase Hosting rewrite requests are denied upstream (`403` HTML from Google Frontend) before app-level auth checks run.
+- Decision required for staging completion:
+  - allow public invoker (then enforce auth/app-check/rate-limits in app), or
+  - keep private invoker and disable `/api/**` Hosting route.
 
 Exit criteria:
 - Staging confirms contract-correct behavior and bounded write surface.
@@ -116,6 +124,7 @@ Maps to Phase 7 sections:
 Scope:
 - [ ] Enable production `/api/**` route for authenticated feedback flow.
 - [ ] Verify production App Check enforcement is active.
+- [ ] Confirm Phase 7.5 edge hardening controls are active before production exposure.
 - [ ] Validate post-deploy behavior:
   - [ ] auth-required response behavior
   - [ ] create/update semantics with `auth_uid` identity
@@ -142,6 +151,6 @@ Exit criteria:
 - [ ] Unauthenticated feedback writes are rejected in staging and production.
 - [ ] Authenticated + App Check verified users can create/update feedback.
 - [x] Feedback upsert uniqueness is `(auth_uid, question_id, feedback_date_utc)`.
-- [x] Direct backend URLs remain non-public.
 - [x] Routing and IAM posture are source-controlled and reproducible.
 - [ ] Runbook/docs reflect auth-era operations and rollback controls.
+- [ ] Production exposure decision is aligned with Phase 7.5 edge hardening policy.

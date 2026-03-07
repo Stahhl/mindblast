@@ -21,6 +21,7 @@ module "firebase_foundation" {
   feedback_api_region                        = var.feedback_api_region
   feedback_api_cloud_run_service_name        = var.feedback_api_cloud_run_service_name
   feedback_api_allow_public_invoker          = var.feedback_api_allow_public_invoker
+  feedback_api_additional_invoker_members    = var.feedback_api_additional_invoker_members
   manage_feedback_api_runtime_project_roles  = var.manage_feedback_api_runtime_project_roles
   feedback_api_runtime_service_account_email = var.feedback_api_runtime_service_account_email
   feedback_api_runtime_project_roles         = var.feedback_api_runtime_project_roles

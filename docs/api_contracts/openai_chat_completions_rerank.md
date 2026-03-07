@@ -4,7 +4,7 @@
 - Provider: `openai`
 - API: `chat.completions`
 - Task: `history_mcq_4` distractor rerank
-- Snapshot file: `/Users/stahl/dev/mindblast/docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
+- Snapshot file: `docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
 - Last reviewed: `2026-03-02`
 
 ## Canonical Sources
@@ -59,6 +59,6 @@
 
 ## Operational Note
 - If provider behavior changes, update both:
-  - `/Users/stahl/dev/mindblast/scripts/quiz_forge/ai/providers/openai_contract.py`
-  - `/Users/stahl/dev/mindblast/docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
-- CI contract tests in `/Users/stahl/dev/mindblast/tests/quiz_forge/` are expected to fail until both are aligned.
+  - `scripts/quiz_forge/ai/providers/openai_contract.py`
+  - `docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
+- CI contract tests in `tests/quiz_forge/` are expected to fail until both are aligned.

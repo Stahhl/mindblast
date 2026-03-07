@@ -47,6 +47,7 @@ github_actions_service_account_id     = "mindblast-staging-gha"
 # feedback_api_region             = "us-central1"
 # feedback_api_cloud_run_service_name = "quizfeedbackapi"
 # feedback_api_allow_public_invoker   = false
+# feedback_api_additional_invoker_members     = []
 #
 # Runtime service-account IAM (optional):
 # manage_feedback_api_runtime_project_roles   = false

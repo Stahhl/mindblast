@@ -11,10 +11,12 @@
 
 - Phase scope and contract: `docs/PHASE1.md`
 - Next phase planning: `docs/PHASE1_5.md`, `docs/PHASE2.md`, `docs/PHASE3.md`
+- Current backend hardening phases: `docs/PHASE7.md`, `docs/PHASE7_5.md`
 - System design and guardrails: `docs/QUIZ_FORGE_DESIGN.md`
 - Content/compliance guardrails: `docs/CONTENT_COMPLIANCE_POLICY.md`, `docs/QUIZ_CONTENT_SOURCES.md`
 - Planned future features: `docs/FUTURE_FEATURES.md`
 - Domain and naming checklist: `docs/DOMAIN_PREPURCHASE_CHECKLIST.md`
+- Environment definitions and risk posture: `docs/ENVIRONMENTS.md`
 
 If there is any conflict, follow `docs/PHASE1.md` for current implementation behavior.
 

@@ -141,6 +141,12 @@ variable "feedback_api_allow_public_invoker" {
   default     = false
 }
 
+variable "feedback_api_additional_invoker_members" {
+  description = "Additional IAM members granted run.invoker on feedback API."
+  type        = list(string)
+  default     = []
+}
+
 variable "manage_feedback_api_runtime_project_roles" {
   description = "Whether Terraform manages runtime service account project IAM for feedback API."
   type        = bool

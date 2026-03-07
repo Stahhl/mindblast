@@ -6,11 +6,14 @@
 - Backend generator service name: `quiz-forge`.
 
 ## Objective
-Upgrade feedback writes from anonymous identity to authenticated user identity so `/api/quiz-feedback` can be safely exposed through Hosting routes.
+Upgrade feedback writes from anonymous identity to authenticated user identity and enforce a strict backend write contract (`quiz_feedback_v2`).
 
 ## Dependency
 - Phase 6 (`docs/PHASE6.md`) feedback endpoint is implemented.
 - Phase 6.5 (`docs/PHASE6_5.md`) Terraform IAM/invoker toggles are available.
+
+## Follow-On Phase
+- Phase 7.5 (`docs/PHASE7_5.md`) defines edge hardening and cost-risk controls before production exposure.
 
 ## Why This Phase
 As of `2026-03-04`, staging feedback infrastructure exists, but internet-facing write endpoints need stronger abuse and spend controls than cookie-based anonymous identity. Phase 7 introduces authenticated identity + attestation while preserving the existing feedback product flow.
@@ -18,11 +21,11 @@ As of `2026-03-04`, staging feedback infrastructure exists, but internet-facing 
 ## Scope (Phase 7)
 - Require Firebase Auth identity for feedback writes.
 - Require Firebase App Check for feedback writes.
-- Keep direct backend URLs non-public.
 - Expose feedback API via Hosting rewrite only:
   - `/api/**` -> `quizFeedbackApi`
 - Switch feedback upsert identity from `client_id` to `auth_uid`.
 - Keep frontend gameplay functional even if auth/feedback is unavailable.
+- Validate end-to-end write behavior in staging.
 
 ## Out of Scope
 - Profile pages or account management depth.
@@ -33,8 +36,8 @@ As of `2026-03-04`, staging feedback infrastructure exists, but internet-facing 
 ## Architecture
 - Continue serving quiz payloads statically from `/quizzes/**`.
 - Continue same-origin API routing from Hosting to backend.
-- Backend service remains private behind invoker IAM controls.
 - Authentication and attestation are enforced at backend write boundary.
+- Edge hardening and production exposure model are handled in Phase 7.5 (`docs/PHASE7_5.md`).
 
 ## Identity and Access Contract
 
@@ -77,7 +80,7 @@ Optional fields:
 - Keep strict schema allowlist and payload size constraints.
 - Keep same-origin/CORS allowlist for deployed domains only.
 - Keep feature flags for `writeEnabled` and `commentsEnabled`.
-- Keep direct backend URLs private even when Hosting route is enabled.
+- If invoker is public for rewrite compatibility, treat traffic as internet-exposed and billable and rely on auth/app-check/rate-limit rejection until Phase 7.5 edge controls are in place.
 
 ## Infra Prerequisites
 - Firebase Auth enabled in each environment.
@@ -132,22 +135,26 @@ GitHub Actions variable names wired in frontend deploy workflows:
 1. Implement backend auth enforcement behind config flags.
 2. Implement frontend auth token acquisition + request wiring.
 3. Validate end-to-end in staging with Hosting `/api/**` route enabled.
-4. Verify direct backend URLs remain non-public.
-5. Promote to production.
+4. Record invoker posture and risk acceptance in docs (`docs/ENVIRONMENTS.md`, runbook).
+5. Complete Phase 7.5 edge hardening before production exposure decisions.
 6. Remove legacy anonymous identity write path after confidence window.
+
+Operational runbook:
+- `docs/roadmap/phase7_rollout_runbook.md`
 
 ## Rollback Plan
 - Disable writes using `writeEnabled` and redeploy.
 - Disable `/api/**` Hosting rewrite if needed.
-- Keep direct backend URLs private throughout rollback.
+- Revert invoker posture through Terraform if exposure changes are part of incident response.
 
 ## Acceptance Criteria
 - Unauthenticated requests cannot create/update feedback.
 - Authenticated + App Check verified requests can create/update feedback.
 - Feedback upsert behavior is keyed by authenticated user identity.
-- Routing/IAM exposure remains source-controlled and reproducible.
+- Routing/IAM posture is source-controlled and reproducible.
 - Frontend remains playable even when feedback path is unavailable.
 
 ## Known Limitations
 - One-provider MVP (`google.com`) before adding more identity providers.
 - Auth improves abuse resistance but does not eliminate all abusive traffic.
+- Rejected traffic can still incur billable load until edge protection is introduced (Phase 7.5).
