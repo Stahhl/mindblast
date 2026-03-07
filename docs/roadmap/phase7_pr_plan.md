@@ -97,8 +97,9 @@ Maps to Phase 7 sections:
 Scope:
 - [x] Re-enable staging Hosting rewrite `/api/** -> quizFeedbackApi`.
 - [x] Verify direct backend URLs remain non-public.
+- [x] Document temporary staging public-invoker exception and production gate (Phase 7.5).
 - [ ] Run staging smoke tests:
-  - [ ] unauthenticated request rejected (`401`)
+  - [x] unauthenticated request rejected (`401`)
   - [ ] auth without valid App Check rejected (`403`)
   - [ ] authenticated + valid App Check request accepted
   - [ ] rate limits still enforced
@@ -107,9 +108,9 @@ Scope:
 
 Current blocker:
 - With private Cloud Run invoker IAM, Firebase Hosting rewrite requests are denied upstream (`403` HTML from Google Frontend) before app-level auth checks run.
-- Decision required for staging completion:
-  - allow public invoker (then enforce auth/app-check/rate-limits in app), or
-  - keep private invoker and disable `/api/**` Hosting route.
+- Selected Phase 7 posture:
+  - staging: allow public invoker as temporary exception, then enforce auth/app-check/rate-limits in app.
+  - production: keep non-public invoker until Phase 7.5 edge hardening is complete.
 
 Exit criteria:
 - Staging confirms contract-correct behavior and bounded write surface.

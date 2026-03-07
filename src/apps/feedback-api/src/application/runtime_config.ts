@@ -67,6 +67,14 @@ function parseAllowedOrigins(nodeEnv: string): string[] {
   return base;
 }
 
+function isManagedRuntime(): boolean {
+  const isEmulator = (process.env.FUNCTIONS_EMULATOR || "").trim().toLowerCase() === "true";
+  if (isEmulator) {
+    return false;
+  }
+  return Boolean(process.env.K_SERVICE || process.env.FUNCTION_TARGET || process.env.FUNCTION_NAME);
+}
+
 function parseAppCheckRequired(nodeEnv: string): boolean {
   const mode = (process.env.FEEDBACK_APP_CHECK_ENFORCEMENT || "auto").trim().toLowerCase();
   if (mode === "required") {
@@ -76,7 +84,7 @@ function parseAppCheckRequired(nodeEnv: string): boolean {
     return false;
   }
   if (mode === "auto") {
-    return nodeEnv === "production";
+    return nodeEnv === "production" || isManagedRuntime();
   }
   throw new Error("FEEDBACK_APP_CHECK_ENFORCEMENT must be one of: auto|required|off");
 }
@@ -90,7 +98,7 @@ function parseAuthRequired(nodeEnv: string): boolean {
     return false;
   }
   if (mode === "auto") {
-    return nodeEnv === "production";
+    return nodeEnv === "production" || isManagedRuntime();
   }
   throw new Error("FEEDBACK_AUTH_ENFORCEMENT must be one of: auto|required|off");
 }

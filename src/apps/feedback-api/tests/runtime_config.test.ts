@@ -42,4 +42,27 @@ describe("feedback runtime config", () => {
     const config = loadFeedbackRuntimeConfig();
     expect(config.security.requireAuth).toBe(false);
   });
+
+  test("auto enforcement is enabled in managed runtime even when NODE_ENV is not production", () => {
+    process.env.NODE_ENV = "development";
+    process.env.K_SERVICE = "quizfeedbackapi";
+    delete process.env.FEEDBACK_AUTH_ENFORCEMENT;
+    delete process.env.FEEDBACK_APP_CHECK_ENFORCEMENT;
+
+    const config = loadFeedbackRuntimeConfig();
+    expect(config.security.requireAuth).toBe(true);
+    expect(config.security.requireAppCheck).toBe(true);
+  });
+
+  test("auto enforcement stays disabled in emulator runtime", () => {
+    process.env.NODE_ENV = "development";
+    process.env.K_SERVICE = "quizfeedbackapi";
+    process.env.FUNCTIONS_EMULATOR = "true";
+    delete process.env.FEEDBACK_AUTH_ENFORCEMENT;
+    delete process.env.FEEDBACK_APP_CHECK_ENFORCEMENT;
+
+    const config = loadFeedbackRuntimeConfig();
+    expect(config.security.requireAuth).toBe(false);
+    expect(config.security.requireAppCheck).toBe(false);
+  });
 });

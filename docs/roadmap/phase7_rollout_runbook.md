@@ -19,6 +19,10 @@ Runbook for `quiz_feedback_v2` (authenticated feedback writes) in:
 
 ## Staging Rollout
 
+Phase 7 exception posture:
+- `feedback_api_allow_public_invoker = true` (temporary)
+- backend app-level controls remain required (`401`/`403`/`429` contract)
+
 1. Deploy feedback backend:
 
 ```zsh
@@ -114,7 +118,7 @@ If `/api/quiz-feedback` returns Google Frontend HTML `403` (not JSON):
   or keep invoker private and disable `/api/**` rewrite.
 
 Production note:
-- If using public invoker for rewrite compatibility, complete Phase 7.5 hardening (`docs/PHASE7_5.md`) before production enablement.
+- production must remain `feedback_api_allow_public_invoker = false` until Phase 7.5 hardening (`docs/PHASE7_5.md`) is complete.
 
 ## Rollback
 

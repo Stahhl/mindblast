@@ -22,6 +22,7 @@ github_actions_service_account_id     = "mindblast-staging-gha"
 # Optional overrides. Defaults already include APIs/roles needed for Hosting + Functions + Firestore.
 # required_services = [
 #   "cloudresourcemanager.googleapis.com",
+#   "cloudbilling.googleapis.com",
 #   "cloudbuild.googleapis.com",
 #   "cloudfunctions.googleapis.com",
 #   "eventarc.googleapis.com",
@@ -36,6 +37,8 @@ github_actions_service_account_id     = "mindblast-staging-gha"
 #
 # github_actions_project_roles = [
 #   "roles/cloudfunctions.admin",
+#   "roles/datastore.indexAdmin",
+#   "roles/firebaserules.admin",
 #   "roles/firebasehosting.admin",
 #   "roles/firebase.viewer",
 #   "roles/iam.serviceAccountUser",
@@ -46,7 +49,7 @@ github_actions_service_account_id     = "mindblast-staging-gha"
 # manage_feedback_api_invoker_iam = true
 # feedback_api_region             = "us-central1"
 # feedback_api_cloud_run_service_name = "quizfeedbackapi"
-# feedback_api_allow_public_invoker   = false
+# feedback_api_allow_public_invoker   = true   # Phase 7 temporary staging exception
 # feedback_api_additional_invoker_members     = []
 #
 # Runtime service-account IAM (optional):

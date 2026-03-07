@@ -76,6 +76,7 @@ The default module/env values now include APIs and IAM roles required for:
 - Firestore-backed feedback writes.
 
 New default APIs:
+- `cloudbilling.googleapis.com`
 - `cloudbuild.googleapis.com`
 - `cloudfunctions.googleapis.com`
 - `eventarc.googleapis.com`
@@ -86,6 +87,8 @@ New default APIs:
 
 New default CI service account roles:
 - `roles/cloudfunctions.admin`
+- `roles/datastore.indexAdmin`
+- `roles/firebaserules.admin`
 - `roles/iam.serviceAccountUser`
 
 These are additive to the existing Hosting roles and are required before
@@ -130,6 +133,10 @@ Common use:
 - Temporarily open public invoker (if needed): set to `true`, `terraform apply`
 - Re-close: set back to `false`, `terraform apply`
 
+Current Phase 7 exception policy:
+- staging may set `feedback_api_allow_public_invoker = true` temporarily to allow Hosting rewrite traffic.
+- production must keep `feedback_api_allow_public_invoker = false` until Phase 7.5 edge hardening is complete.
+
 Note:
 - Terraform can only manage Cloud Run IAM after the feedback function has been deployed at least once (service exists).
 - Firestore rules/indexes deploy requires a Firestore database in the project.
@@ -158,7 +165,7 @@ terraform import 'module.firebase_foundation.google_firestore_database.default[0
 
 ## Helper Script: GitHub WIF + Secrets
 
-Use `/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh` to:
+Use `infra/scripts/setup_github_wif.sh` to:
 - create/update workload identity pool + provider,
 - grant `roles/iam.workloadIdentityUser` on the deploy service account,
 - set GitHub repo secrets for a custom WIF-based deploy workflow.
@@ -172,27 +179,27 @@ Legacy compatibility:
 - The workflows also accept secrets with a trailing underscore
   (`..._STAGING_`, `..._PRODUCTION_`) from earlier script output.
 
-Use `/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh`
+Use `infra/scripts/set_firebase_service_account_secret.sh`
 to generate a service-account JSON key and set the environment-specific GitHub secret.
 
 Example (staging):
 
 ```zsh
-/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
+infra/scripts/set_firebase_service_account_secret.sh \
   --environment staging
 ```
 
 Example (production, standard project naming):
 
 ```zsh
-/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
+infra/scripts/set_firebase_service_account_secret.sh \
   --environment production
 ```
 
 Example (production, custom project id and optional additional legacy secret name):
 
 ```zsh
-/Users/stahl/dev/mindblast/infra/scripts/set_firebase_service_account_secret.sh \
+infra/scripts/set_firebase_service_account_secret.sh \
   --environment production \
   --project-id mindblast-prod \
   --also-set-secret FIREBASE_SERVICE_ACCOUNT_PRODUCTION_
@@ -201,19 +208,19 @@ Example (production, custom project id and optional additional legacy secret nam
 Example (staging):
 
 ```zsh
-/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh --project-id mindblast-staging
+infra/scripts/setup_github_wif.sh --project-id mindblast-staging
 ```
 
 Example (production):
 
 ```zsh
-/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh --project-id mindblast-prod
+infra/scripts/setup_github_wif.sh --project-id mindblast-prod
 ```
 
 Optional override when auto-detect does not match:
 
 ```zsh
-/Users/stahl/dev/mindblast/infra/scripts/setup_github_wif.sh \
+infra/scripts/setup_github_wif.sh \
   --project-id mindblast-staging \
   --service-account mindblast-staging-gha@mindblast-staging.iam.gserviceaccount.com \
   --repo owner/repo

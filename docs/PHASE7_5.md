@@ -49,6 +49,9 @@ Defense in depth, in this order:
   - `docs/ENVIRONMENTS.md`
   - rollout runbook
   - PR/incident notes
+- Phase 7 exception:
+  - staging may be public invoker temporarily.
+  - production remains non-public until this phase is accepted.
 
 ## Rollout Plan
 1. Select edge control implementation path (Cloudflare WAF/rate limit rules recommended with current DNS setup).

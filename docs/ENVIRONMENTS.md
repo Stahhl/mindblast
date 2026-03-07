@@ -17,12 +17,20 @@ This is the source of truth for:
 | staging | `mindblast-staging` | `staging` | `staging.mindblast.app` | Yes | Yes (Blaze) |
 | production | `mindblast-prod` | `production` | `mindblast.app` | Yes | Yes (Blaze) |
 
+## Current Feedback API Exposure Posture (Phase 7 Exception)
+
+| Environment | `feedback_api_allow_public_invoker` | Status | Notes |
+| --- | --- | --- | --- |
+| staging | `true` | Temporary exception | Allowed during Phase 7 validation because Hosting rewrite traffic to Cloud Run is unauthenticated at invoker layer. |
+| production | `false` | Required baseline | Must remain non-public until Phase 7.5 edge hardening is implemented and accepted. |
+
 ## Non-Negotiable Posture
 
 1. `staging` is not a safe sandbox by default.
 2. `staging` is publicly reachable on the internet.
 3. `staging` spend is tied to real billing and can incur charges.
 4. Any security/cost control required for production should be treated as required for staging unless explicitly waived in writing.
+5. Current written waiver: temporary staging public invoker for Phase 7 only; production remains gated by Phase 7.5.
 
 ## Deployment Mapping
 

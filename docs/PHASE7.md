@@ -135,7 +135,9 @@ GitHub Actions variable names wired in frontend deploy workflows:
 1. Implement backend auth enforcement behind config flags.
 2. Implement frontend auth token acquisition + request wiring.
 3. Validate end-to-end in staging with Hosting `/api/**` route enabled.
-4. Record invoker posture and risk acceptance in docs (`docs/ENVIRONMENTS.md`, runbook).
+4. Apply temporary staging invoker exception:
+   - `feedback_api_allow_public_invoker = true` in staging
+   - document waiver in `docs/ENVIRONMENTS.md` and runbook
 5. Complete Phase 7.5 edge hardening before production exposure decisions.
 6. Remove legacy anonymous identity write path after confidence window.
 
@@ -158,3 +160,4 @@ Operational runbook:
 - One-provider MVP (`google.com`) before adding more identity providers.
 - Auth improves abuse resistance but does not eliminate all abusive traffic.
 - Rejected traffic can still incur billable load until edge protection is introduced (Phase 7.5).
+- Phase 7 may temporarily require public invoker in staging for rewrite compatibility.

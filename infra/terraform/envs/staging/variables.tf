@@ -44,6 +44,7 @@ variable "required_services" {
   type        = list(string)
   default = [
     "cloudresourcemanager.googleapis.com",
+    "cloudbilling.googleapis.com",
     "cloudbuild.googleapis.com",
     "cloudfunctions.googleapis.com",
     "eventarc.googleapis.com",
@@ -110,6 +111,8 @@ variable "github_actions_project_roles" {
   type        = list(string)
   default = [
     "roles/cloudfunctions.admin",
+    "roles/datastore.indexAdmin",
+    "roles/firebaserules.admin",
     "roles/firebasehosting.admin",
     "roles/firebase.viewer",
     "roles/iam.serviceAccountUser",
