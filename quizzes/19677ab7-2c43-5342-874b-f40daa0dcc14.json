@@ -1,0 +1,234 @@
+{
+  "date": "2026-03-08",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "42be041b-e05b-5399-9045-9476a0e6b9c6",
+      "type": "history_factoid_mcq_4",
+      "prompt": "When did a British force unsuccessfully attempt to relieve the siege of Kut in the Battle of Dujaila?",
+      "answer_fact_ids": [
+        "1ee96ae2-7c97-555f-aefa-9a06a2ab5265",
+        "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f",
+        "4aa53b46-ec6e-5509-9fe3-425305c73c0f",
+        "8ce8f3ab-904c-51fd-ace9-139e2bbc4d55"
+      ],
+      "correct_answer_fact_id": "1ee96ae2-7c97-555f-aefa-9a06a2ab5265",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "time",
+        "prompt_style": "when",
+        "generation_method": "ai_native_factoid_v1"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1916
+      },
+      "human_id": "Q40"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "1ee96ae2-7c97-555f-aefa-9a06a2ab5265",
+      "label": "World War I: A British force unsuccessfully attempts to relieve the siege of Kut (present-day Iraq) in the Battle of Dujaila.",
+      "year": 1916,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1910s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1910s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1916,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1910s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "World War I: A British force unsuccessfully attempts to relieve the siege of Kut (present-day Iraq) in the Battle of Dujaila.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A96"
+    },
+    {
+      "id": "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f",
+      "label": "International Women's Day protests in Petrograd mark the beginning of the February Revolution (February 23 in the Julian calendar).",
+      "year": 1917,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1910s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1910s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1917,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1910s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "International Women's Day protests in Petrograd mark the beginning of the February Revolution (February 23 in the Julian calendar).",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A97"
+    },
+    {
+      "id": "4aa53b46-ec6e-5509-9fe3-425305c73c0f",
+      "label": "French aviatrix Raymonde de Laroche becomes the first woman to receive a pilot's license.",
+      "year": 1910,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1910s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1910s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1910,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1910s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "French aviatrix Raymonde de Laroche becomes the first woman to receive a pilot's license.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A91"
+    },
+    {
+      "id": "8ce8f3ab-904c-51fd-ace9-139e2bbc4d55",
+      "label": "Philips demonstrates the compact disc publicly for the first time.",
+      "year": 1979,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1970s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1970s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1979,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1970s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Philips demonstrates the compact disc publicly for the first time.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A93"
+    }
+  ],
+  "question": "When did a British force unsuccessfully attempt to relieve the siege of Kut in the Battle of Dujaila?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "March 1916",
+      "answer_fact_id": "1ee96ae2-7c97-555f-aefa-9a06a2ab5265",
+      "human_id": "A96"
+    },
+    {
+      "id": "B",
+      "label": "1917",
+      "answer_fact_id": "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f",
+      "human_id": "A97"
+    },
+    {
+      "id": "C",
+      "label": "1910",
+      "answer_fact_id": "4aa53b46-ec6e-5509-9fe3-425305c73c0f",
+      "human_id": "A91"
+    },
+    {
+      "id": "D",
+      "label": "1979",
+      "answer_fact_id": "8ce8f3ab-904c-51fd-ace9-139e2bbc4d55",
+      "human_id": "A93"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/8",
+    "retrieved_at": "2026-03-08T06:08:51Z",
+    "events_used": [
+      {
+        "event_id": "1ee96ae2-7c97-555f-aefa-9a06a2ab5265",
+        "text": "World War I: A British force unsuccessfully attempts to relieve the siege of Kut (present-day Iraq) in the Battle of Dujaila.",
+        "year": 1916,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/World_War_I"
+      },
+      {
+        "event_id": "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f",
+        "text": "International Women's Day protests in Petrograd mark the beginning of the February Revolution (February 23 in the Julian calendar).",
+        "year": 1917,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/International_Women's_Day"
+      },
+      {
+        "event_id": "4aa53b46-ec6e-5509-9fe3-425305c73c0f",
+        "text": "French aviatrix Raymonde de Laroche becomes the first woman to receive a pilot's license.",
+        "year": 1910,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Aircraft_pilot"
+      },
+      {
+        "event_id": "8ce8f3ab-904c-51fd-ace9-139e2bbc4d55",
+        "text": "Philips demonstrates the compact disc publicly for the first time.",
+        "year": 1979,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Philips"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-08T06:08:51Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1",
+    "pipeline_version": "phase5_5_v1",
+    "generation_method": "ai_native_factoid_v1"
+  }
+}

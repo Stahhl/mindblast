@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-07T06:05:30Z"
+    "updated_at": "2026-03-08T06:09:03Z"
   },
   "counters": {
-    "question": 37,
-    "answer": 90
+    "question": 40,
+    "answer": 97
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -44,7 +44,10 @@
     "4ce224ca-5065-5522-939c-e7a08d8a9b0f": "Q34",
     "599a7e67-a7b3-59d1-9120-ba9b4e260634": "Q35",
     "2b3bf345-5773-5820-8d03-bc158c102a4f": "Q36",
-    "960c7562-0378-5402-bf2b-1586f914ed0a": "Q37"
+    "960c7562-0378-5402-bf2b-1586f914ed0a": "Q37",
+    "02bebf6a-ae74-538a-a7fd-9cfc27b073ff": "Q38",
+    "9fb2340f-d8f8-5a8b-bd80-f1454c3a5d0b": "Q39",
+    "42be041b-e05b-5399-9045-9476a0e6b9c6": "Q40"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -136,7 +139,14 @@
     "76d2669b-dc14-5ec8-a6c6-6e6450715838": "A87",
     "244c9efc-4164-55af-9101-1e7ff027a35e": "A88",
     "392597b4-fe89-5047-bb95-3b9b4471ddcb": "A89",
-    "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1": "A90"
+    "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1": "A90",
+    "4aa53b46-ec6e-5509-9fe3-425305c73c0f": "A91",
+    "72c93c70-7690-5796-bb97-d5a60b862f96": "A92",
+    "8ce8f3ab-904c-51fd-ace9-139e2bbc4d55": "A93",
+    "90d2e817-4e09-58c5-99ac-c0224dc8c5f7": "A94",
+    "ab7bab0e-6cc0-506e-ab43-692564f9eae2": "A95",
+    "1ee96ae2-7c97-555f-aefa-9a06a2ab5265": "A96",
+    "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f": "A97"
   },
   "questions": {
     "Q1": {
@@ -395,6 +405,27 @@
       "question_id": "960c7562-0378-5402-bf2b-1586f914ed0a",
       "quiz_file": "quizzes/4aee9a8f-bd7c-51af-a73f-7442b16bcb66.json",
       "date": "2026-03-07",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q38": {
+      "question_id": "02bebf6a-ae74-538a-a7fd-9cfc27b073ff",
+      "quiz_file": "quizzes/4d574c58-eb3e-5ca8-b410-ad13b1b40639.json",
+      "date": "2026-03-08",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q39": {
+      "question_id": "9fb2340f-d8f8-5a8b-bd80-f1454c3a5d0b",
+      "quiz_file": "quizzes/e96d71af-4053-5b0a-8324-1c6ccb050c39.json",
+      "date": "2026-03-08",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q40": {
+      "question_id": "42be041b-e05b-5399-9045-9476a0e6b9c6",
+      "quiz_file": "quizzes/19677ab7-2c43-5342-874b-f40daa0dcc14.json",
+      "date": "2026-03-08",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -849,6 +880,41 @@
       "answer_fact_id": "3f34b5b0-a146-5e72-87eb-cb2b4275b1d1",
       "label": "Emperor Napoleon I of France wins the Battle of Craonne.",
       "year": 1814
+    },
+    "A91": {
+      "answer_fact_id": "4aa53b46-ec6e-5509-9fe3-425305c73c0f",
+      "label": "French aviatrix Raymonde de Laroche becomes the first woman to receive a pilot's license.",
+      "year": 1910
+    },
+    "A92": {
+      "answer_fact_id": "72c93c70-7690-5796-bb97-d5a60b862f96",
+      "label": "Twenty-eight political institutions in Myanmar establish the National Unity Consultative Council, a historic alliance of ethnic armed organizations and democratically elected leaders, in response to the 2021 Myanmar coup d'\u00e9tat.",
+      "year": 2021
+    },
+    "A93": {
+      "answer_fact_id": "8ce8f3ab-904c-51fd-ace9-139e2bbc4d55",
+      "label": "Philips demonstrates the compact disc publicly for the first time.",
+      "year": 1979
+    },
+    "A94": {
+      "answer_fact_id": "90d2e817-4e09-58c5-99ac-c0224dc8c5f7",
+      "label": "Ferdowsi completes his epic poem Shahnameh.",
+      "year": 1010
+    },
+    "A95": {
+      "answer_fact_id": "ab7bab0e-6cc0-506e-ab43-692564f9eae2",
+      "label": "Following the death of his mother, queen Urraca of Le\u00f3n, Alfonso VII is proclaimed king of Le\u00f3n.",
+      "year": 1126
+    },
+    "A96": {
+      "answer_fact_id": "1ee96ae2-7c97-555f-aefa-9a06a2ab5265",
+      "label": "World War I: A British force unsuccessfully attempts to relieve the siege of Kut (present-day Iraq) in the Battle of Dujaila.",
+      "year": 1916
+    },
+    "A97": {
+      "answer_fact_id": "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f",
+      "label": "International Women's Day protests in Petrograd mark the beginning of the February Revolution (February 23 in the Julian calendar).",
+      "year": 1917
     }
   }
 }
