@@ -70,9 +70,11 @@ function parseBearerToken(authorizationHeader: string | undefined): string | und
 }
 
 function parseIdToken(idTokenHeader: string | undefined, authorizationHeader: string | undefined): string | undefined {
+  // Browser clients use X-Firebase-ID-Token to avoid edge/runtime interception of Authorization.
   if (idTokenHeader && idTokenHeader.trim()) {
     return idTokenHeader.trim();
   }
+  // Keep Authorization fallback for non-browser tooling and backward compatibility.
   return parseBearerToken(authorizationHeader);
 }
 

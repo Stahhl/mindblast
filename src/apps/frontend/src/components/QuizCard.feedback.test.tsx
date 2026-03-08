@@ -172,6 +172,7 @@ describe("QuizCard feedback", () => {
       "X-Firebase-ID-Token": "fake-id-token",
       "X-Firebase-AppCheck": "fake-app-check",
     });
+    expect(submitFeedbackMock.mock.calls[0]?.[1]).not.toHaveProperty("Authorization");
 
     expect(await screen.findByText("Feedback saved.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Saved" })).toBeInTheDocument();

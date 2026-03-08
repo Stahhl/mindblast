@@ -45,6 +45,10 @@ As of `2026-03-04`, staging feedback infrastructure exists, but internet-facing 
 - `X-Firebase-ID-Token: <Firebase ID token>`
 - `X-Firebase-AppCheck: <App Check token>`
 
+Header policy:
+- Browser clients must send Firebase ID tokens via `X-Firebase-ID-Token`.
+- `Authorization: Bearer <Firebase ID token>` is backend-compatible fallback for non-browser tooling only.
+
 ### Required backend behavior (`POST /api/quiz-feedback`)
 - `401 unauthenticated` when ID token is missing/invalid.
 - `403 app_check_failed` when App Check is missing/invalid.

@@ -77,9 +77,11 @@ class StubAuthVerifier implements AuthIdentityVerifierPort {
     },
   };
   calls = 0;
+  lastToken: string | undefined = undefined;
 
-  async verifyIdToken(_token: string | undefined): Promise<AuthIdentityDecision> {
+  async verifyIdToken(token: string | undefined): Promise<AuthIdentityDecision> {
     this.calls += 1;
+    this.lastToken = token;
     return this.decision;
   }
 }
@@ -370,6 +372,43 @@ describe("quiz feedback HTTP handler hardening", () => {
     expect(record?.rating).toBe(4);
     expect(record?.comment).toBeUndefined();
     expect(record?.auth_uid).toBe("uid-1");
+  });
+
+  test("prefers x-firebase-id-token over authorization bearer", async () => {
+    const runtimeConfig = buildRuntimeConfig();
+    const deps = createHandlerDeps(runtimeConfig);
+
+    const request = buildRequest({
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer fallback-token",
+        "x-firebase-id-token": "header-token",
+      },
+    });
+    const response = new FakeResponse();
+
+    await deps.handler(request, response);
+
+    expect(response.statusCode).toBe(200);
+    expect(deps.authVerifier.lastToken).toBe("header-token");
+  });
+
+  test("uses authorization bearer token when x-firebase-id-token is absent", async () => {
+    const runtimeConfig = buildRuntimeConfig();
+    const deps = createHandlerDeps(runtimeConfig);
+
+    const request = buildRequest({
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer fallback-token",
+      },
+    });
+    const response = new FakeResponse();
+
+    await deps.handler(request, response);
+
+    expect(response.statusCode).toBe(200);
+    expect(deps.authVerifier.lastToken).toBe("fallback-token");
   });
 
   test("logs invalid_payload for malformed body", async () => {
