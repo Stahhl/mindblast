@@ -143,7 +143,7 @@ describe("QuizCard feedback", () => {
         feedbackBlockedMessage=""
         getFeedbackRequestHeaders={() =>
           Promise.resolve({
-            Authorization: "Bearer fake-token",
+            "X-Firebase-ID-Token": "fake-id-token",
             "X-Firebase-AppCheck": "fake-app-check",
           })}
         selectedChoiceId={undefined}
@@ -169,7 +169,7 @@ describe("QuizCard feedback", () => {
       rating: 4,
       comment: "Useful question",
     }, {
-      Authorization: "Bearer fake-token",
+      "X-Firebase-ID-Token": "fake-id-token",
       "X-Firebase-AppCheck": "fake-app-check",
     });
 
@@ -191,7 +191,7 @@ describe("QuizCard feedback", () => {
         feedbackBlockedMessage=""
         getFeedbackRequestHeaders={() =>
           Promise.resolve({
-            Authorization: "Bearer fake-token",
+            "X-Firebase-ID-Token": "fake-id-token",
             "X-Firebase-AppCheck": "fake-app-check",
           })}
         selectedChoiceId={undefined}
@@ -220,7 +220,7 @@ describe("QuizCard feedback", () => {
         feedbackBlockedMessage=""
         getFeedbackRequestHeaders={() =>
           Promise.resolve({
-            Authorization: "Bearer fake-token",
+            "X-Firebase-ID-Token": "fake-id-token",
             "X-Firebase-AppCheck": "fake-app-check",
           })}
         selectedChoiceId={undefined}
@@ -247,7 +247,7 @@ describe("QuizCard feedback", () => {
         feedbackBlockedMessage="Sign in to submit feedback."
         getFeedbackRequestHeaders={() =>
           Promise.resolve({
-            Authorization: "Bearer fake-token",
+            "X-Firebase-ID-Token": "fake-id-token",
             "X-Firebase-AppCheck": "fake-app-check",
           })}
         selectedChoiceId={undefined}

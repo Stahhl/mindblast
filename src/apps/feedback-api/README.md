@@ -40,8 +40,12 @@ Function source path in `firebase.json`:
 - `FEEDBACK_RATE_LIMIT_GLOBAL_HOURLY` (default: `5000`)
 
 Request requirements for `POST /api/quiz-feedback`:
-- `Authorization: Bearer <Firebase ID token>`
+- `X-Firebase-ID-Token: <Firebase ID token>`
 - `X-Firebase-AppCheck: <token>`
+
+Compatibility note:
+- `Authorization: Bearer <Firebase ID token>` is still accepted as a fallback for non-browser tooling.
+- Browser clients should use `X-Firebase-ID-Token` to avoid edge/runtime auth interception.
 
 Operational note:
 - Feedback API deploy workflows materialize environment-specific runtime config via

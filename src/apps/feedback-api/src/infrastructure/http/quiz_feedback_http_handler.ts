@@ -14,7 +14,7 @@ import type {
 
 const QUIZ_FEEDBACK_PATHS = new Set(["/api/quiz-feedback", "/quiz-feedback"]);
 const ALLOWED_METHODS = "POST, OPTIONS";
-const ALLOWED_HEADERS = "Content-Type, Authorization, X-Firebase-AppCheck";
+const ALLOWED_HEADERS = "Content-Type, Authorization, X-Firebase-ID-Token, X-Firebase-AppCheck";
 
 interface RequestLike {
   method: string;
@@ -67,6 +67,13 @@ function parseBearerToken(authorizationHeader: string | undefined): string | und
     return undefined;
   }
   return token;
+}
+
+function parseIdToken(idTokenHeader: string | undefined, authorizationHeader: string | undefined): string | undefined {
+  if (idTokenHeader && idTokenHeader.trim()) {
+    return idTokenHeader.trim();
+  }
+  return parseBearerToken(authorizationHeader);
 }
 
 function readLegacyClientIdFromCookie(request: RequestLike): string | undefined {
@@ -227,8 +234,9 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
       return;
     }
 
+    const idTokenHeader = request.get("x-firebase-id-token") || normalizeHeader(request.headers["x-firebase-id-token"]);
     const authHeader = request.get("authorization") || normalizeHeader(request.headers.authorization);
-    const idToken = parseBearerToken(authHeader);
+    const idToken = parseIdToken(idTokenHeader, authHeader);
     const authDecision = await deps.authVerifier.verifyIdToken(idToken);
     if (!authDecision.ok || !authDecision.identity) {
       reject(

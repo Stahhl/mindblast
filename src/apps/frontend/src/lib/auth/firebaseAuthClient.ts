@@ -102,7 +102,7 @@ export class FirebaseFeedbackAuthClient implements FeedbackAuthClient {
     }
 
     return {
-      Authorization: `Bearer ${idToken}`,
+      "X-Firebase-ID-Token": idToken,
       "X-Firebase-AppCheck": appCheckToken.token,
     };
   }

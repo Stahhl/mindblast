@@ -22,7 +22,7 @@ This is the source of truth for:
 | Environment | `feedback_api_allow_public_invoker` | Status | Notes |
 | --- | --- | --- | --- |
 | staging | `true` | Temporary exception | Allowed during Phase 7 validation because Hosting rewrite traffic to Cloud Run is unauthenticated at invoker layer. |
-| production | `false` | Required baseline | Must remain non-public until Phase 7.5 edge hardening is implemented and accepted. |
+| production | `true` | Temporary exception | Enabled to allow Hosting rewrite browser traffic to reach the feedback API while app-level Firebase Auth + App Check + rate limits are enforced. |
 
 ## Non-Negotiable Posture
 
@@ -30,7 +30,7 @@ This is the source of truth for:
 2. `staging` is publicly reachable on the internet.
 3. `staging` spend is tied to real billing and can incur charges.
 4. Any security/cost control required for production should be treated as required for staging unless explicitly waived in writing.
-5. Current written waiver: temporary staging public invoker for Phase 7 only; production remains gated by Phase 7.5.
+5. Current written waiver: temporary public invoker for both staging and production while Phase 7.5 edge hardening remains in progress.
 
 ## Deployment Mapping
 

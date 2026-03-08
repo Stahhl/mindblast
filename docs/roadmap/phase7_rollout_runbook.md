@@ -57,14 +57,14 @@ Expect:
 Steps:
 1. Sign in on `https://staging.mindblast.app`.
 2. In browser devtools Network tab, capture one successful feedback request.
-3. Copy its `Authorization: Bearer <id-token>` value.
+3. Copy its `X-Firebase-ID-Token: <id-token>` value.
 4. Replay with invalid App Check:
 
 ```zsh
 curl -i -X POST "https://staging.mindblast.app/api/quiz-feedback" \
   -H "Origin: https://staging.mindblast.app" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <copied-id-token>" \
+  -H "X-Firebase-ID-Token: <copied-id-token>" \
   -H "X-Firebase-AppCheck: invalid" \
   --data '{}'
 ```

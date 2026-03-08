@@ -42,7 +42,7 @@ As of `2026-03-04`, staging feedback infrastructure exists, but internet-facing 
 ## Identity and Access Contract
 
 ### Required write request headers
-- `Authorization: Bearer <Firebase ID token>`
+- `X-Firebase-ID-Token: <Firebase ID token>`
 - `X-Firebase-AppCheck: <App Check token>`
 
 ### Required backend behavior (`POST /api/quiz-feedback`)
