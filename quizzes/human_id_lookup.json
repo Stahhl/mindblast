@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-08T06:09:03Z"
+    "updated_at": "2026-03-09T06:16:58Z"
   },
   "counters": {
-    "question": 40,
-    "answer": 97
+    "question": 43,
+    "answer": 104
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -47,7 +47,10 @@
     "960c7562-0378-5402-bf2b-1586f914ed0a": "Q37",
     "02bebf6a-ae74-538a-a7fd-9cfc27b073ff": "Q38",
     "9fb2340f-d8f8-5a8b-bd80-f1454c3a5d0b": "Q39",
-    "42be041b-e05b-5399-9045-9476a0e6b9c6": "Q40"
+    "42be041b-e05b-5399-9045-9476a0e6b9c6": "Q40",
+    "772033ed-188d-54ec-b0ef-1946f642a3cf": "Q41",
+    "4f48831d-d4b5-558b-ab3e-4f51a0f7ca50": "Q42",
+    "aa88c78e-21ca-5a5e-9c4e-29e77e6e9e35": "Q43"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -146,7 +149,14 @@
     "90d2e817-4e09-58c5-99ac-c0224dc8c5f7": "A94",
     "ab7bab0e-6cc0-506e-ab43-692564f9eae2": "A95",
     "1ee96ae2-7c97-555f-aefa-9a06a2ab5265": "A96",
-    "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f": "A97"
+    "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f": "A97",
+    "4ea2c37f-7f65-5828-ab6e-88ad4ffea9d8": "A98",
+    "0033729f-6824-57cc-bf5b-0666da165646": "A99",
+    "e15d3989-39de-579b-b64c-5a393a9e7ad0": "A100",
+    "ba00ca5d-1d0c-5703-bc7e-e4d723b09492": "A101",
+    "3088f3fb-d03a-5a77-9a0b-f535f86facc9": "A102",
+    "319234b7-8373-5ffe-86fa-c011759bf500": "A103",
+    "f04d1318-ebe1-5a51-ae35-37e995bc6321": "A104"
   },
   "questions": {
     "Q1": {
@@ -426,6 +436,27 @@
       "question_id": "42be041b-e05b-5399-9045-9476a0e6b9c6",
       "quiz_file": "quizzes/19677ab7-2c43-5342-874b-f40daa0dcc14.json",
       "date": "2026-03-08",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q41": {
+      "question_id": "772033ed-188d-54ec-b0ef-1946f642a3cf",
+      "quiz_file": "quizzes/6e76be92-0d4e-5cb4-bd1c-0c7e57e5d4cb.json",
+      "date": "2026-03-09",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q42": {
+      "question_id": "4f48831d-d4b5-558b-ab3e-4f51a0f7ca50",
+      "quiz_file": "quizzes/70e387e2-f1fc-5566-85dc-8d4b4db253fa.json",
+      "date": "2026-03-09",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q43": {
+      "question_id": "aa88c78e-21ca-5a5e-9c4e-29e77e6e9e35",
+      "quiz_file": "quizzes/790d11f9-6a70-534d-bcda-99eb602e716e.json",
+      "date": "2026-03-09",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -915,6 +946,41 @@
       "answer_fact_id": "c7b82339-2ef7-5b4b-9eb4-e3e33b4e5a0f",
       "label": "International Women's Day protests in Petrograd mark the beginning of the February Revolution (February 23 in the Julian calendar).",
       "year": 1917
+    },
+    "A98": {
+      "answer_fact_id": "4ea2c37f-7f65-5828-ab6e-88ad4ffea9d8",
+      "label": "After a campaign by the writer Voltaire, judges in Paris posthumously exonerate Jean Calas of murdering his son. Calas had been tortured and executed in 1762 on the charge, though his son may have actually died by suicide.",
+      "year": 1765
+    },
+    "A99": {
+      "answer_fact_id": "0033729f-6824-57cc-bf5b-0666da165646",
+      "label": "McCarthyism: CBS television broadcasts the See It Now episode, \"A Report on Senator Joseph McCarthy\", produced by Fred Friendly.",
+      "year": 1954
+    },
+    "A100": {
+      "answer_fact_id": "e15d3989-39de-579b-b64c-5a393a9e7ad0",
+      "label": "The fleet of Pedro \u00c1lvares Cabral leaves Lisbon for the Indies. The fleet will discover Brazil which lies within boundaries granted to Portugal in the Treaty of Tordesillas in 1494.",
+      "year": 1500
+    },
+    "A101": {
+      "answer_fact_id": "ba00ca5d-1d0c-5703-bc7e-e4d723b09492",
+      "label": "Safavid troops retreat from Basra, ending a three-year occupation.",
+      "year": 1701
+    },
+    "A102": {
+      "answer_fact_id": "3088f3fb-d03a-5a77-9a0b-f535f86facc9",
+      "label": "Scottish philosopher Adam Smith publishes The Wealth of Nations, ushering in the classical period of political economy.",
+      "year": 1776
+    },
+    "A103": {
+      "answer_fact_id": "319234b7-8373-5ffe-86fa-c011759bf500",
+      "label": "Khwarazmian sultan Jalal ad-Din conquers the Georgian capital of Tbilisi.",
+      "year": 1226
+    },
+    "A104": {
+      "answer_fact_id": "f04d1318-ebe1-5a51-ae35-37e995bc6321",
+      "label": "The Hanafi Siege: In a 39-hour standoff, armed Hanafi Muslims seize three Washington, D.C., buildings.",
+      "year": 1977
     }
   }
 }

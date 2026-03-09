@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-09",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "4f48831d-d4b5-558b-ab3e-4f51a0f7ca50",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1776?",
+      "answer_fact_ids": [
+        "e15d3989-39de-579b-b64c-5a393a9e7ad0",
+        "ba00ca5d-1d0c-5703-bc7e-e4d723b09492",
+        "4ea2c37f-7f65-5828-ab6e-88ad4ffea9d8",
+        "3088f3fb-d03a-5a77-9a0b-f535f86facc9"
+      ],
+      "correct_answer_fact_id": "3088f3fb-d03a-5a77-9a0b-f535f86facc9",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1776
+      },
+      "human_id": "Q42"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "e15d3989-39de-579b-b64c-5a393a9e7ad0",
+      "label": "The fleet of Pedro \u00c1lvares Cabral leaves Lisbon for the Indies. The fleet will discover Brazil which lies within boundaries granted to Portugal in the Treaty of Tordesillas in 1494.",
+      "year": 1500,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "15th-century",
+        "1500s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "15th-century",
+        "temporal_decade": "1500s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1500,
+          "temporal_century": "15th-century",
+          "temporal_decade": "1500s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The fleet of Pedro \u00c1lvares Cabral leaves Lisbon for the Indies. The fleet will discover Brazil which lies within boundaries granted to Portugal in the Treaty of Tordesillas in 1494.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A100"
+    },
+    {
+      "id": "ba00ca5d-1d0c-5703-bc7e-e4d723b09492",
+      "label": "Safavid troops retreat from Basra, ending a three-year occupation.",
+      "year": 1701,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "18th-century",
+        "1700s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1700s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1701,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1700s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Safavid troops retreat from Basra, ending a three-year occupation.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A101"
+    },
+    {
+      "id": "4ea2c37f-7f65-5828-ab6e-88ad4ffea9d8",
+      "label": "After a campaign by the writer Voltaire, judges in Paris posthumously exonerate Jean Calas of murdering his son. Calas had been tortured and executed in 1762 on the charge, though his son may have actually died by suicide.",
+      "year": 1765,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "18th-century",
+        "1760s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1760s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1765,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1760s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "After a campaign by the writer Voltaire, judges in Paris posthumously exonerate Jean Calas of murdering his son. Calas had been tortured and executed in 1762 on the charge, though his son may have actually died by suicide.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A98"
+    },
+    {
+      "id": "3088f3fb-d03a-5a77-9a0b-f535f86facc9",
+      "label": "Scottish philosopher Adam Smith publishes The Wealth of Nations, ushering in the classical period of political economy.",
+      "year": 1776,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "18th-century",
+        "1770s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1770s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1776,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1770s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Scottish philosopher Adam Smith publishes The Wealth of Nations, ushering in the classical period of political economy.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A102"
+    }
+  ],
+  "question": "Which event happened in 1776?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The fleet of Pedro \u00c1lvares Cabral leaves Lisbon for the Indies. The fleet will discover Brazil which lies within boundaries granted to Portugal in the Treaty of Tordesillas in 1494.",
+      "answer_fact_id": "e15d3989-39de-579b-b64c-5a393a9e7ad0",
+      "human_id": "A100"
+    },
+    {
+      "id": "B",
+      "label": "Safavid troops retreat from Basra, ending a three-year occupation.",
+      "answer_fact_id": "ba00ca5d-1d0c-5703-bc7e-e4d723b09492",
+      "human_id": "A101"
+    },
+    {
+      "id": "C",
+      "label": "After a campaign by the writer Voltaire, judges in Paris posthumously exonerate Jean Calas of murdering his son. Calas had been tortured and executed in 1762 on the charge, though his son may have actually died by suicide.",
+      "answer_fact_id": "4ea2c37f-7f65-5828-ab6e-88ad4ffea9d8",
+      "human_id": "A98"
+    },
+    {
+      "id": "D",
+      "label": "Scottish philosopher Adam Smith publishes The Wealth of Nations, ushering in the classical period of political economy.",
+      "answer_fact_id": "3088f3fb-d03a-5a77-9a0b-f535f86facc9",
+      "human_id": "A102"
+    }
+  ],
+  "correct_choice_id": "D",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/9",
+    "retrieved_at": "2026-03-09T06:16:48Z",
+    "events_used": [
+      {
+        "event_id": "e15d3989-39de-579b-b64c-5a393a9e7ad0",
+        "text": "The fleet of Pedro \u00c1lvares Cabral leaves Lisbon for the Indies. The fleet will discover Brazil which lies within boundaries granted to Portugal in the Treaty of Tordesillas in 1494.",
+        "year": 1500,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Pedro_%C3%81lvares_Cabral"
+      },
+      {
+        "event_id": "ba00ca5d-1d0c-5703-bc7e-e4d723b09492",
+        "text": "Safavid troops retreat from Basra, ending a three-year occupation.",
+        "year": 1701,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Safavid_Iran"
+      },
+      {
+        "event_id": "4ea2c37f-7f65-5828-ab6e-88ad4ffea9d8",
+        "text": "After a campaign by the writer Voltaire, judges in Paris posthumously exonerate Jean Calas of murdering his son. Calas had been tortured and executed in 1762 on the charge, though his son may have actually died by suicide.",
+        "year": 1765,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Voltaire"
+      },
+      {
+        "event_id": "3088f3fb-d03a-5a77-9a0b-f535f86facc9",
+        "text": "Scottish philosopher Adam Smith publishes The Wealth of Nations, ushering in the classical period of political economy.",
+        "year": 1776,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Adam_Smith"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-09T06:16:48Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
