@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-09T06:16:58Z"
+    "updated_at": "2026-03-10T06:10:11Z"
   },
   "counters": {
-    "question": 43,
-    "answer": 104
+    "question": 46,
+    "answer": 111
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -50,7 +50,10 @@
     "42be041b-e05b-5399-9045-9476a0e6b9c6": "Q40",
     "772033ed-188d-54ec-b0ef-1946f642a3cf": "Q41",
     "4f48831d-d4b5-558b-ab3e-4f51a0f7ca50": "Q42",
-    "aa88c78e-21ca-5a5e-9c4e-29e77e6e9e35": "Q43"
+    "aa88c78e-21ca-5a5e-9c4e-29e77e6e9e35": "Q43",
+    "3889077b-534b-52cc-932e-92fca0a9a4f8": "Q44",
+    "a024c5e1-196a-5d72-afce-929294fc7f91": "Q45",
+    "dd965376-cdd7-5847-a446-980b4952e391": "Q46"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -156,7 +159,14 @@
     "ba00ca5d-1d0c-5703-bc7e-e4d723b09492": "A101",
     "3088f3fb-d03a-5a77-9a0b-f535f86facc9": "A102",
     "319234b7-8373-5ffe-86fa-c011759bf500": "A103",
-    "f04d1318-ebe1-5a51-ae35-37e995bc6321": "A104"
+    "f04d1318-ebe1-5a51-ae35-37e995bc6321": "A104",
+    "15892f00-e60d-5f00-b70c-e918e583bf59": "A105",
+    "52e546e6-0b36-50b2-9c23-8aadd91aee34": "A106",
+    "2c1392a4-99e5-5ff0-8f37-0bb48472663d": "A107",
+    "862eb6ae-f4ea-5d65-9d22-9308faf65644": "A108",
+    "27e63c70-edc6-5064-b084-1eabb2189344": "A109",
+    "df9ae042-c3d4-544f-9eeb-63afa3e23067": "A110",
+    "8a3be337-68cd-5507-9eea-ecdebe0882b9": "A111"
   },
   "questions": {
     "Q1": {
@@ -457,6 +467,27 @@
       "question_id": "aa88c78e-21ca-5a5e-9c4e-29e77e6e9e35",
       "quiz_file": "quizzes/790d11f9-6a70-534d-bcda-99eb602e716e.json",
       "date": "2026-03-09",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q44": {
+      "question_id": "3889077b-534b-52cc-932e-92fca0a9a4f8",
+      "quiz_file": "quizzes/8640e7d4-746f-52b5-ab23-b2c6af60ac4a.json",
+      "date": "2026-03-10",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q45": {
+      "question_id": "a024c5e1-196a-5d72-afce-929294fc7f91",
+      "quiz_file": "quizzes/b09bbf30-ada1-5fc8-825c-0286120556bd.json",
+      "date": "2026-03-10",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q46": {
+      "question_id": "dd965376-cdd7-5847-a446-980b4952e391",
+      "quiz_file": "quizzes/6d881436-8dc8-5346-8b68-cb903abd87b0.json",
+      "date": "2026-03-10",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -981,6 +1012,41 @@
       "answer_fact_id": "f04d1318-ebe1-5a51-ae35-37e995bc6321",
       "label": "The Hanafi Siege: In a 39-hour standoff, armed Hanafi Muslims seize three Washington, D.C., buildings.",
       "year": 1977
+    },
+    "A105": {
+      "answer_fact_id": "15892f00-e60d-5f00-b70c-e918e583bf59",
+      "label": "The Dot-com bubble peaks with the NASDAQ Composite stock market index reaching 5,048.62.",
+      "year": 2000
+    },
+    "A106": {
+      "answer_fact_id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+      "label": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+      "year": 298
+    },
+    "A107": {
+      "answer_fact_id": "2c1392a4-99e5-5ff0-8f37-0bb48472663d",
+      "label": "Spaniard Fray Tom\u00e1s de Berlanga, the fourth Bishop of Panama, discovers the Gal\u00e1pagos Islands by chance on his way to Peru.",
+      "year": 1535
+    },
+    "A108": {
+      "answer_fact_id": "862eb6ae-f4ea-5d65-9d22-9308faf65644",
+      "label": "Ethiopian Airlines Flight 302, a Boeing 737 MAX, crashes shortly after take off, killing all 157 passengers and crew. This and the prior Lion Air Flight 610 led to all 387 Boeing 737 MAX aircraft being grounded worldwide.",
+      "year": 2019
+    },
+    "A109": {
+      "answer_fact_id": "27e63c70-edc6-5064-b084-1eabb2189344",
+      "label": "After establishing the city of Santo Domingo, Christopher Columbus departs for Spain, leaving his brother in command.",
+      "year": 1496
+    },
+    "A110": {
+      "answer_fact_id": "df9ae042-c3d4-544f-9eeb-63afa3e23067",
+      "label": "John Gorton resigns as Prime Minister of Australia and the leader of the Liberal Party of Australia after a secret ballot vote of confidence, being replaced in both positions by William McMahon.",
+      "year": 1971
+    },
+    "A111": {
+      "answer_fact_id": "8a3be337-68cd-5507-9eea-ecdebe0882b9",
+      "label": "In Memphis, Tennessee, James Earl Ray pleads guilty to assassinating Martin Luther King Jr. He later unsuccessfully attempts to recant.",
+      "year": 1969
     }
   }
 }

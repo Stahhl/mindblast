@@ -1,0 +1,139 @@
+{
+  "date": "2026-03-10",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "3889077b-534b-52cc-932e-92fca0a9a4f8",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "15892f00-e60d-5f00-b70c-e918e583bf59",
+        "52e546e6-0b36-50b2-9c23-8aadd91aee34"
+      ],
+      "correct_answer_fact_id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q44"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "15892f00-e60d-5f00-b70c-e918e583bf59",
+      "label": "The Dot-com bubble peaks with the NASDAQ Composite stock market index reaching 5,048.62.",
+      "year": 2000,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "20th-century",
+        "2000s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "2000s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 2000,
+          "temporal_century": "20th-century",
+          "temporal_decade": "2000s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Dot-com bubble peaks with the NASDAQ Composite stock market index reaching 5,048.62.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A105"
+    },
+    {
+      "id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+      "label": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+      "year": 298,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "3th-century",
+        "290s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "3th-century",
+        "temporal_decade": "290s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 298,
+          "temporal_century": "3th-century",
+          "temporal_decade": "290s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A106"
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The Dot-com bubble peaks with the NASDAQ Composite stock market index reaching 5,048.62.",
+      "year": 2000,
+      "answer_fact_id": "15892f00-e60d-5f00-b70c-e918e583bf59",
+      "human_id": "A105"
+    },
+    {
+      "id": "B",
+      "label": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+      "year": 298,
+      "answer_fact_id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+      "human_id": "A106"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/10",
+    "retrieved_at": "2026-03-10T06:10:00Z",
+    "events_used": [
+      {
+        "event_id": "15892f00-e60d-5f00-b70c-e918e583bf59",
+        "text": "The Dot-com bubble peaks with the NASDAQ Composite stock market index reaching 5,048.62.",
+        "year": 2000,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Dot-com_bubble"
+      },
+      {
+        "event_id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+        "text": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+        "year": 298,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Maximian"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-10T06:10:00Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

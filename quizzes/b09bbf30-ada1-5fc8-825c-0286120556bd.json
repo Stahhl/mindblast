@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-10",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "a024c5e1-196a-5d72-afce-929294fc7f91",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 2019?",
+      "answer_fact_ids": [
+        "2c1392a4-99e5-5ff0-8f37-0bb48472663d",
+        "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+        "862eb6ae-f4ea-5d65-9d22-9308faf65644",
+        "27e63c70-edc6-5064-b084-1eabb2189344"
+      ],
+      "correct_answer_fact_id": "862eb6ae-f4ea-5d65-9d22-9308faf65644",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 2019
+      },
+      "human_id": "Q45"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "2c1392a4-99e5-5ff0-8f37-0bb48472663d",
+      "label": "Spaniard Fray Tom\u00e1s de Berlanga, the fourth Bishop of Panama, discovers the Gal\u00e1pagos Islands by chance on his way to Peru.",
+      "year": 1535,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "16th-century",
+        "1530s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "16th-century",
+        "temporal_decade": "1530s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1535,
+          "temporal_century": "16th-century",
+          "temporal_decade": "1530s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Spaniard Fray Tom\u00e1s de Berlanga, the fourth Bishop of Panama, discovers the Gal\u00e1pagos Islands by chance on his way to Peru.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A107"
+    },
+    {
+      "id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+      "label": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+      "year": 298,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "3th-century",
+        "290s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "3th-century",
+        "temporal_decade": "290s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 298,
+          "temporal_century": "3th-century",
+          "temporal_decade": "290s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A106"
+    },
+    {
+      "id": "862eb6ae-f4ea-5d65-9d22-9308faf65644",
+      "label": "Ethiopian Airlines Flight 302, a Boeing 737 MAX, crashes shortly after take off, killing all 157 passengers and crew. This and the prior Lion Air Flight 610 led to all 387 Boeing 737 MAX aircraft being grounded worldwide.",
+      "year": 2019,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "21th-century",
+        "2010s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "21th-century",
+        "temporal_decade": "2010s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 2019,
+          "temporal_century": "21th-century",
+          "temporal_decade": "2010s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Ethiopian Airlines Flight 302, a Boeing 737 MAX, crashes shortly after take off, killing all 157 passengers and crew. This and the prior Lion Air Flight 610 led to all 387 Boeing 737 MAX aircraft being grounded worldwide.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A108"
+    },
+    {
+      "id": "27e63c70-edc6-5064-b084-1eabb2189344",
+      "label": "After establishing the city of Santo Domingo, Christopher Columbus departs for Spain, leaving his brother in command.",
+      "year": 1496,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "15th-century",
+        "1490s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "15th-century",
+        "temporal_decade": "1490s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1496,
+          "temporal_century": "15th-century",
+          "temporal_decade": "1490s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "After establishing the city of Santo Domingo, Christopher Columbus departs for Spain, leaving his brother in command.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A109"
+    }
+  ],
+  "question": "Which event happened in 2019?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Spaniard Fray Tom\u00e1s de Berlanga, the fourth Bishop of Panama, discovers the Gal\u00e1pagos Islands by chance on his way to Peru.",
+      "answer_fact_id": "2c1392a4-99e5-5ff0-8f37-0bb48472663d",
+      "human_id": "A107"
+    },
+    {
+      "id": "B",
+      "label": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+      "answer_fact_id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+      "human_id": "A106"
+    },
+    {
+      "id": "C",
+      "label": "Ethiopian Airlines Flight 302, a Boeing 737 MAX, crashes shortly after take off, killing all 157 passengers and crew. This and the prior Lion Air Flight 610 led to all 387 Boeing 737 MAX aircraft being grounded worldwide.",
+      "answer_fact_id": "862eb6ae-f4ea-5d65-9d22-9308faf65644",
+      "human_id": "A108"
+    },
+    {
+      "id": "D",
+      "label": "After establishing the city of Santo Domingo, Christopher Columbus departs for Spain, leaving his brother in command.",
+      "answer_fact_id": "27e63c70-edc6-5064-b084-1eabb2189344",
+      "human_id": "A109"
+    }
+  ],
+  "correct_choice_id": "C",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/10",
+    "retrieved_at": "2026-03-10T06:10:00Z",
+    "events_used": [
+      {
+        "event_id": "2c1392a4-99e5-5ff0-8f37-0bb48472663d",
+        "text": "Spaniard Fray Tom\u00e1s de Berlanga, the fourth Bishop of Panama, discovers the Gal\u00e1pagos Islands by chance on his way to Peru.",
+        "year": 1535,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Tom%C3%A1s_de_Berlanga"
+      },
+      {
+        "event_id": "52e546e6-0b36-50b2-9c23-8aadd91aee34",
+        "text": "Roman Emperor Maximian concludes his campaign in North Africa and makes a triumphal entry into Carthage.",
+        "year": 298,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Maximian"
+      },
+      {
+        "event_id": "862eb6ae-f4ea-5d65-9d22-9308faf65644",
+        "text": "Ethiopian Airlines Flight 302, a Boeing 737 MAX, crashes shortly after take off, killing all 157 passengers and crew. This and the prior Lion Air Flight 610 led to all 387 Boeing 737 MAX aircraft being grounded worldwide.",
+        "year": 2019,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Ethiopian_Airlines_Flight_302"
+      },
+      {
+        "event_id": "27e63c70-edc6-5064-b084-1eabb2189344",
+        "text": "After establishing the city of Santo Domingo, Christopher Columbus departs for Spain, leaving his brother in command.",
+        "year": 1496,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Santo_Domingo"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-10T06:10:00Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

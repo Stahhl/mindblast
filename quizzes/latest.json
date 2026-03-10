@@ -1,18 +1,18 @@
 {
-  "date": "2026-03-09",
-  "index_file": "quizzes/index/2026-03-09.json",
+  "date": "2026-03-10",
+  "index_file": "quizzes/index/2026-03-10.json",
   "available_types": [
     "which_came_first",
     "history_mcq_4",
     "history_factoid_mcq_4"
   ],
   "latest_quiz_by_type": {
-    "which_came_first": "quizzes/6e76be92-0d4e-5cb4-bd1c-0c7e57e5d4cb.json",
-    "history_mcq_4": "quizzes/70e387e2-f1fc-5566-85dc-8d4b4db253fa.json",
-    "history_factoid_mcq_4": "quizzes/790d11f9-6a70-534d-bcda-99eb602e716e.json"
+    "which_came_first": "quizzes/8640e7d4-746f-52b5-ab23-b2c6af60ac4a.json",
+    "history_mcq_4": "quizzes/b09bbf30-ada1-5fc8-825c-0286120556bd.json",
+    "history_factoid_mcq_4": "quizzes/6d881436-8dc8-5346-8b68-cb903abd87b0.json"
   },
   "metadata": {
     "version": 2,
-    "updated_at": "2026-03-09T06:16:58Z"
+    "updated_at": "2026-03-10T06:10:11Z"
   }
 }
