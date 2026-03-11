@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-11",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "e327b5cc-bd22-5e3c-a2fa-5955ce17b837",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 2010?",
+      "answer_fact_ids": [
+        "6db44eb8-ccde-5bcc-ba79-bc19e2f0297c",
+        "6eca41e5-a29a-5f0c-baec-3ad77d316137",
+        "dc864f7c-59e4-5bfb-b18f-167eb4e86555",
+        "f95cdabe-79ef-58ed-94a8-6173211babe8"
+      ],
+      "correct_answer_fact_id": "6eca41e5-a29a-5f0c-baec-3ad77d316137",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 2010
+      },
+      "human_id": "Q48"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "6db44eb8-ccde-5bcc-ba79-bc19e2f0297c",
+      "label": "In New York City, Samuel Roxy Rothafel opens the Roxy Theatre.",
+      "year": 1927,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1920s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1920s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1927,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1920s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "In New York City, Samuel Roxy Rothafel opens the Roxy Theatre.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A112"
+    },
+    {
+      "id": "6eca41e5-a29a-5f0c-baec-3ad77d316137",
+      "label": "Economist and businessman Sebasti\u00e1n Pi\u00f1era is sworn in as President of Chile. Aftershocks of the 2010 Pichilemu earthquakes hit central Chile during the ceremony.",
+      "year": 2010,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "21th-century",
+        "2010s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "21th-century",
+        "temporal_decade": "2010s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 2010,
+          "temporal_century": "21th-century",
+          "temporal_decade": "2010s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Economist and businessman Sebasti\u00e1n Pi\u00f1era is sworn in as President of Chile. Aftershocks of the 2010 Pichilemu earthquakes hit central Chile during the ceremony.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A114"
+    },
+    {
+      "id": "dc864f7c-59e4-5bfb-b18f-167eb4e86555",
+      "label": "Lithuania declares independence from the Soviet Union.",
+      "year": 1990,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1990s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1990s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1990,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1990s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Lithuania declares independence from the Soviet Union.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A115"
+    },
+    {
+      "id": "f95cdabe-79ef-58ed-94a8-6173211babe8",
+      "label": "Mikhail Gorbachev is elected to the position of General Secretary of the Communist Party of the Soviet Union, making Gorbachev the USSR's de facto, and last, head of state.",
+      "year": 1985,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1980s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1980s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1985,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1980s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Mikhail Gorbachev is elected to the position of General Secretary of the Communist Party of the Soviet Union, making Gorbachev the USSR's de facto, and last, head of state.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A116"
+    }
+  ],
+  "question": "Which event happened in 2010?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "In New York City, Samuel Roxy Rothafel opens the Roxy Theatre.",
+      "answer_fact_id": "6db44eb8-ccde-5bcc-ba79-bc19e2f0297c",
+      "human_id": "A112"
+    },
+    {
+      "id": "B",
+      "label": "Economist and businessman Sebasti\u00e1n Pi\u00f1era is sworn in as President of Chile. Aftershocks of the 2010 Pichilemu earthquakes hit central Chile during the ceremony.",
+      "answer_fact_id": "6eca41e5-a29a-5f0c-baec-3ad77d316137",
+      "human_id": "A114"
+    },
+    {
+      "id": "C",
+      "label": "Lithuania declares independence from the Soviet Union.",
+      "answer_fact_id": "dc864f7c-59e4-5bfb-b18f-167eb4e86555",
+      "human_id": "A115"
+    },
+    {
+      "id": "D",
+      "label": "Mikhail Gorbachev is elected to the position of General Secretary of the Communist Party of the Soviet Union, making Gorbachev the USSR's de facto, and last, head of state.",
+      "answer_fact_id": "f95cdabe-79ef-58ed-94a8-6173211babe8",
+      "human_id": "A116"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/11",
+    "retrieved_at": "2026-03-11T06:11:29Z",
+    "events_used": [
+      {
+        "event_id": "6db44eb8-ccde-5bcc-ba79-bc19e2f0297c",
+        "text": "In New York City, Samuel Roxy Rothafel opens the Roxy Theatre.",
+        "year": 1927,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Samuel_Roxy_Rothafel"
+      },
+      {
+        "event_id": "6eca41e5-a29a-5f0c-baec-3ad77d316137",
+        "text": "Economist and businessman Sebasti\u00e1n Pi\u00f1era is sworn in as President of Chile. Aftershocks of the 2010 Pichilemu earthquakes hit central Chile during the ceremony.",
+        "year": 2010,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Sebasti%C3%A1n_Pi%C3%B1era"
+      },
+      {
+        "event_id": "dc864f7c-59e4-5bfb-b18f-167eb4e86555",
+        "text": "Lithuania declares independence from the Soviet Union.",
+        "year": 1990,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Act_of_the_Re-Establishment_of_the_State_of_Lithuania"
+      },
+      {
+        "event_id": "f95cdabe-79ef-58ed-94a8-6173211babe8",
+        "text": "Mikhail Gorbachev is elected to the position of General Secretary of the Communist Party of the Soviet Union, making Gorbachev the USSR's de facto, and last, head of state.",
+        "year": 1985,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Mikhail_Gorbachev"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-11T06:11:29Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

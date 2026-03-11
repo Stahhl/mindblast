@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-10T06:10:11Z"
+    "updated_at": "2026-03-11T06:11:40Z"
   },
   "counters": {
-    "question": 46,
-    "answer": 111
+    "question": 49,
+    "answer": 117
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -53,7 +53,10 @@
     "aa88c78e-21ca-5a5e-9c4e-29e77e6e9e35": "Q43",
     "3889077b-534b-52cc-932e-92fca0a9a4f8": "Q44",
     "a024c5e1-196a-5d72-afce-929294fc7f91": "Q45",
-    "dd965376-cdd7-5847-a446-980b4952e391": "Q46"
+    "dd965376-cdd7-5847-a446-980b4952e391": "Q46",
+    "01a8ff90-2f43-53c4-858c-71966adf1755": "Q47",
+    "e327b5cc-bd22-5e3c-a2fa-5955ce17b837": "Q48",
+    "ccdc4f64-9568-58cd-9d5d-6e3f41c10607": "Q49"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -166,7 +169,13 @@
     "862eb6ae-f4ea-5d65-9d22-9308faf65644": "A108",
     "27e63c70-edc6-5064-b084-1eabb2189344": "A109",
     "df9ae042-c3d4-544f-9eeb-63afa3e23067": "A110",
-    "8a3be337-68cd-5507-9eea-ecdebe0882b9": "A111"
+    "8a3be337-68cd-5507-9eea-ecdebe0882b9": "A111",
+    "6db44eb8-ccde-5bcc-ba79-bc19e2f0297c": "A112",
+    "b40eade7-6317-5b81-806c-2fbadf2250ef": "A113",
+    "6eca41e5-a29a-5f0c-baec-3ad77d316137": "A114",
+    "dc864f7c-59e4-5bfb-b18f-167eb4e86555": "A115",
+    "f95cdabe-79ef-58ed-94a8-6173211babe8": "A116",
+    "3e740347-40c9-500b-8475-f9e2584637e6": "A117"
   },
   "questions": {
     "Q1": {
@@ -488,6 +497,27 @@
       "question_id": "dd965376-cdd7-5847-a446-980b4952e391",
       "quiz_file": "quizzes/6d881436-8dc8-5346-8b68-cb903abd87b0.json",
       "date": "2026-03-10",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q47": {
+      "question_id": "01a8ff90-2f43-53c4-858c-71966adf1755",
+      "quiz_file": "quizzes/c92e12b0-8b3c-57de-a488-8c5e0f29cd19.json",
+      "date": "2026-03-11",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q48": {
+      "question_id": "e327b5cc-bd22-5e3c-a2fa-5955ce17b837",
+      "quiz_file": "quizzes/1eea4c93-f2a4-5b9b-ba4d-d8b10df9f527.json",
+      "date": "2026-03-11",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q49": {
+      "question_id": "ccdc4f64-9568-58cd-9d5d-6e3f41c10607",
+      "quiz_file": "quizzes/7e5fb0f0-b4fc-5787-ae38-cf2e7075ac73.json",
+      "date": "2026-03-11",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1047,6 +1077,36 @@
       "answer_fact_id": "8a3be337-68cd-5507-9eea-ecdebe0882b9",
       "label": "In Memphis, Tennessee, James Earl Ray pleads guilty to assassinating Martin Luther King Jr. He later unsuccessfully attempts to recant.",
       "year": 1969
+    },
+    "A112": {
+      "answer_fact_id": "6db44eb8-ccde-5bcc-ba79-bc19e2f0297c",
+      "label": "In New York City, Samuel Roxy Rothafel opens the Roxy Theatre.",
+      "year": 1927
+    },
+    "A113": {
+      "answer_fact_id": "b40eade7-6317-5b81-806c-2fbadf2250ef",
+      "label": "Space Shuttle Endeavour launches on STS-123, carrying the first component of the Japanese Kib\u014d module to the International Space Station.",
+      "year": 2008
+    },
+    "A114": {
+      "answer_fact_id": "6eca41e5-a29a-5f0c-baec-3ad77d316137",
+      "label": "Economist and businessman Sebasti\u00e1n Pi\u00f1era is sworn in as President of Chile. Aftershocks of the 2010 Pichilemu earthquakes hit central Chile during the ceremony.",
+      "year": 2010
+    },
+    "A115": {
+      "answer_fact_id": "dc864f7c-59e4-5bfb-b18f-167eb4e86555",
+      "label": "Lithuania declares independence from the Soviet Union.",
+      "year": 1990
+    },
+    "A116": {
+      "answer_fact_id": "f95cdabe-79ef-58ed-94a8-6173211babe8",
+      "label": "Mikhail Gorbachev is elected to the position of General Secretary of the Communist Party of the Soviet Union, making Gorbachev the USSR's de facto, and last, head of state.",
+      "year": 1985
+    },
+    "A117": {
+      "answer_fact_id": "3e740347-40c9-500b-8475-f9e2584637e6",
+      "label": "Battle of Castagnaro: Padua, led by John Hawkwood, is victorious over Giovanni Ordelaffi of Verona.",
+      "year": 1387
     }
   }
 }
