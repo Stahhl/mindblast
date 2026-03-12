@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-11T06:11:40Z"
+    "updated_at": "2026-03-12T06:13:15Z"
   },
   "counters": {
-    "question": 49,
-    "answer": 117
+    "question": 52,
+    "answer": 124
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -56,7 +56,10 @@
     "dd965376-cdd7-5847-a446-980b4952e391": "Q46",
     "01a8ff90-2f43-53c4-858c-71966adf1755": "Q47",
     "e327b5cc-bd22-5e3c-a2fa-5955ce17b837": "Q48",
-    "ccdc4f64-9568-58cd-9d5d-6e3f41c10607": "Q49"
+    "ccdc4f64-9568-58cd-9d5d-6e3f41c10607": "Q49",
+    "28baebbc-0cad-548d-a73a-3c982ed1e7cf": "Q50",
+    "3e18a23b-45b2-5998-b848-29e5bebedaf7": "Q51",
+    "83ef184c-4d8b-5404-afef-64c4c2226130": "Q52"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -175,7 +178,14 @@
     "6eca41e5-a29a-5f0c-baec-3ad77d316137": "A114",
     "dc864f7c-59e4-5bfb-b18f-167eb4e86555": "A115",
     "f95cdabe-79ef-58ed-94a8-6173211babe8": "A116",
-    "3e740347-40c9-500b-8475-f9e2584637e6": "A117"
+    "3e740347-40c9-500b-8475-f9e2584637e6": "A117",
+    "bfac7c65-6a3c-5ead-b97c-e964aa1b891c": "A118",
+    "716a6204-1b95-50b2-9012-175d6148b656": "A119",
+    "59a47711-e2b2-5edc-82c5-dd60cb6a01b2": "A120",
+    "8b096886-9b7e-502a-9a03-0903d6af3c23": "A121",
+    "7473c397-d288-556b-873b-2d984ea24293": "A122",
+    "7d5920e9-1391-5903-a3cf-728366061954": "A123",
+    "7d1f4750-77df-5664-8894-29b28b904264": "A124"
   },
   "questions": {
     "Q1": {
@@ -518,6 +528,27 @@
       "question_id": "ccdc4f64-9568-58cd-9d5d-6e3f41c10607",
       "quiz_file": "quizzes/7e5fb0f0-b4fc-5787-ae38-cf2e7075ac73.json",
       "date": "2026-03-11",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q50": {
+      "question_id": "28baebbc-0cad-548d-a73a-3c982ed1e7cf",
+      "quiz_file": "quizzes/0bdebc95-9553-5293-a441-5abe8b269ba2.json",
+      "date": "2026-03-12",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q51": {
+      "question_id": "3e18a23b-45b2-5998-b848-29e5bebedaf7",
+      "quiz_file": "quizzes/66cd535c-6336-51e1-a6cc-dc6e8b47b61c.json",
+      "date": "2026-03-12",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q52": {
+      "question_id": "83ef184c-4d8b-5404-afef-64c4c2226130",
+      "quiz_file": "quizzes/ba987ff9-1679-5c29-8fba-c305552bc798.json",
+      "date": "2026-03-12",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1107,6 +1138,41 @@
       "answer_fact_id": "3e740347-40c9-500b-8475-f9e2584637e6",
       "label": "Battle of Castagnaro: Padua, led by John Hawkwood, is victorious over Giovanni Ordelaffi of Verona.",
       "year": 1387
+    },
+    "A118": {
+      "answer_fact_id": "bfac7c65-6a3c-5ead-b97c-e964aa1b891c",
+      "label": "The 1971 Turkish military memorandum is sent to the S\u00fcleyman Demirel government of Turkey and the government resigns.",
+      "year": 1971
+    },
+    "A119": {
+      "answer_fact_id": "716a6204-1b95-50b2-9012-175d6148b656",
+      "label": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+      "year": 538
+    },
+    "A120": {
+      "answer_fact_id": "59a47711-e2b2-5edc-82c5-dd60cb6a01b2",
+      "label": "The World Health Organization officially release a global warning of outbreaks of Severe acute respiratory syndrome (SARS).",
+      "year": 2003
+    },
+    "A121": {
+      "answer_fact_id": "8b096886-9b7e-502a-9a03-0903d6af3c23",
+      "label": "The future capital of Australia is officially named Canberra.",
+      "year": 1913
+    },
+    "A122": {
+      "answer_fact_id": "7473c397-d288-556b-873b-2d984ea24293",
+      "label": "Tim Berners-Lee submits his proposal to CERN for an information management system, which subsequently develops into the World Wide Web.",
+      "year": 1989
+    },
+    "A123": {
+      "answer_fact_id": "7d5920e9-1391-5903-a3cf-728366061954",
+      "label": "Konrad von Wallenrode is elected the 24th Grand Master of the Teutonic Order (date is O.S.).",
+      "year": 1391
+    },
+    "A124": {
+      "answer_fact_id": "7d1f4750-77df-5664-8894-29b28b904264",
+      "label": "Start of the Siege of Maastricht, part of the Eighty Years' War.",
+      "year": 1579
     }
   }
 }

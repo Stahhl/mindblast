@@ -1,0 +1,234 @@
+{
+  "date": "2026-03-12",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "83ef184c-4d8b-5404-afef-64c4c2226130",
+      "type": "history_factoid_mcq_4",
+      "prompt": "When was Konrad von Wallenrode elected the 24th Grand Master of the Teutonic Order?",
+      "answer_fact_ids": [
+        "7d5920e9-1391-5903-a3cf-728366061954",
+        "716a6204-1b95-50b2-9012-175d6148b656",
+        "7d1f4750-77df-5664-8894-29b28b904264",
+        "8b096886-9b7e-502a-9a03-0903d6af3c23"
+      ],
+      "correct_answer_fact_id": "7d5920e9-1391-5903-a3cf-728366061954",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "time",
+        "prompt_style": "when",
+        "generation_method": "ai_native_factoid_v1"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1391
+      },
+      "human_id": "Q52"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "7d5920e9-1391-5903-a3cf-728366061954",
+      "label": "Konrad von Wallenrode is elected the 24th Grand Master of the Teutonic Order (date is O.S.).",
+      "year": 1391,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "14th-century",
+        "1390s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "14th-century",
+        "temporal_decade": "1390s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1391,
+          "temporal_century": "14th-century",
+          "temporal_decade": "1390s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Konrad von Wallenrode is elected the 24th Grand Master of the Teutonic Order (date is O.S.).",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A123"
+    },
+    {
+      "id": "716a6204-1b95-50b2-9012-175d6148b656",
+      "label": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+      "year": 538,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "6th-century",
+        "530s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "6th-century",
+        "temporal_decade": "530s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 538,
+          "temporal_century": "6th-century",
+          "temporal_decade": "530s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A119"
+    },
+    {
+      "id": "7d1f4750-77df-5664-8894-29b28b904264",
+      "label": "Start of the Siege of Maastricht, part of the Eighty Years' War.",
+      "year": 1579,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "16th-century",
+        "1570s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "16th-century",
+        "temporal_decade": "1570s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1579,
+          "temporal_century": "16th-century",
+          "temporal_decade": "1570s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Start of the Siege of Maastricht, part of the Eighty Years' War.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A124"
+    },
+    {
+      "id": "8b096886-9b7e-502a-9a03-0903d6af3c23",
+      "label": "The future capital of Australia is officially named Canberra.",
+      "year": 1913,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1910s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1910s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "time"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1913,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1910s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The future capital of Australia is officially named Canberra.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A121"
+    }
+  ],
+  "question": "When was Konrad von Wallenrode elected the 24th Grand Master of the Teutonic Order?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "1391",
+      "answer_fact_id": "7d5920e9-1391-5903-a3cf-728366061954",
+      "human_id": "A123"
+    },
+    {
+      "id": "B",
+      "label": "538",
+      "answer_fact_id": "716a6204-1b95-50b2-9012-175d6148b656",
+      "human_id": "A119"
+    },
+    {
+      "id": "C",
+      "label": "1579",
+      "answer_fact_id": "7d1f4750-77df-5664-8894-29b28b904264",
+      "human_id": "A124"
+    },
+    {
+      "id": "D",
+      "label": "1913",
+      "answer_fact_id": "8b096886-9b7e-502a-9a03-0903d6af3c23",
+      "human_id": "A121"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/12",
+    "retrieved_at": "2026-03-12T06:13:03Z",
+    "events_used": [
+      {
+        "event_id": "7d5920e9-1391-5903-a3cf-728366061954",
+        "text": "Konrad von Wallenrode is elected the 24th Grand Master of the Teutonic Order (date is O.S.).",
+        "year": 1391,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Konrad_von_Wallenrode"
+      },
+      {
+        "event_id": "716a6204-1b95-50b2-9012-175d6148b656",
+        "text": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+        "year": 538,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Vitiges"
+      },
+      {
+        "event_id": "7d1f4750-77df-5664-8894-29b28b904264",
+        "text": "Start of the Siege of Maastricht, part of the Eighty Years' War.",
+        "year": 1579,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Siege_of_Maastricht_(1579)"
+      },
+      {
+        "event_id": "8b096886-9b7e-502a-9a03-0903d6af3c23",
+        "text": "The future capital of Australia is officially named Canberra.",
+        "year": 1913,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Australia"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-12T06:13:03Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1",
+    "pipeline_version": "phase5_5_v1",
+    "generation_method": "ai_native_factoid_v1"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "date": "2026-03-12",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "28baebbc-0cad-548d-a73a-3c982ed1e7cf",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "bfac7c65-6a3c-5ead-b97c-e964aa1b891c",
+        "716a6204-1b95-50b2-9012-175d6148b656"
+      ],
+      "correct_answer_fact_id": "716a6204-1b95-50b2-9012-175d6148b656",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q50"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "bfac7c65-6a3c-5ead-b97c-e964aa1b891c",
+      "label": "The 1971 Turkish military memorandum is sent to the S\u00fcleyman Demirel government of Turkey and the government resigns.",
+      "year": 1971,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "20th-century",
+        "1970s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1970s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1971,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1970s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The 1971 Turkish military memorandum is sent to the S\u00fcleyman Demirel government of Turkey and the government resigns.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A118"
+    },
+    {
+      "id": "716a6204-1b95-50b2-9012-175d6148b656",
+      "label": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+      "year": 538,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "6th-century",
+        "530s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "6th-century",
+        "temporal_decade": "530s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 538,
+          "temporal_century": "6th-century",
+          "temporal_decade": "530s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A119"
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The 1971 Turkish military memorandum is sent to the S\u00fcleyman Demirel government of Turkey and the government resigns.",
+      "year": 1971,
+      "answer_fact_id": "bfac7c65-6a3c-5ead-b97c-e964aa1b891c",
+      "human_id": "A118"
+    },
+    {
+      "id": "B",
+      "label": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+      "year": 538,
+      "answer_fact_id": "716a6204-1b95-50b2-9012-175d6148b656",
+      "human_id": "A119"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/12",
+    "retrieved_at": "2026-03-12T06:13:03Z",
+    "events_used": [
+      {
+        "event_id": "bfac7c65-6a3c-5ead-b97c-e964aa1b891c",
+        "text": "The 1971 Turkish military memorandum is sent to the S\u00fcleyman Demirel government of Turkey and the government resigns.",
+        "year": 1971,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/1971_Turkish_military_memorandum"
+      },
+      {
+        "event_id": "716a6204-1b95-50b2-9012-175d6148b656",
+        "text": "Vitiges, king of the Ostrogoths, ends his siege of Rome and retreats to Ravenna, leaving the city to the victorious Byzantine general, Belisarius.",
+        "year": 538,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Vitiges"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-12T06:13:03Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
