@@ -1,0 +1,139 @@
+{
+  "date": "2026-03-13",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "59889398-dec8-5014-ab66-24286e6fd537",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "68fa8ee2-56cf-57c7-97b9-45f5f42ffb7d",
+        "12781bba-fb88-5314-8a44-8711b252fbd3"
+      ],
+      "correct_answer_fact_id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q53"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "68fa8ee2-56cf-57c7-97b9-45f5f42ffb7d",
+      "label": "British forces occupy Bloemfontein, Orange Free State, during the Second Boer War.",
+      "year": 1900,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "19th-century",
+        "1900s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1900s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1900,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1900s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "British forces occupy Bloemfontein, Orange Free State, during the Second Boer War.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A125"
+    },
+    {
+      "id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+      "label": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+      "year": 1741,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "18th-century",
+        "1740s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1740s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1741,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1740s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A126"
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "British forces occupy Bloemfontein, Orange Free State, during the Second Boer War.",
+      "year": 1900,
+      "answer_fact_id": "68fa8ee2-56cf-57c7-97b9-45f5f42ffb7d",
+      "human_id": "A125"
+    },
+    {
+      "id": "B",
+      "label": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+      "year": 1741,
+      "answer_fact_id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+      "human_id": "A126"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/13",
+    "retrieved_at": "2026-03-13T06:12:00Z",
+    "events_used": [
+      {
+        "event_id": "68fa8ee2-56cf-57c7-97b9-45f5f42ffb7d",
+        "text": "British forces occupy Bloemfontein, Orange Free State, during the Second Boer War.",
+        "year": 1900,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Bloemfontein"
+      },
+      {
+        "event_id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+        "text": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+        "year": 1741,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Cartagena_de_Indias"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-13T06:12:00Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

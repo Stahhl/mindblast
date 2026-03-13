@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-13",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "2d01045b-1cb6-5af5-8076-6c4cd501cdf2",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1930?",
+      "answer_fact_ids": [
+        "c3e0b1f1-2114-5143-a200-c091d41ee034",
+        "d411034c-d83c-5741-bfa9-63c7391f2edd",
+        "12781bba-fb88-5314-8a44-8711b252fbd3",
+        "49e7206c-f074-55d5-8472-0a6118155e94"
+      ],
+      "correct_answer_fact_id": "d411034c-d83c-5741-bfa9-63c7391f2edd",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1930
+      },
+      "human_id": "Q54"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "c3e0b1f1-2114-5143-a200-c091d41ee034",
+      "label": "The Byzantine Empire and the Republic of Genoa sign a permanent treaty against the Venetians at Nymphaeum.",
+      "year": 1261,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "13th-century",
+        "1260s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "13th-century",
+        "temporal_decade": "1260s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1261,
+          "temporal_century": "13th-century",
+          "temporal_decade": "1260s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Byzantine Empire and the Republic of Genoa sign a permanent treaty against the Venetians at Nymphaeum.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A127"
+    },
+    {
+      "id": "d411034c-d83c-5741-bfa9-63c7391f2edd",
+      "label": "The news of the discovery of Pluto is announced by Lowell Observatory.",
+      "year": 1930,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1930s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1930s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1930,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1930s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The news of the discovery of Pluto is announced by Lowell Observatory.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A128"
+    },
+    {
+      "id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+      "label": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+      "year": 1741,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "18th-century",
+        "1740s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1740s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1741,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1740s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A126"
+    },
+    {
+      "id": "49e7206c-f074-55d5-8472-0a6118155e94",
+      "label": "The Battle of Oosterweel, traditionally regarded as the start of the Eighty Years' War.",
+      "year": 1567,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "16th-century",
+        "1560s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "16th-century",
+        "temporal_decade": "1560s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1567,
+          "temporal_century": "16th-century",
+          "temporal_decade": "1560s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Battle of Oosterweel, traditionally regarded as the start of the Eighty Years' War.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A129"
+    }
+  ],
+  "question": "Which event happened in 1930?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The Byzantine Empire and the Republic of Genoa sign a permanent treaty against the Venetians at Nymphaeum.",
+      "answer_fact_id": "c3e0b1f1-2114-5143-a200-c091d41ee034",
+      "human_id": "A127"
+    },
+    {
+      "id": "B",
+      "label": "The news of the discovery of Pluto is announced by Lowell Observatory.",
+      "answer_fact_id": "d411034c-d83c-5741-bfa9-63c7391f2edd",
+      "human_id": "A128"
+    },
+    {
+      "id": "C",
+      "label": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+      "answer_fact_id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+      "human_id": "A126"
+    },
+    {
+      "id": "D",
+      "label": "The Battle of Oosterweel, traditionally regarded as the start of the Eighty Years' War.",
+      "answer_fact_id": "49e7206c-f074-55d5-8472-0a6118155e94",
+      "human_id": "A129"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/13",
+    "retrieved_at": "2026-03-13T06:12:00Z",
+    "events_used": [
+      {
+        "event_id": "c3e0b1f1-2114-5143-a200-c091d41ee034",
+        "text": "The Byzantine Empire and the Republic of Genoa sign a permanent treaty against the Venetians at Nymphaeum.",
+        "year": 1261,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Byzantine_Empire"
+      },
+      {
+        "event_id": "d411034c-d83c-5741-bfa9-63c7391f2edd",
+        "text": "The news of the discovery of Pluto is announced by Lowell Observatory.",
+        "year": 1930,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Pluto"
+      },
+      {
+        "event_id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+        "text": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+        "year": 1741,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Cartagena_de_Indias"
+      },
+      {
+        "event_id": "49e7206c-f074-55d5-8472-0a6118155e94",
+        "text": "The Battle of Oosterweel, traditionally regarded as the start of the Eighty Years' War.",
+        "year": 1567,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Oosterweel"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-13T06:12:00Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

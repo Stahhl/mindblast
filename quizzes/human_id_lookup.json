@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-12T06:13:15Z"
+    "updated_at": "2026-03-13T06:12:13Z"
   },
   "counters": {
-    "question": 52,
-    "answer": 124
+    "question": 55,
+    "answer": 131
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -59,7 +59,10 @@
     "ccdc4f64-9568-58cd-9d5d-6e3f41c10607": "Q49",
     "28baebbc-0cad-548d-a73a-3c982ed1e7cf": "Q50",
     "3e18a23b-45b2-5998-b848-29e5bebedaf7": "Q51",
-    "83ef184c-4d8b-5404-afef-64c4c2226130": "Q52"
+    "83ef184c-4d8b-5404-afef-64c4c2226130": "Q52",
+    "59889398-dec8-5014-ab66-24286e6fd537": "Q53",
+    "2d01045b-1cb6-5af5-8076-6c4cd501cdf2": "Q54",
+    "3e450d27-d0b1-51b9-bcb1-5f898ea14dba": "Q55"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -185,7 +188,14 @@
     "8b096886-9b7e-502a-9a03-0903d6af3c23": "A121",
     "7473c397-d288-556b-873b-2d984ea24293": "A122",
     "7d5920e9-1391-5903-a3cf-728366061954": "A123",
-    "7d1f4750-77df-5664-8894-29b28b904264": "A124"
+    "7d1f4750-77df-5664-8894-29b28b904264": "A124",
+    "68fa8ee2-56cf-57c7-97b9-45f5f42ffb7d": "A125",
+    "12781bba-fb88-5314-8a44-8711b252fbd3": "A126",
+    "c3e0b1f1-2114-5143-a200-c091d41ee034": "A127",
+    "d411034c-d83c-5741-bfa9-63c7391f2edd": "A128",
+    "49e7206c-f074-55d5-8472-0a6118155e94": "A129",
+    "bb1e7ee3-ca8a-5170-9630-3da991d1fa15": "A130",
+    "c596ef56-2df8-5ad7-b7a9-f84693cfa53e": "A131"
   },
   "questions": {
     "Q1": {
@@ -549,6 +559,27 @@
       "question_id": "83ef184c-4d8b-5404-afef-64c4c2226130",
       "quiz_file": "quizzes/ba987ff9-1679-5c29-8fba-c305552bc798.json",
       "date": "2026-03-12",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q53": {
+      "question_id": "59889398-dec8-5014-ab66-24286e6fd537",
+      "quiz_file": "quizzes/96ae0bbd-8e16-5d90-ae0f-a2c8febedfee.json",
+      "date": "2026-03-13",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q54": {
+      "question_id": "2d01045b-1cb6-5af5-8076-6c4cd501cdf2",
+      "quiz_file": "quizzes/350a82f4-c432-5a97-9caa-a60e596c9436.json",
+      "date": "2026-03-13",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q55": {
+      "question_id": "3e450d27-d0b1-51b9-bcb1-5f898ea14dba",
+      "quiz_file": "quizzes/06a44fc9-2a2c-5fde-a49f-be92031ef9b0.json",
+      "date": "2026-03-13",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1173,6 +1204,41 @@
       "answer_fact_id": "7d1f4750-77df-5664-8894-29b28b904264",
       "label": "Start of the Siege of Maastricht, part of the Eighty Years' War.",
       "year": 1579
+    },
+    "A125": {
+      "answer_fact_id": "68fa8ee2-56cf-57c7-97b9-45f5f42ffb7d",
+      "label": "British forces occupy Bloemfontein, Orange Free State, during the Second Boer War.",
+      "year": 1900
+    },
+    "A126": {
+      "answer_fact_id": "12781bba-fb88-5314-8a44-8711b252fbd3",
+      "label": "The Battle of Cartagena de Indias (part of the War of Jenkins' Ear) begins.",
+      "year": 1741
+    },
+    "A127": {
+      "answer_fact_id": "c3e0b1f1-2114-5143-a200-c091d41ee034",
+      "label": "The Byzantine Empire and the Republic of Genoa sign a permanent treaty against the Venetians at Nymphaeum.",
+      "year": 1261
+    },
+    "A128": {
+      "answer_fact_id": "d411034c-d83c-5741-bfa9-63c7391f2edd",
+      "label": "The news of the discovery of Pluto is announced by Lowell Observatory.",
+      "year": 1930
+    },
+    "A129": {
+      "answer_fact_id": "49e7206c-f074-55d5-8472-0a6118155e94",
+      "label": "The Battle of Oosterweel, traditionally regarded as the start of the Eighty Years' War.",
+      "year": 1567
+    },
+    "A130": {
+      "answer_fact_id": "bb1e7ee3-ca8a-5170-9630-3da991d1fa15",
+      "label": "The Ankara bombing kills at least 37 people.",
+      "year": 2016
+    },
+    "A131": {
+      "answer_fact_id": "c596ef56-2df8-5ad7-b7a9-f84693cfa53e",
+      "label": "Breonna Taylor is killed by police officers who were forcibly entering her home in Louisville, Kentucky; her death sparked extensive protests against racism and police brutality.",
+      "year": 2020
     }
   }
 }
