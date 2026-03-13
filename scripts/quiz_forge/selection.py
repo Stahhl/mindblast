@@ -201,6 +201,35 @@ _NON_PERSON_KEYWORDS = {
 _SUBJECT_RE = re.compile(
     r"^(?P<subject>[A-Z][\w'.-]+(?:\s+(?:[A-Z][\w'.-]+|[ivxlcdmIVXLCDM]+|Jr\.|Sr\.|St\.|[a-z]{1,4})){1,6})\s+(?P<rest>.+)$"
 )
+_PLACE_CONNECTORS = {"and", "de", "del", "du", "la", "le", "of", "st.", "the"}
+_NON_PLACE_KEYWORDS = {
+    "Army",
+    "Association",
+    "Battle",
+    "Bombing",
+    "Conference",
+    "Court",
+    "Day",
+    "Dynasty",
+    "Expedition",
+    "Flight",
+    "Forces",
+    "Government",
+    "King",
+    "Law",
+    "League",
+    "March",
+    "Museum",
+    "President",
+    "Senate",
+    "Siege",
+    "Speech",
+    "Treaty",
+    "War",
+}
+_LEADING_PLACE_RE = re.compile(
+    r"^(?P<prefix>In|At|Near|From)\s+(?P<place>[^.;:()]{2,80}?),\s*(?P<rest>.+)$"
+)
 
 
 def _normalize_ws(value: str) -> str:
@@ -276,7 +305,70 @@ def _extract_person_factoid_candidate(event: dict[str, Any]) -> dict[str, Any] |
     return None
 
 
-def _person_candidate_sort_key(candidate: dict[str, Any]) -> tuple[str, int, str]:
+def _looks_like_place_label(label: str) -> bool:
+    normalized_label = _normalize_ws(label.strip(" ,"))
+    if not normalized_label:
+        return False
+    if any(char.isdigit() for char in normalized_label):
+        return False
+    if normalized_label.lower() in {"the world", "world", "earth"}:
+        return False
+    if _looks_like_person_name(normalized_label):
+        return False
+
+    segments = [segment.strip() for segment in normalized_label.split(",")]
+    if len(segments) > 3:
+        return False
+
+    capitalized_token_count = 0
+    for segment in segments:
+        if not segment:
+            return False
+        for token in segment.split():
+            bare = token.rstrip(".,")
+            if not bare:
+                continue
+            if bare.lower() in _PLACE_CONNECTORS:
+                continue
+            if bare[0].isupper():
+                capitalized_token_count += 1
+                if bare in _NON_PLACE_KEYWORDS:
+                    return False
+                continue
+            return False
+
+    return capitalized_token_count >= 1
+
+
+def _extract_place_factoid_candidate(event: dict[str, Any]) -> dict[str, Any] | None:
+    raw_text = event.get("text")
+    if not isinstance(raw_text, str):
+        return None
+
+    text = _normalize_ws(raw_text)
+    match = _LEADING_PLACE_RE.match(text)
+    if match is None:
+        return None
+
+    place = _normalize_ws(match.group("place").strip(" ,"))
+    rest = _normalize_ws(match.group("rest").rstrip(" .!?"))
+    if not rest or not _looks_like_place_label(place):
+        return None
+
+    question = f"Where did this happen: {rest}?"
+    if len(question) > 220:
+        return None
+
+    return {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": place,
+        "question_text": question,
+        "source_event": event,
+    }
+
+
+def _factoid_candidate_sort_key(candidate: dict[str, Any]) -> tuple[str, int, str]:
     source_event = candidate["source_event"]
     return (
         candidate["answer_label"].casefold(),
@@ -285,22 +377,11 @@ def _person_candidate_sort_key(candidate: dict[str, Any]) -> tuple[str, int, str
     )
 
 
-def pick_history_factoid_person_candidates(
-    candidates: list[dict[str, Any]],
+def _pick_factoid_candidates_of_kind(
+    extracted_candidates: list[dict[str, Any]],
     seed: int,
-    preferred_distractor_events: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    del preferred_distractor_events
-
-    person_candidates = [
-        candidate
-        for event in candidates
-        if (candidate := _extract_person_factoid_candidate(event)) is not None
-    ]
-    if len(person_candidates) < 4:
-        raise ValueError("Not enough valid person factoid candidates to build a 4-option history factoid MCQ.")
-
-    ordered = sorted(person_candidates, key=_person_candidate_sort_key)
+    ordered = sorted(extracted_candidates, key=_factoid_candidate_sort_key)
     correct_idx = seed % len(ordered)
     correct = ordered[correct_idx]
 
@@ -321,7 +402,39 @@ def pick_history_factoid_person_candidates(
         if len(distractors) == 3:
             break
 
+    return correct, distractors
+
+
+def pick_history_factoid_typed_candidates(
+    candidates: list[dict[str, Any]],
+    seed: int,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    del preferred_distractor_events
+
+    by_kind = {
+        "person": [
+            candidate
+            for event in candidates
+            if (candidate := _extract_person_factoid_candidate(event)) is not None
+        ],
+        "place": [
+            candidate
+            for event in candidates
+            if (candidate := _extract_place_factoid_candidate(event)) is not None
+        ],
+    }
+    eligible_kinds = [
+        answer_kind
+        for answer_kind in ("person", "place")
+        if len({candidate["answer_label"].casefold() for candidate in by_kind[answer_kind]}) >= 4
+    ]
+    if not eligible_kinds:
+        raise ValueError("Not enough typed factoid candidates to build a 4-option history factoid MCQ.")
+
+    selected_kind = eligible_kinds[seed % len(eligible_kinds)]
+    correct, distractors = _pick_factoid_candidates_of_kind(by_kind[selected_kind], seed)
     if len(distractors) < 3:
-        raise ValueError("Could not pick three distinct person distractors for history_factoid_mcq_4.")
+        raise ValueError(f"Could not pick three distinct {selected_kind} distractors for history_factoid_mcq_4.")
 
     return correct, distractors

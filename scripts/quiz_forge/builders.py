@@ -22,7 +22,7 @@ from .model import (
     build_question_id,
     build_question_object,
 )
-from .selection import pick_history_factoid_person_candidates, pick_history_mcq_distractor_pool, pick_two_events
+from .selection import pick_history_factoid_typed_candidates, pick_history_mcq_distractor_pool, pick_two_events
 
 
 def _format_year_label(year: int) -> str:
@@ -244,7 +244,7 @@ def build_history_factoid_mcq_4_quiz(
         raise ValueError(f"Unsupported generation mode: {generation_mode}")
 
     try:
-        correct_person, distractor_people = pick_history_factoid_person_candidates(
+        correct_factoid, distractor_factoids = pick_history_factoid_typed_candidates(
             candidates,
             seed,
             preferred_distractor_events=preferred_distractor_events,
@@ -327,8 +327,8 @@ def build_history_factoid_mcq_4_quiz(
             },
         }
 
-    person_options = [correct_person, *distractor_people]
-    person_options.sort(
+    factoid_options = [correct_factoid, *distractor_factoids]
+    factoid_options.sort(
         key=lambda item: hashlib.sha256(
             (
                 f"{seed}:{item['answer_label']}:{item['source_event']['year']}:"
@@ -336,28 +336,31 @@ def build_history_factoid_mcq_4_quiz(
             ).encode("utf-8")
         ).hexdigest()
     )
-    question_text = correct_person["question_text"]
+    answer_kind = correct_factoid["answer_kind"]
+    prompt_style = correct_factoid["prompt_style"]
+    question_text = correct_factoid["question_text"]
 
     choice_ids = ("A", "B", "C", "D")
     choices = []
     correct_choice_id: str | None = None
     answer_facts = []
+    correct_answer_fact_id: str | None = None
 
-    for choice_id, option in zip(choice_ids, person_options):
+    for choice_id, option in zip(choice_ids, factoid_options):
         source_event = option["source_event"]
         fact_id = build_factoid_answer_fact_id(
             source_event,
             answer_label=option["answer_label"],
-            entity_type="person",
+            entity_type=answer_kind,
         )
-        role = "correct" if option is correct_person else "distractor"
+        role = "correct" if option is correct_factoid else "distractor"
         fact = build_answer_fact(
             source_event,
             quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
             role=role,
             fact_id=fact_id,
             label=option["answer_label"],
-            entity_type="person",
+            entity_type=answer_kind,
             embedding_text=f"{option['answer_label']} -- {source_event['text']}",
         )
         answer_facts.append(fact)
@@ -369,26 +372,25 @@ def build_history_factoid_mcq_4_quiz(
             }
         )
         option["answer_fact_id"] = fact["id"]
-        if option is correct_person:
+        if option is correct_factoid:
             correct_choice_id = choice_id
+            correct_answer_fact_id = fact["id"]
 
-    if correct_choice_id is None:
+    if correct_choice_id is None or correct_answer_fact_id is None:
         raise ValueError("Could not determine correct choice id for history_factoid_mcq_4.")
 
-    correct_source_event = correct_person["source_event"]
+    correct_source_event = correct_factoid["source_event"]
     question_object = build_question_object(
         question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_FACTOID_MCQ_4, edition),
         prompt=question_text,
         quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
         answer_fact_ids=[fact["id"] for fact in answer_facts],
-        correct_answer_fact_id=next(
-            fact["id"] for fact in answer_facts if fact["label"] == correct_person["answer_label"]
-        ),
+        correct_answer_fact_id=correct_answer_fact_id,
         target_year=correct_source_event["year"],
         extra_facets={
             "question_format": "factoid",
-            "answer_kind": "person",
-            "prompt_style": "who",
+            "answer_kind": answer_kind,
+            "prompt_style": prompt_style,
         },
     )
 
@@ -401,7 +403,7 @@ def build_history_factoid_mcq_4_quiz(
         "question": question_text,
         "choices": choices,
         "correct_choice_id": correct_choice_id,
-        "source": build_source(retrieval_time, source_url, person_options),
+        "source": build_source(retrieval_time, source_url, factoid_options),
         "generation": {
             "mode": generation_mode,
             "edition": edition,

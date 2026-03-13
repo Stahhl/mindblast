@@ -83,6 +83,36 @@ def _person_factoid_candidates() -> list[dict[str, object]]:
     ]
 
 
+def _place_factoid_candidates() -> list[dict[str, object]]:
+    return [
+        {
+            "text": "In Kyoto, Emperor Komei grants an imperial audience to foreign diplomats for the first time.",
+            "year": 1863,
+            "wikipedia_url": "https://example.com/kyoto",
+        },
+        {
+            "text": "At Waterloo, Napoleon Bonaparte is defeated by the Seventh Coalition.",
+            "year": 1815,
+            "wikipedia_url": "https://example.com/waterloo",
+        },
+        {
+            "text": "In Karachi, Pakistan, a bomb blast kills at least 48 people in a predominantly Shia Muslim area.",
+            "year": 2013,
+            "wikipedia_url": "https://example.com/karachi",
+        },
+        {
+            "text": "In Honolulu, Amelia Earhart departs in her attempt to fly around the world.",
+            "year": 1937,
+            "wikipedia_url": "https://example.com/honolulu",
+        },
+        {
+            "text": "At the Winter Palace, demonstrators demand political reform from the Russian Empire.",
+            "year": 1905,
+            "wikipedia_url": "https://example.com/winter-palace",
+        },
+    ]
+
+
 def _legacy_which_came_first_payload(*, target_date: dt.date) -> dict[str, object]:
     return {
         "date": target_date.isoformat(),
@@ -348,6 +378,50 @@ def test_cli_generates_history_factoid_person_mcq_when_person_candidates_exist(m
     assert all(fact["facets"]["entity_type"] == "person" for fact in payload["answer_facts"])
     assert {event["text"] for event in payload["source"]["events_used"]} <= {
         candidate["text"] for candidate in _person_factoid_candidates()
+    }
+
+
+def test_cli_generates_history_factoid_place_mcq_when_place_candidates_exist(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _place_factoid_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    assert [record.edition for record in records] == [1]
+    payload = records[0].payload
+    assert payload["type"] == "history_factoid_mcq_4"
+    assert payload["question"].startswith("Where did this happen: ")
+    assert len(payload["choices"]) == 4
+    assert all(any(character.isalpha() for character in choice["label"]) for choice in payload["choices"])
+    facets = payload["questions"][0]["facets"]
+    assert facets["question_format"] == "factoid"
+    assert facets["answer_kind"] == "place"
+    assert facets["prompt_style"] == "where"
+    assert all(fact["facets"]["entity_type"] == "place" for fact in payload["answer_facts"])
+    assert {event["text"] for event in payload["source"]["events_used"]} <= {
+        candidate["text"] for candidate in _place_factoid_candidates()
     }
 
 
