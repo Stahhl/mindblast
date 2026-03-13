@@ -238,6 +238,7 @@ def build_history_factoid_mcq_4_quiz(
     generation_mode: str,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
     ai_ranked_distractor_ids: list[str] | None = None,
+    preferred_answer_kind: str | None = None,
 ) -> dict[str, Any]:
     del ai_ranked_distractor_ids
     if generation_mode not in SUPPORTED_GENERATION_MODES:
@@ -248,6 +249,7 @@ def build_history_factoid_mcq_4_quiz(
             candidates,
             seed,
             preferred_distractor_events=preferred_distractor_events,
+            preferred_answer_kind=preferred_answer_kind,
         )
     except ValueError:
         correct, distractor_pool = pick_history_mcq_distractor_pool(

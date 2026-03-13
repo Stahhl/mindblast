@@ -113,6 +113,80 @@ def _place_factoid_candidates() -> list[dict[str, object]]:
     ]
 
 
+def _place_factoid_embedded_candidates() -> list[dict[str, object]]:
+    return [
+        {
+            "text": "A bomb blast in Karachi, Pakistan, kills at least 48 people in a predominantly Shia Muslim area.",
+            "year": 2013,
+            "wikipedia_url": "https://example.com/karachi",
+        },
+        {
+            "text": "An armistice is signed in Versailles after months of negotiation.",
+            "year": 1919,
+            "wikipedia_url": "https://example.com/versailles",
+        },
+        {
+            "text": "Protesters gather at Tiananmen Square during a state visit by Mikhail Gorbachev.",
+            "year": 1989,
+            "wikipedia_url": "https://example.com/tiananmen-square",
+        },
+        {
+            "text": "A military convoy departs from Baghdad for the northern front.",
+            "year": 2003,
+            "wikipedia_url": "https://example.com/baghdad",
+        },
+        {
+            "text": "Athletes parade in Barcelona during the opening ceremony of the Summer Olympics.",
+            "year": 1992,
+            "wikipedia_url": "https://example.com/barcelona",
+        },
+    ]
+
+
+def _mixed_factoid_candidates() -> list[dict[str, object]]:
+    return [*_person_factoid_candidates(), *_place_factoid_candidates()]
+
+
+def _minimal_existing_factoid_payload(
+    *,
+    target_date: dt.date,
+    generated_at: str,
+    answer_kind: str,
+    prompt_style: str,
+) -> dict[str, object]:
+    return {
+        "date": target_date.isoformat(),
+        "type": "history_factoid_mcq_4",
+        "question": "Placeholder?",
+        "questions": [
+            {
+                "id": f"q-{target_date.isoformat()}",
+                "type": "history_factoid_mcq_4",
+                "prompt": "Placeholder?",
+                "answer_fact_ids": [],
+                "correct_answer_fact_id": "fact-a",
+                "tags": ["history", "history_factoid_mcq_4"],
+                "facets": {
+                    "topic": "history",
+                    "difficulty_band": "baseline",
+                    "question_format": "factoid",
+                    "answer_kind": answer_kind,
+                    "prompt_style": prompt_style,
+                },
+                "selection_rules": {},
+            }
+        ],
+        "generation": {
+            "mode": "daily",
+            "edition": 1,
+            "generated_at": generated_at,
+        },
+        "source": {
+            "retrieved_at": generated_at,
+        },
+    }
+
+
 def _legacy_which_came_first_payload(*, target_date: dt.date) -> dict[str, object]:
     return {
         "date": target_date.isoformat(),
@@ -423,6 +497,96 @@ def test_cli_generates_history_factoid_place_mcq_when_place_candidates_exist(mon
     assert {event["text"] for event in payload["source"]["events_used"]} <= {
         candidate["text"] for candidate in _place_factoid_candidates()
     }
+
+
+def test_cli_generates_history_factoid_place_mcq_for_embedded_place_patterns(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _place_factoid_embedded_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    payload = records[0].payload
+    assert payload["question"].startswith("Where did this happen: ")
+    assert payload["questions"][0]["facets"]["answer_kind"] == "place"
+    assert any(choice["label"] == "Karachi, Pakistan" for choice in payload["choices"])
+
+
+def test_cli_prefers_less_recent_factoid_kind_when_both_person_and_place_are_available(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    output_dir = (tmp_path / "quizzes").as_posix()
+    quizzes_dir = Path(output_dir)
+    earlier_date = dt.date(2026, 2, 24)
+    later_date = dt.date(2026, 2, 25)
+
+    write_quiz_file(
+        build_output_path(output_dir, earlier_date, "history_factoid_mcq_4", 1),
+        _minimal_existing_factoid_payload(
+            target_date=earlier_date,
+            generated_at="2026-02-24T06:00:00Z",
+            answer_kind="person",
+            prompt_style="who",
+        ),
+    )
+    write_quiz_file(
+        build_output_path(output_dir, later_date, "history_factoid_mcq_4", 1),
+        _minimal_existing_factoid_payload(
+            target_date=later_date,
+            generated_at="2026-02-25T06:00:00Z",
+            answer_kind="person",
+            prompt_style="who",
+        ),
+    )
+
+    target_date = "2026-02-26"
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _mixed_factoid_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    payload = records[0].payload
+    assert payload["questions"][0]["facets"]["answer_kind"] == "place"
+    assert payload["questions"][0]["facets"]["prompt_style"] == "where"
+    assert quizzes_dir.exists()
 
 
 def test_cli_reuses_existing_human_ids_on_rerun(monkeypatch, tmp_path) -> None:

@@ -202,6 +202,32 @@ _SUBJECT_RE = re.compile(
     r"^(?P<subject>[A-Z][\w'.-]+(?:\s+(?:[A-Z][\w'.-]+|[ivxlcdmIVXLCDM]+|Jr\.|Sr\.|St\.|[a-z]{1,4})){1,6})\s+(?P<rest>.+)$"
 )
 _PLACE_CONNECTORS = {"and", "de", "del", "du", "la", "le", "of", "st.", "the"}
+_PLACE_HINT_TOKENS = {
+    "Bay",
+    "Beach",
+    "Bridge",
+    "Canal",
+    "Castle",
+    "City",
+    "Fort",
+    "Harbor",
+    "Harbour",
+    "Hill",
+    "Island",
+    "Lake",
+    "Mountain",
+    "Mount",
+    "Palace",
+    "Park",
+    "Port",
+    "River",
+    "Road",
+    "Sea",
+    "Square",
+    "Station",
+    "Temple",
+    "Valley",
+}
 _NON_PLACE_KEYWORDS = {
     "Army",
     "Association",
@@ -228,7 +254,17 @@ _NON_PLACE_KEYWORDS = {
     "War",
 }
 _LEADING_PLACE_RE = re.compile(
-    r"^(?P<prefix>In|At|Near|From)\s+(?P<place>[^.;:()]{2,80}?),\s*(?P<rest>.+)$"
+    r"^(?P<prefix>In|At|Near|From)\s+(?P<place>(?:the\s+)?[A-Z][^.;:()]{1,70}?)(?:,\s*(?P<place_suffix>[A-Z][^.;:()]{1,40}?))?,\s*(?P<rest>.+)$"
+)
+_INLINE_PLACE_COMMA_RE = re.compile(
+    r"^(?P<prefix>.+?)\s+(?P<prep>in|at|near|from)\s+"
+    r"(?P<place>(?:the\s+)?[A-Z][^,.;:()]{1,40})(?:,\s*(?P<place_suffix>[A-Z][^,.;:()]{1,30}))?,\s*"
+    r"(?P<suffix>.+)$"
+)
+_INLINE_PLACE_TRAILING_RE = re.compile(
+    r"^(?P<prefix>.+?)\s+(?P<prep>in|at|near|from)\s+"
+    r"(?P<place>(?:the\s+)?[A-Z][\w'.-]+(?:\s+(?:[A-Z][\w'.-]+|of|the|de|del|du|la|le|St\.)){0,4})"
+    r"(?P<suffix>\s+(?:in|on|during|after|before|while|as|to|for|with|under)\b.+)$"
 )
 
 
@@ -314,7 +350,13 @@ def _looks_like_place_label(label: str) -> bool:
     if normalized_label.lower() in {"the world", "world", "earth"}:
         return False
     if _looks_like_person_name(normalized_label):
-        return False
+        place_hint_present = (
+            "," in normalized_label
+            or normalized_label.lower().startswith("the ")
+            or any(token.rstrip(".,") in _PLACE_HINT_TOKENS for token in normalized_label.split())
+        )
+        if not place_hint_present:
+            return False
 
     segments = [segment.strip() for segment in normalized_label.split(",")]
     if len(segments) > 3:
@@ -340,32 +382,85 @@ def _looks_like_place_label(label: str) -> bool:
     return capitalized_token_count >= 1
 
 
+def _split_place_segments(text: str, *, prefix: str) -> tuple[str, str] | None:
+    remainder = _normalize_ws(text[len(prefix) :].strip())
+    if not remainder:
+        return None
+    segments = [segment.strip() for segment in remainder.split(",")]
+    if len(segments) < 2 or not segments[0]:
+        return None
+
+    place_segments = [segments[0]]
+    rest_segments = segments[1:]
+    if len(rest_segments) >= 2 and _looks_like_place_label(rest_segments[0]):
+        place_segments.append(rest_segments[0])
+        rest_segments = rest_segments[1:]
+
+    place = _normalize_ws(", ".join(segment for segment in place_segments if segment))
+    rest = _normalize_ws(", ".join(segment for segment in rest_segments if segment).rstrip(" .!?"))
+    if not place or not rest:
+        return None
+    return place, rest
+
+
 def _extract_place_factoid_candidate(event: dict[str, Any]) -> dict[str, Any] | None:
     raw_text = event.get("text")
     if not isinstance(raw_text, str):
         return None
 
     text = _normalize_ws(raw_text)
-    match = _LEADING_PLACE_RE.match(text)
-    if match is None:
-        return None
+    for place_prefix in ("In ", "At ", "Near ", "From "):
+        if text.startswith(place_prefix):
+            split_result = _split_place_segments(text, prefix=place_prefix)
+            if split_result is not None:
+                place, rest = split_result
+                if _looks_like_place_label(place):
+                    question = f"Where did this happen: {rest}?"
+                    if len(question) <= 220:
+                        return {
+                            "answer_kind": "place",
+                            "prompt_style": "where",
+                            "answer_label": place,
+                            "question_text": question,
+                            "source_event": event,
+                        }
 
-    place = _normalize_ws(match.group("place").strip(" ,"))
-    rest = _normalize_ws(match.group("rest").rstrip(" .!?"))
-    if not rest or not _looks_like_place_label(place):
-        return None
+    match = _INLINE_PLACE_COMMA_RE.match(text)
+    if match is not None:
+        place_parts = [match.group("place"), match.group("place_suffix")]
+        place = _normalize_ws(", ".join(part.strip(" ,") for part in place_parts if isinstance(part, str) and part.strip()))
+        prefix = _normalize_ws(match.group("prefix").rstrip(" ,"))
+        suffix = _normalize_ws(match.group("suffix").rstrip(" .!?"))
+        rest = _normalize_ws(f"{prefix} {suffix}".strip())
+        if rest and _looks_like_place_label(place):
+            question = f"Where did this happen: {rest}?"
+            if len(question) <= 220:
+                return {
+                    "answer_kind": "place",
+                    "prompt_style": "where",
+                    "answer_label": place,
+                    "question_text": question,
+                    "source_event": event,
+                }
 
-    question = f"Where did this happen: {rest}?"
-    if len(question) > 220:
-        return None
+    match = _INLINE_PLACE_TRAILING_RE.match(text)
+    if match is not None:
+        place = _normalize_ws(match.group("place").strip(" ,"))
+        prefix = _normalize_ws(match.group("prefix").rstrip(" ,"))
+        suffix = _normalize_ws(match.group("suffix").rstrip(" .!?"))
+        rest = _normalize_ws(f"{prefix} {suffix}".strip())
+        if rest and _looks_like_place_label(place):
+            question = f"Where did this happen: {rest}?"
+            if len(question) <= 220:
+                return {
+                    "answer_kind": "place",
+                    "prompt_style": "where",
+                    "answer_label": place,
+                    "question_text": question,
+                    "source_event": event,
+                }
 
-    return {
-        "answer_kind": "place",
-        "prompt_style": "where",
-        "answer_label": place,
-        "question_text": question,
-        "source_event": event,
-    }
+    return None
 
 
 def _factoid_candidate_sort_key(candidate: dict[str, Any]) -> tuple[str, int, str]:
@@ -409,6 +504,7 @@ def pick_history_factoid_typed_candidates(
     candidates: list[dict[str, Any]],
     seed: int,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
+    preferred_answer_kind: str | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     del preferred_distractor_events
 
@@ -432,7 +528,10 @@ def pick_history_factoid_typed_candidates(
     if not eligible_kinds:
         raise ValueError("Not enough typed factoid candidates to build a 4-option history factoid MCQ.")
 
-    selected_kind = eligible_kinds[seed % len(eligible_kinds)]
+    if preferred_answer_kind in eligible_kinds:
+        selected_kind = preferred_answer_kind
+    else:
+        selected_kind = eligible_kinds[seed % len(eligible_kinds)]
     correct, distractors = _pick_factoid_candidates_of_kind(by_kind[selected_kind], seed)
     if len(distractors) < 3:
         raise ValueError(f"Could not pick three distinct {selected_kind} distractors for history_factoid_mcq_4.")

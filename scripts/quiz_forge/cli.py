@@ -130,6 +130,51 @@ def _backfill_human_ids(output_dir: str) -> int:
     return 0
 
 
+def _extract_factoid_answer_kind(payload: dict[str, Any]) -> str | None:
+    questions = payload.get("questions")
+    if not isinstance(questions, list) or not questions or not isinstance(questions[0], dict):
+        return None
+    facets = questions[0].get("facets")
+    if not isinstance(facets, dict):
+        return None
+    answer_kind = facets.get("answer_kind")
+    if answer_kind in {"person", "place", "time"}:
+        return answer_kind
+    return None
+
+
+def _collect_recent_factoid_answer_kinds(output_dir: str, *, limit: int = 6) -> list[str]:
+    records = [
+        record
+        for record in iter_quiz_records(output_dir)
+        if record.quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4
+    ]
+    records.sort(
+        key=lambda record: (
+            record.date.isoformat(),
+            record.generated_at or "",
+            record.edition,
+            record.path.as_posix(),
+        )
+    )
+    kinds = [
+        answer_kind
+        for record in records
+        if (answer_kind := _extract_factoid_answer_kind(record.payload)) is not None
+    ]
+    return kinds[-limit:]
+
+
+def _preferred_factoid_answer_kind(recent_kinds: list[str]) -> str | None:
+    person_count = sum(1 for kind in recent_kinds if kind == "person")
+    place_count = sum(1 for kind in recent_kinds if kind == "place")
+    if person_count == place_count:
+        return None
+    if person_count > place_count:
+        return "place"
+    return "person"
+
+
 def main() -> int:
     args = parse_args()
     if getattr(args, "backfill_human_ids", False):
@@ -152,6 +197,7 @@ def main() -> int:
     )
     human_id_lookup = load_human_id_lookup(args.output_dir)
     human_id_lookup_changed = False
+    recent_factoid_answer_kinds = _collect_recent_factoid_answer_kinds(args.output_dir)
 
     generated: list[tuple[str, int, Path, dict[str, Any]]] = []
     if pending:
@@ -192,17 +238,31 @@ def main() -> int:
                 elif ai_attempt.fallback_reason:
                     print(f"AI rerank fallback for {quiz_type}: {ai_attempt.fallback_reason}")
 
-            quiz = builder(
-                target_date,
-                retrieval_time,
-                source_url,
-                candidates,
-                seed,
-                edition,
-                generation_mode,
-                preferred_distractor_events=reusable_correct_events,
-                ai_ranked_distractor_ids=ai_ranked_distractor_ids,
-            )
+            if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
+                quiz = builder(
+                    target_date,
+                    retrieval_time,
+                    source_url,
+                    candidates,
+                    seed,
+                    edition,
+                    generation_mode,
+                    preferred_distractor_events=reusable_correct_events,
+                    ai_ranked_distractor_ids=ai_ranked_distractor_ids,
+                    preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
+                )
+            else:
+                quiz = builder(
+                    target_date,
+                    retrieval_time,
+                    source_url,
+                    candidates,
+                    seed,
+                    edition,
+                    generation_mode,
+                    preferred_distractor_events=reusable_correct_events,
+                    ai_ranked_distractor_ids=ai_ranked_distractor_ids,
+                )
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
                 quiz, factoid_reason = apply_factoid_ai_pipeline(
                     quiz=quiz,
@@ -216,6 +276,10 @@ def main() -> int:
                         print("AI factoid pipeline shadow run completed for history_factoid_mcq_4.")
                     else:
                         print(f"AI factoid pipeline fallback for history_factoid_mcq_4: {factoid_reason}")
+                answer_kind = _extract_factoid_answer_kind(quiz)
+                if answer_kind is not None:
+                    recent_factoid_answer_kinds.append(answer_kind)
+                    recent_factoid_answer_kinds = recent_factoid_answer_kinds[-6:]
 
             if apply_human_ids_to_quiz(quiz=quiz, quiz_path=output_path, lookup=human_id_lookup):
                 human_id_lookup_changed = True
