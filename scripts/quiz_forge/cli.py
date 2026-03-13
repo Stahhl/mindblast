@@ -248,20 +248,23 @@ def main() -> int:
             if correct_fact is None:
                 continue
 
-            label = correct_fact.get("label")
             year = correct_fact.get("year")
-            source_url_for_fact = next(
+            matching_source_event = next(
                 (
-                    source_event.get("wikipedia_url")
+                    source_event
                     for source_event in quiz.get("source", {}).get("events_used", [])
                     if isinstance(source_event, dict) and source_event.get("event_id") == correct_answer_fact_id
                 ),
                 None,
             )
-            if isinstance(label, str) and isinstance(year, int) and isinstance(source_url_for_fact, str):
+            source_text = matching_source_event.get("text") if isinstance(matching_source_event, dict) else None
+            source_url_for_fact = (
+                matching_source_event.get("wikipedia_url") if isinstance(matching_source_event, dict) else None
+            )
+            if isinstance(source_text, str) and isinstance(year, int) and isinstance(source_url_for_fact, str):
                 reusable_correct_events.append(
                     {
-                        "text": label,
+                        "text": source_text,
                         "year": year,
                         "wikipedia_url": source_url_for_fact,
                     }

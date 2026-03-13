@@ -10,6 +10,7 @@ Define a production-safe AI workflow for generating `history_factoid_mcq_4` cont
 
 ## Relationship to Other Phases
 - Extends `docs/PHASE5.md` (new factoid quiz type contract).
+- Builds on `docs/PHASE5_2.md` for deterministic typed factoid expansion.
 - Reuses Phase 3 provider abstraction and budget controls.
 - Keeps Phase 4 multi-edition generation behavior compatible.
 

@@ -332,8 +332,6 @@ def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dic
     question = quiz.get("question")
     if not isinstance(question, str) or not question.strip().endswith("?"):
         raise ValueError("history_factoid_mcq_4 question text must end with '?'.")
-    if not question.strip().lower().startswith("when"):
-        raise ValueError("history_factoid_mcq_4 question text must be a 'when' question.")
 
     questions = quiz.get("questions")
     if not isinstance(questions, list) or not questions or not isinstance(questions[0], dict):
@@ -343,14 +341,35 @@ def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dic
         raise ValueError("history_factoid_mcq_4 questions[0].facets must be an object.")
     if facets.get("question_format") != "factoid":
         raise ValueError("history_factoid_mcq_4 facets.question_format must be 'factoid'.")
-    if facets.get("answer_kind") != "time":
-        raise ValueError("history_factoid_mcq_4 facets.answer_kind must be 'time'.")
-    if facets.get("prompt_style") != "when":
-        raise ValueError("history_factoid_mcq_4 facets.prompt_style must be 'when'.")
+    answer_kind = facets.get("answer_kind")
+    prompt_style = facets.get("prompt_style")
+    allowed_pairs = {
+        "person": "who",
+        "place": "where",
+        "time": "when",
+    }
+    if answer_kind not in allowed_pairs:
+        raise ValueError("history_factoid_mcq_4 facets.answer_kind must be one of person/place/time.")
+    if prompt_style != allowed_pairs[answer_kind]:
+        raise ValueError("history_factoid_mcq_4 facets.prompt_style must align with answer_kind.")
+    if not question.strip().lower().startswith(prompt_style):
+        raise ValueError("history_factoid_mcq_4 question text must align with facets.prompt_style.")
 
     events_used = quiz["source"]["events_used"]
     if len(events_used) != 4:
         raise ValueError("history_factoid_mcq_4 source.events_used must contain exactly 4 entries.")
+
+    answer_facts = quiz.get("answer_facts")
+    if not isinstance(answer_facts, list) or len(answer_facts) != 4:
+        raise ValueError("history_factoid_mcq_4 answer_facts must contain exactly 4 entries.")
+    for fact in answer_facts:
+        if not isinstance(fact, dict):
+            raise ValueError("history_factoid_mcq_4 answer_facts entries must be objects.")
+        fact_facets = fact.get("facets")
+        if not isinstance(fact_facets, dict):
+            raise ValueError("history_factoid_mcq_4 answer_facts facets must be objects.")
+        if fact_facets.get("entity_type") != answer_kind:
+            raise ValueError("history_factoid_mcq_4 answer_facts entity_type must align with answer_kind.")
 
 
 def validate_quiz(quiz: dict[str, Any], target_date: dt.date) -> None:

@@ -116,6 +116,13 @@ def apply_factoid_ai_pipeline(
         return quiz, "factoid_pipeline_disabled"
     if not ai_orchestrator.is_enabled():
         return quiz, "factoid_pipeline_ai_disabled"
+    questions = quiz.get("questions")
+    question = questions[0] if isinstance(questions, list) and questions and isinstance(questions[0], dict) else None
+    facets = question.get("facets") if isinstance(question, dict) else None
+    if not isinstance(facets, dict):
+        return quiz, "factoid_pipeline_missing_question_facets"
+    if facets.get("answer_kind") != "time" or facets.get("prompt_style") != "when":
+        return quiz, "factoid_pipeline_unsupported_prompt_style"
 
     correct_event, choices = _extract_correct_and_choices(quiz)
     correct_year = correct_event.get("year")

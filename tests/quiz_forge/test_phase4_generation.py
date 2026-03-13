@@ -53,6 +53,36 @@ def _sample_candidates() -> list[dict[str, object]]:
     ]
 
 
+def _person_factoid_candidates() -> list[dict[str, object]]:
+    return [
+        {
+            "text": "Neil Armstrong walks on the Moon during Apollo 11.",
+            "year": 1969,
+            "wikipedia_url": "https://example.com/neil-armstrong",
+        },
+        {
+            "text": "Napoleon Bonaparte abdicates as Emperor of the French.",
+            "year": 1814,
+            "wikipedia_url": "https://example.com/napoleon",
+        },
+        {
+            "text": "Martin Luther King Jr. delivers his I've Been to the Mountaintop speech.",
+            "year": 1968,
+            "wikipedia_url": "https://example.com/mlk",
+        },
+        {
+            "text": "Amelia Earhart departs from Honolulu in her attempt to fly around the world.",
+            "year": 1937,
+            "wikipedia_url": "https://example.com/amelia",
+        },
+        {
+            "text": "Julius Caesar is assassinated by Roman senators in the Theatre of Pompey.",
+            "year": -44,
+            "wikipedia_url": "https://example.com/caesar",
+        },
+    ]
+
+
 def _legacy_which_came_first_payload(*, target_date: dt.date) -> dict[str, object]:
     return {
         "date": target_date.isoformat(),
@@ -275,6 +305,50 @@ def test_cli_generates_history_factoid_mcq(monkeypatch, tmp_path) -> None:
     assert facets["prompt_style"] == "when"
     assert payload["questions"][0]["human_id"].startswith("Q")
     assert all(choice["human_id"].startswith("A") for choice in payload["choices"])
+
+
+def test_cli_generates_history_factoid_person_mcq_when_person_candidates_exist(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    assert [record.edition for record in records] == [1]
+    payload = records[0].payload
+    assert payload["type"] == "history_factoid_mcq_4"
+    assert payload["question"].startswith("Who ")
+    assert len(payload["choices"]) == 4
+    assert all(any(character.isalpha() for character in choice["label"]) for choice in payload["choices"])
+    facets = payload["questions"][0]["facets"]
+    assert facets["question_format"] == "factoid"
+    assert facets["answer_kind"] == "person"
+    assert facets["prompt_style"] == "who"
+    assert all(fact["facets"]["entity_type"] == "person" for fact in payload["answer_facts"])
+    assert {event["text"] for event in payload["source"]["events_used"]} <= {
+        candidate["text"] for candidate in _person_factoid_candidates()
+    }
 
 
 def test_cli_reuses_existing_human_ids_on_rerun(monkeypatch, tmp_path) -> None:

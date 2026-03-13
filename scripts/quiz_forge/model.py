@@ -29,6 +29,19 @@ def build_answer_fact_id(event: dict[str, Any]) -> str:
     return str(uuid.uuid5(ANSWER_FACT_NAMESPACE, key))
 
 
+def build_factoid_answer_fact_id(
+    source_event: dict[str, Any],
+    *,
+    answer_label: str,
+    entity_type: str,
+) -> str:
+    key = (
+        f"{source_event['year']}|{source_event['text']}|{source_event['wikipedia_url']}|"
+        f"{entity_type}|{answer_label.strip()}"
+    )
+    return str(uuid.uuid5(ANSWER_FACT_NAMESPACE, key))
+
+
 def build_question_id(target_date: dt.date, quiz_type: str, edition: int) -> str:
     key = f"{target_date.isoformat()}|{quiz_type}|{edition}"
     return str(uuid.uuid5(QUIZ_QUESTION_NAMESPACE, key))
@@ -39,12 +52,26 @@ def build_answer_fact(
     *,
     quiz_type: str,
     role: str,
+    fact_id: str | None = None,
+    label: str | None = None,
+    entity_type: str | None = None,
+    embedding_text: str | None = None,
 ) -> dict[str, Any]:
-    fact_id = build_answer_fact_id(event)
+    fact_id = fact_id or build_answer_fact_id(event)
     year = event["year"]
+    fact_label = label or event["text"]
+    vector_text = embedding_text or event["text"]
+    facets = {
+        "topic": "history",
+        "temporal_century": _century_label(year),
+        "temporal_decade": _decade_label(year),
+        "source": "wikipedia_on_this_day",
+    }
+    if entity_type:
+        facets["entity_type"] = entity_type
     return {
         "id": fact_id,
-        "label": event["text"],
+        "label": fact_label,
         "year": year,
         "tags": [
             "history",
@@ -53,12 +80,7 @@ def build_answer_fact(
             _century_label(year),
             _decade_label(year),
         ],
-        "facets": {
-            "topic": "history",
-            "temporal_century": _century_label(year),
-            "temporal_decade": _decade_label(year),
-            "source": "wikipedia_on_this_day",
-        },
+        "facets": facets,
         "match": {
             "distractor_profile": {
                 "year": year,
@@ -67,7 +89,7 @@ def build_answer_fact(
             }
         },
         "vector_metadata": {
-            "text_for_embedding": event["text"],
+            "text_for_embedding": vector_text,
             "embedding_status": "not_generated",
         },
     }

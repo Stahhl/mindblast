@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import datetime as dt
+import re
 from typing import Any
 
 
@@ -101,7 +102,7 @@ def pick_history_mcq_distractor_pool(
             if len(distractors) == max_distractors:
                 break
 
-    for offset in range(len(ordered) - 1):
+    for offset in range(len(ordered)):
         idx = (correct_idx + step + offset) % len(ordered)
         if idx == correct_idx:
             continue
@@ -121,5 +122,206 @@ def pick_history_mcq_distractor_pool(
 
     if len(distractors) < 3:
         raise ValueError("Could not pick three distinct-year distractors for history_mcq_4.")
+
+    return correct, distractors
+
+
+_PERSON_CONNECTORS = {
+    "al",
+    "ap",
+    "bin",
+    "da",
+    "de",
+    "del",
+    "di",
+    "el",
+    "ibn",
+    "la",
+    "le",
+    "st.",
+    "the",
+    "van",
+    "von",
+}
+_PERSON_TITLES = {
+    "Archduke",
+    "Bishop",
+    "Count",
+    "Dr.",
+    "Emperor",
+    "Empress",
+    "General",
+    "King",
+    "Pope",
+    "President",
+    "Prince",
+    "Princess",
+    "Queen",
+    "Saint",
+    "Sir",
+    "Sultan",
+    "Tsar",
+}
+_NON_PERSON_KEYWORDS = {
+    "Academy",
+    "Airlines",
+    "Alliance",
+    "Apollo",
+    "Army",
+    "Association",
+    "Battle",
+    "Bombing",
+    "Center",
+    "Centre",
+    "Company",
+    "Congress",
+    "Court",
+    "Empire",
+    "Expedition",
+    "Flight",
+    "Force",
+    "Forces",
+    "Kingdom",
+    "March",
+    "Museum",
+    "Order",
+    "Parliament",
+    "Republic",
+    "RMS",
+    "Shuttle",
+    "Siege",
+    "Space",
+    "Squadron",
+    "STS-",
+    "Treaty",
+    "University",
+    "USS",
+    "War",
+}
+_SUBJECT_RE = re.compile(
+    r"^(?P<subject>[A-Z][\w'.-]+(?:\s+(?:[A-Z][\w'.-]+|[ivxlcdmIVXLCDM]+|Jr\.|Sr\.|St\.|[a-z]{1,4})){1,6})\s+(?P<rest>.+)$"
+)
+
+
+def _normalize_ws(value: str) -> str:
+    return " ".join(value.split())
+
+
+def _strip_leading_context(text: str) -> list[str]:
+    segments = [segment.strip() for segment in text.split(",")]
+    variants: list[str] = []
+    for start in range(min(3, len(segments))):
+        variant = _normalize_ws(", ".join(segments[start:]))
+        if variant and variant not in variants:
+            variants.append(variant)
+    return variants or [_normalize_ws(text)]
+
+
+def _looks_like_person_name(subject: str) -> bool:
+    tokens = subject.split()
+    if len(tokens) < 2:
+        return False
+    if any(any(char.isdigit() for char in token) for token in tokens if token.upper() != token):
+        return False
+
+    non_title_tokens = [token for token in tokens if token not in _PERSON_TITLES]
+    if len(non_title_tokens) < 2:
+        return False
+
+    first = non_title_tokens[0]
+    if first in _NON_PERSON_KEYWORDS or any(keyword in subject for keyword in _NON_PERSON_KEYWORDS):
+        return False
+
+    capitalized_token_count = 0
+    for token in non_title_tokens:
+        normalized = token.rstrip(".,")
+        if normalized.lower() in _PERSON_CONNECTORS:
+            continue
+        if normalized in {"Jr", "Jr.", "Sr", "Sr.", "II", "III", "IV", "V"}:
+            continue
+        if normalized and normalized[0].isupper():
+            capitalized_token_count += 1
+            continue
+        return False
+
+    return capitalized_token_count >= 2
+
+
+def _extract_person_factoid_candidate(event: dict[str, Any]) -> dict[str, Any] | None:
+    raw_text = event.get("text")
+    if not isinstance(raw_text, str):
+        return None
+
+    for candidate_text in _strip_leading_context(raw_text):
+        match = _SUBJECT_RE.match(candidate_text)
+        if match is None:
+            continue
+        subject = _normalize_ws(match.group("subject").strip(" ,"))
+        rest = _normalize_ws(match.group("rest").rstrip(" .!?"))
+        if not rest or not _looks_like_person_name(subject):
+            continue
+        if rest.lower().startswith(("and ", "or ", "but ")):
+            continue
+        question = f"Who {rest}?"
+        if len(question) > 180:
+            continue
+        return {
+            "answer_kind": "person",
+            "prompt_style": "who",
+            "answer_label": subject,
+            "question_text": question,
+            "source_event": event,
+        }
+
+    return None
+
+
+def _person_candidate_sort_key(candidate: dict[str, Any]) -> tuple[str, int, str]:
+    source_event = candidate["source_event"]
+    return (
+        candidate["answer_label"].casefold(),
+        int(source_event["year"]),
+        str(source_event["text"]),
+    )
+
+
+def pick_history_factoid_person_candidates(
+    candidates: list[dict[str, Any]],
+    seed: int,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    del preferred_distractor_events
+
+    person_candidates = [
+        candidate
+        for event in candidates
+        if (candidate := _extract_person_factoid_candidate(event)) is not None
+    ]
+    if len(person_candidates) < 4:
+        raise ValueError("Not enough valid person factoid candidates to build a 4-option history factoid MCQ.")
+
+    ordered = sorted(person_candidates, key=_person_candidate_sort_key)
+    correct_idx = seed % len(ordered)
+    correct = ordered[correct_idx]
+
+    step = (seed % (len(ordered) - 1)) + 1
+    distractors: list[dict[str, Any]] = []
+    seen_labels = {correct["answer_label"].casefold()}
+
+    for offset in range(len(ordered)):
+        idx = (correct_idx + step + offset) % len(ordered)
+        if idx == correct_idx:
+            continue
+        candidate = ordered[idx]
+        answer_label = candidate["answer_label"].casefold()
+        if answer_label in seen_labels:
+            continue
+        distractors.append(candidate)
+        seen_labels.add(answer_label)
+        if len(distractors) == 3:
+            break
+
+    if len(distractors) < 3:
+        raise ValueError("Could not pick three distinct person distractors for history_factoid_mcq_4.")
 
     return correct, distractors
