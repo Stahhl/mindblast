@@ -23,6 +23,7 @@ from .model import (
     build_question_object,
 )
 from .selection import pick_history_factoid_typed_candidates, pick_history_mcq_distractor_pool, pick_two_events
+from .selection import build_history_factoid_distractors_for_candidate
 
 
 def _format_year_label(year: int) -> str:
@@ -37,6 +38,106 @@ def _build_factoid_when_question(event_text: str) -> str:
     if len(condensed) > 220:
         condensed = f"{condensed[:217].rstrip()}..."
     return f"When did this happen: {condensed}?"
+
+
+def _build_history_factoid_typed_quiz(
+    *,
+    target_date: dt.date,
+    retrieval_time: dt.datetime,
+    source_url: str,
+    seed: int,
+    edition: int,
+    generation_mode: str,
+    correct_factoid: dict[str, Any],
+    distractor_factoids: list[dict[str, Any]],
+) -> dict[str, Any]:
+    factoid_options = [correct_factoid, *distractor_factoids]
+    factoid_options.sort(
+        key=lambda item: hashlib.sha256(
+            (
+                f"{seed}:{item['answer_label']}:{item['source_event']['year']}:"
+                f"{item['source_event']['text']}"
+            ).encode("utf-8")
+        ).hexdigest()
+    )
+    answer_kind = correct_factoid["answer_kind"]
+    prompt_style = correct_factoid["prompt_style"]
+    question_text = correct_factoid["question_text"]
+
+    choice_ids = ("A", "B", "C", "D")
+    choices = []
+    correct_choice_id: str | None = None
+    answer_facts = []
+    correct_answer_fact_id: str | None = None
+
+    for choice_id, option in zip(choice_ids, factoid_options):
+        source_event = option["source_event"]
+        fact_id = build_factoid_answer_fact_id(
+            source_event,
+            answer_label=option["answer_label"],
+            entity_type=answer_kind,
+        )
+        role = "correct" if option is correct_factoid else "distractor"
+        fact = build_answer_fact(
+            source_event,
+            quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
+            role=role,
+            fact_id=fact_id,
+            label=option["answer_label"],
+            entity_type=answer_kind,
+            embedding_text=f"{option['answer_label']} -- {source_event['text']}",
+        )
+        answer_facts.append(fact)
+        choices.append(
+            {
+                "id": choice_id,
+                "label": option["answer_label"],
+                "answer_fact_id": fact["id"],
+            }
+        )
+        option["answer_fact_id"] = fact["id"]
+        if option is correct_factoid:
+            correct_choice_id = choice_id
+            correct_answer_fact_id = fact["id"]
+
+    if correct_choice_id is None or correct_answer_fact_id is None:
+        raise ValueError("Could not determine correct choice id for history_factoid_mcq_4.")
+
+    correct_source_event = correct_factoid["source_event"]
+    question_object = build_question_object(
+        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_FACTOID_MCQ_4, edition),
+        prompt=question_text,
+        quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
+        answer_fact_ids=[fact["id"] for fact in answer_facts],
+        correct_answer_fact_id=correct_answer_fact_id,
+        target_year=correct_source_event["year"],
+        extra_facets={
+            "question_format": "factoid",
+            "answer_kind": answer_kind,
+            "prompt_style": prompt_style,
+        },
+    )
+
+    return {
+        "date": target_date.isoformat(),
+        "topics": ["history"],
+        "type": QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
+        "questions": [question_object],
+        "answer_facts": answer_facts,
+        "question": question_text,
+        "choices": choices,
+        "correct_choice_id": correct_choice_id,
+        "source": build_source(retrieval_time, source_url, factoid_options),
+        "generation": {
+            "mode": generation_mode,
+            "edition": edition,
+            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        },
+        "metadata": {
+            "version": QUIZ_SCHEMA_VERSION,
+            "normalized_model": NORMALIZED_MODEL_VERSION,
+        },
+    }
 
 
 def build_source(
@@ -239,10 +340,28 @@ def build_history_factoid_mcq_4_quiz(
     preferred_distractor_events: list[dict[str, Any]] | None = None,
     ai_ranked_distractor_ids: list[str] | None = None,
     preferred_answer_kind: str | None = None,
+    ai_selected_factoid_candidate: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     del ai_ranked_distractor_ids
     if generation_mode not in SUPPORTED_GENERATION_MODES:
         raise ValueError(f"Unsupported generation mode: {generation_mode}")
+
+    if ai_selected_factoid_candidate is not None:
+        distractors = build_history_factoid_distractors_for_candidate(
+            candidates,
+            seed=seed,
+            correct_candidate=ai_selected_factoid_candidate,
+        )
+        return _build_history_factoid_typed_quiz(
+            target_date=target_date,
+            retrieval_time=retrieval_time,
+            source_url=source_url,
+            seed=seed,
+            edition=edition,
+            generation_mode=generation_mode,
+            correct_factoid=ai_selected_factoid_candidate,
+            distractor_factoids=distractors,
+        )
 
     try:
         correct_factoid, distractor_factoids = pick_history_factoid_typed_candidates(
@@ -329,93 +448,16 @@ def build_history_factoid_mcq_4_quiz(
             },
         }
 
-    factoid_options = [correct_factoid, *distractor_factoids]
-    factoid_options.sort(
-        key=lambda item: hashlib.sha256(
-            (
-                f"{seed}:{item['answer_label']}:{item['source_event']['year']}:"
-                f"{item['source_event']['text']}"
-            ).encode("utf-8")
-        ).hexdigest()
+    return _build_history_factoid_typed_quiz(
+        target_date=target_date,
+        retrieval_time=retrieval_time,
+        source_url=source_url,
+        seed=seed,
+        edition=edition,
+        generation_mode=generation_mode,
+        correct_factoid=correct_factoid,
+        distractor_factoids=distractor_factoids,
     )
-    answer_kind = correct_factoid["answer_kind"]
-    prompt_style = correct_factoid["prompt_style"]
-    question_text = correct_factoid["question_text"]
-
-    choice_ids = ("A", "B", "C", "D")
-    choices = []
-    correct_choice_id: str | None = None
-    answer_facts = []
-    correct_answer_fact_id: str | None = None
-
-    for choice_id, option in zip(choice_ids, factoid_options):
-        source_event = option["source_event"]
-        fact_id = build_factoid_answer_fact_id(
-            source_event,
-            answer_label=option["answer_label"],
-            entity_type=answer_kind,
-        )
-        role = "correct" if option is correct_factoid else "distractor"
-        fact = build_answer_fact(
-            source_event,
-            quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
-            role=role,
-            fact_id=fact_id,
-            label=option["answer_label"],
-            entity_type=answer_kind,
-            embedding_text=f"{option['answer_label']} -- {source_event['text']}",
-        )
-        answer_facts.append(fact)
-        choices.append(
-            {
-                "id": choice_id,
-                "label": option["answer_label"],
-                "answer_fact_id": fact["id"],
-            }
-        )
-        option["answer_fact_id"] = fact["id"]
-        if option is correct_factoid:
-            correct_choice_id = choice_id
-            correct_answer_fact_id = fact["id"]
-
-    if correct_choice_id is None or correct_answer_fact_id is None:
-        raise ValueError("Could not determine correct choice id for history_factoid_mcq_4.")
-
-    correct_source_event = correct_factoid["source_event"]
-    question_object = build_question_object(
-        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_FACTOID_MCQ_4, edition),
-        prompt=question_text,
-        quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
-        answer_fact_ids=[fact["id"] for fact in answer_facts],
-        correct_answer_fact_id=correct_answer_fact_id,
-        target_year=correct_source_event["year"],
-        extra_facets={
-            "question_format": "factoid",
-            "answer_kind": answer_kind,
-            "prompt_style": prompt_style,
-        },
-    )
-
-    return {
-        "date": target_date.isoformat(),
-        "topics": ["history"],
-        "type": QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
-        "questions": [question_object],
-        "answer_facts": answer_facts,
-        "question": question_text,
-        "choices": choices,
-        "correct_choice_id": correct_choice_id,
-        "source": build_source(retrieval_time, source_url, factoid_options),
-        "generation": {
-            "mode": generation_mode,
-            "edition": edition,
-            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        },
-        "metadata": {
-            "version": QUIZ_SCHEMA_VERSION,
-            "normalized_model": NORMALIZED_MODEL_VERSION,
-        },
-    }
 
 
 QUIZ_BUILDERS = {

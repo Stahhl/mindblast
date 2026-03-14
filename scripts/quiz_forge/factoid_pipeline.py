@@ -68,6 +68,145 @@ def _quality_score(value: Any) -> float:
     return 0.0
 
 
+def _normalize_text(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    normalized = " ".join(value.split()).strip()
+    return normalized or None
+
+
+def _typed_factoid_pairs() -> dict[str, str]:
+    return {
+        "person": "who",
+        "place": "where",
+        "time": "when",
+    }
+
+
+def _validate_ai_factoid_candidate(candidate: Any, *, source_event: dict[str, Any]) -> dict[str, Any] | None:
+    if not isinstance(candidate, dict):
+        return None
+    answer_kind = candidate.get("answer_kind")
+    prompt_style = candidate.get("prompt_style")
+    if answer_kind not in _typed_factoid_pairs():
+        return None
+    if prompt_style != _typed_factoid_pairs()[answer_kind]:
+        return None
+
+    question = _normalize_text(candidate.get("question"))
+    answer_label = _normalize_text(candidate.get("correct_answer"))
+    if question is None or answer_label is None:
+        return None
+    if not question.endswith("?"):
+        question = f"{question}?"
+    if not question.lower().startswith(prompt_style):
+        return None
+    if len(question) > 220 or len(answer_label) > 80:
+        return None
+    if answer_kind != "time" and any(char.isdigit() for char in answer_label):
+        return None
+    if answer_kind == "time" and not any(char.isdigit() for char in answer_label):
+        return None
+    source_text = _normalize_text(source_event.get("text"))
+    if source_text is None:
+        return None
+    lowered_source = source_text.casefold()
+    if answer_kind in {"person", "place"} and answer_label.casefold() not in lowered_source:
+        return None
+
+    return {
+        "answer_kind": answer_kind,
+        "prompt_style": prompt_style,
+        "answer_label": answer_label,
+        "question_text": question,
+        "source_event": source_event,
+        "quality_score": _quality_score(candidate.get("score")),
+    }
+
+
+def propose_ai_factoid_candidate(
+    *,
+    candidates: list[dict[str, Any]],
+    seed: int,
+    settings: FactoidPipelineSettings,
+    ai_orchestrator: AIOrchestrator,
+) -> tuple[dict[str, Any] | None, str | None]:
+    if not settings.enabled:
+        return None, "factoid_pipeline_disabled"
+    if not ai_orchestrator.is_enabled():
+        return None, "factoid_pipeline_ai_disabled"
+    if len(candidates) < 4:
+        return None, "factoid_ai_candidate_not_enough_source_events"
+
+    ordered_events = sorted(candidates, key=lambda item: (item["year"], item["text"], item["wikipedia_url"]))
+    source_event = ordered_events[seed % len(ordered_events)]
+    source_text = _normalize_text(source_event.get("text"))
+    article_url = _normalize_text(source_event.get("wikipedia_url"))
+    source_year = source_event.get("year")
+    if source_text is None or article_url is None or not isinstance(source_year, int):
+        return None, "factoid_ai_candidate_missing_source_context"
+
+    qgen_payload = {
+        "task": "factoid_typed_candidate_generation",
+        "article_url": article_url,
+        "event_text": source_text,
+        "event_year": source_year,
+        "constraints": {
+            "num_candidates": 4,
+            "allowed_answer_kinds": ["person", "place", "time"],
+            "allowed_prompt_styles": ["who", "where", "when"],
+            "question_must_end_with_question_mark": True,
+            "max_question_length": 220,
+            "max_answer_length": 80,
+        },
+    }
+    qgen_response, qgen_reason = ai_orchestrator.run_json_task(
+        task_name="factoid_typed_qgen",
+        system_prompt=(
+            "Generate concise history factoid candidates from one sourced event. "
+            "Return JSON only with candidates array. "
+            "Each candidate must include question, correct_answer, answer_kind, prompt_style, and score (0..1). "
+            "Allowed answer kinds are person, place, and time. "
+            "Prompt style must align exactly: person->who, place->where, time->when. "
+            "Do not invent facts not clearly supported by the event text."
+        ),
+        user_payload=qgen_payload,
+        model=settings.model_qgen,
+        max_output_tokens=settings.max_stage_tokens,
+    )
+    if qgen_response is None:
+        return None, qgen_reason or "factoid_typed_qgen_failed"
+    raw_candidates = qgen_response.get("candidates")
+    if not isinstance(raw_candidates, list) or not raw_candidates:
+        return None, "factoid_typed_qgen_empty"
+
+    valid_candidates = [
+        candidate
+        for item in raw_candidates
+        if (candidate := _validate_ai_factoid_candidate(item, source_event=source_event)) is not None
+    ]
+    if not valid_candidates:
+        return None, "factoid_typed_qgen_no_valid_candidates"
+
+    typed_candidates = [candidate for candidate in valid_candidates if candidate["answer_kind"] in {"person", "place"}]
+    if not typed_candidates:
+        return None, "factoid_typed_qgen_only_time_candidates"
+
+    typed_candidates.sort(
+        key=lambda item: (
+            -item["quality_score"],
+            {"person": 0, "place": 1, "time": 2}[item["answer_kind"]],
+            item["question_text"],
+            item["answer_label"],
+        )
+    )
+    selected = typed_candidates[0]
+    if selected["quality_score"] < settings.min_question_score:
+        return None, "factoid_typed_qgen_below_threshold"
+
+    return selected, None
+
+
 def _extract_correct_and_choices(quiz: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     source = quiz.get("source")
     if not isinstance(source, dict):

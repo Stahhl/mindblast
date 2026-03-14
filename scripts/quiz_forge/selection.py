@@ -500,6 +500,38 @@ def _pick_factoid_candidates_of_kind(
     return correct, distractors
 
 
+def build_history_factoid_distractors_for_candidate(
+    candidates: list[dict[str, Any]],
+    *,
+    seed: int,
+    correct_candidate: dict[str, Any],
+) -> list[dict[str, Any]]:
+    answer_kind = correct_candidate.get("answer_kind")
+    if answer_kind not in {"person", "place"}:
+        raise ValueError("Typed factoid distractor builder only supports person/place candidates.")
+
+    extractor = _extract_person_factoid_candidate if answer_kind == "person" else _extract_place_factoid_candidate
+    extracted_candidates = [
+        candidate
+        for event in candidates
+        if (candidate := extractor(event)) is not None
+    ]
+    source_event = correct_candidate.get("source_event")
+    correct_answer_label = str(correct_candidate.get("answer_label", "")).casefold()
+    distractor_pool = [
+        candidate
+        for candidate in extracted_candidates
+        if candidate.get("source_event") is not source_event and candidate.get("answer_label", "").casefold() != correct_answer_label
+    ]
+    if len({candidate["answer_label"].casefold() for candidate in distractor_pool}) < 3:
+        raise ValueError(f"Not enough valid {answer_kind} distractors for history_factoid_mcq_4.")
+
+    _, distractors = _pick_factoid_candidates_of_kind([correct_candidate, *distractor_pool], seed)
+    if len(distractors) < 3:
+        raise ValueError(f"Could not pick three distinct {answer_kind} distractors for history_factoid_mcq_4.")
+    return distractors[:3]
+
+
 def pick_history_factoid_typed_candidates(
     candidates: list[dict[str, Any]],
     seed: int,

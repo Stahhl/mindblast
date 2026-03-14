@@ -744,7 +744,19 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task == "factoid_question_generation":
+        if task == "factoid_typed_candidate_generation":
+            payload = {
+                "candidates": [
+                    {
+                        "question": "When was this event officially recognized?",
+                        "correct_answer": "1901",
+                        "answer_kind": "time",
+                        "prompt_style": "when",
+                        "score": 0.95,
+                    }
+                ]
+            }
+        elif task == "factoid_question_generation":
             payload = {"candidates": [{"question": "When was this event officially recognized?", "score": 0.95}]}
         elif task == "factoid_question_rank":
             payload = {"best_index": 0, "best_score": 0.95}
@@ -784,7 +796,7 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
-    assert run_json_mock.call_count == 4
+    assert run_json_mock.call_count == 5
 
     records = list_quiz_records_for_date_type(
         output_dir=output_dir,
@@ -794,3 +806,71 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
     payload = records[0].payload
     assert payload["question"] == "When was this event officially recognized?"
     assert payload["metadata"]["generation_method"] == "ai_native_factoid_v1"
+
+
+def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_path, mocker) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setenv("AI_MODE", "on")
+    monkeypatch.setenv("AI_PROVIDER", "openai")
+    monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
+    monkeypatch.setenv("AI_MAX_CALLS_PER_RUN", "8")
+    monkeypatch.setenv("FACTOID_AI_PIPELINE_ENABLED", "true")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    def fake_run_json_task(*args, **kwargs) -> AIJsonTaskResponse:  # noqa: ANN002,ANN003
+        del args
+        user_payload = kwargs["user_payload"]
+        task = user_payload.get("task")
+        if task != "factoid_typed_candidate_generation":
+            raise AssertionError(f"Unexpected task: {task}")
+        return AIJsonTaskResponse(
+            payload={
+                "candidates": [
+                    {
+                        "question": "Who walks on the Moon during Apollo 11?",
+                        "correct_answer": "Neil Armstrong",
+                        "answer_kind": "person",
+                        "prompt_style": "who",
+                        "score": 0.97,
+                    }
+                ]
+            },
+            provider="openai",
+            model="gpt-5-mini",
+            usage=AIUsage(input_tokens=20, output_tokens=10, estimated_cost_usd=0.0),
+        )
+
+    run_json_mock = mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=fake_run_json_task,
+    )
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+    assert run_json_mock.call_count == 1
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    payload = records[0].payload
+    assert payload["question"] == "Who walks on the Moon during Apollo 11?"
+    assert payload["questions"][0]["facets"]["answer_kind"] == "person"
+    assert payload["questions"][0]["facets"]["prompt_style"] == "who"
+    assert any(choice["label"] == "Neil Armstrong" for choice in payload["choices"])

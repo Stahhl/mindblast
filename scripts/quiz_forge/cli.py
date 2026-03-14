@@ -24,7 +24,7 @@ from .constants import (
     SUPPORTED_QUIZ_TYPES,
 )
 from .discovery import write_discovery_artifacts
-from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings
+from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings, propose_ai_factoid_candidate
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
 from .storage import (
@@ -238,6 +238,16 @@ def main() -> int:
                 elif ai_attempt.fallback_reason:
                     print(f"AI rerank fallback for {quiz_type}: {ai_attempt.fallback_reason}")
 
+            ai_selected_factoid_candidate: dict[str, Any] | None = None
+            ai_selected_factoid_reason: str | None = None
+            if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4 and factoid_pipeline_settings.enabled:
+                ai_selected_factoid_candidate, ai_selected_factoid_reason = propose_ai_factoid_candidate(
+                    candidates=candidates,
+                    seed=seed,
+                    settings=factoid_pipeline_settings,
+                    ai_orchestrator=ai_orchestrator,
+                )
+
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
                 quiz = builder(
                     target_date,
@@ -250,6 +260,7 @@ def main() -> int:
                     preferred_distractor_events=reusable_correct_events,
                     ai_ranked_distractor_ids=ai_ranked_distractor_ids,
                     preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
+                    ai_selected_factoid_candidate=ai_selected_factoid_candidate,
                 )
             else:
                 quiz = builder(
@@ -264,12 +275,25 @@ def main() -> int:
                     ai_ranked_distractor_ids=ai_ranked_distractor_ids,
                 )
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
-                quiz, factoid_reason = apply_factoid_ai_pipeline(
-                    quiz=quiz,
-                    settings=factoid_pipeline_settings,
-                    ai_orchestrator=ai_orchestrator,
-                )
                 if factoid_pipeline_settings.enabled:
+                    if ai_selected_factoid_candidate is not None:
+                        print(
+                            "AI factoid candidate applied for history_factoid_mcq_4: "
+                            f"answer_kind={ai_selected_factoid_candidate['answer_kind']}"
+                        )
+                    elif ai_selected_factoid_reason is not None:
+                        print(f"AI factoid candidate fallback for history_factoid_mcq_4: {ai_selected_factoid_reason}")
+
+                factoid_facets = quiz.get("questions", [{}])[0].get("facets") if isinstance(quiz.get("questions"), list) and quiz.get("questions") else None
+                uses_time_builder = isinstance(factoid_facets, dict) and factoid_facets.get("answer_kind") == "time"
+                factoid_reason: str | None = None
+                if uses_time_builder:
+                    quiz, factoid_reason = apply_factoid_ai_pipeline(
+                        quiz=quiz,
+                        settings=factoid_pipeline_settings,
+                        ai_orchestrator=ai_orchestrator,
+                    )
+                if factoid_pipeline_settings.enabled and uses_time_builder:
                     if factoid_reason is None:
                         print("AI factoid pipeline applied for history_factoid_mcq_4.")
                     elif factoid_reason == "shadow_mode":
