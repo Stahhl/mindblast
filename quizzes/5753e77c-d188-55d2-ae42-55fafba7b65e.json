@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-14",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "02b1f88a-a81d-5d83-a4e6-944bd96bfdf9",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1964?",
+      "answer_fact_ids": [
+        "804f7dae-0cae-5410-8120-5fbb443b741a",
+        "fc94d272-aba6-5a0c-b709-37e98bb45d2b",
+        "333f011b-eb2c-5fa4-8bfe-a9d640ce2609",
+        "148e0538-4ee1-5668-b881-8df9808a67ad"
+      ],
+      "correct_answer_fact_id": "fc94d272-aba6-5a0c-b709-37e98bb45d2b",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1964
+      },
+      "human_id": "Q57"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+      "label": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+      "year": 1647,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "17th-century",
+        "1640s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "17th-century",
+        "temporal_decade": "1640s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1647,
+          "temporal_century": "17th-century",
+          "temporal_decade": "1640s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A133"
+    },
+    {
+      "id": "fc94d272-aba6-5a0c-b709-37e98bb45d2b",
+      "label": "Jack Ruby is convicted of killing Lee Harvey Oswald, the assassin who had shot and killed John F. Kennedy the previous year.",
+      "year": 1964,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1960s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1964,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Jack Ruby is convicted of killing Lee Harvey Oswald, the assassin who had shot and killed John F. Kennedy the previous year.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A134"
+    },
+    {
+      "id": "333f011b-eb2c-5fa4-8bfe-a9d640ce2609",
+      "label": "Battle of Ivry: Henry of Navarre and the Huguenots defeat the forces of the Catholic League under Charles, Duke of Mayenne, during the French Wars of Religion.",
+      "year": 1590,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "16th-century",
+        "1590s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "16th-century",
+        "temporal_decade": "1590s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1590,
+          "temporal_century": "16th-century",
+          "temporal_decade": "1590s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Battle of Ivry: Henry of Navarre and the Huguenots defeat the forces of the Catholic League under Charles, Duke of Mayenne, during the French Wars of Religion.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A135"
+    },
+    {
+      "id": "148e0538-4ee1-5668-b881-8df9808a67ad",
+      "label": "Battle of Mogyor\u00f3d: Dukes G\u00e9za and Ladislaus defeat their cousin Solomon, King of Hungary, forcing him to flee to Hungary's western borderland.",
+      "year": 1074,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "11th-century",
+        "1070s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "11th-century",
+        "temporal_decade": "1070s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1074,
+          "temporal_century": "11th-century",
+          "temporal_decade": "1070s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Battle of Mogyor\u00f3d: Dukes G\u00e9za and Ladislaus defeat their cousin Solomon, King of Hungary, forcing him to flee to Hungary's western borderland.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A136"
+    }
+  ],
+  "question": "Which event happened in 1964?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+      "answer_fact_id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+      "human_id": "A133"
+    },
+    {
+      "id": "B",
+      "label": "Jack Ruby is convicted of killing Lee Harvey Oswald, the assassin who had shot and killed John F. Kennedy the previous year.",
+      "answer_fact_id": "fc94d272-aba6-5a0c-b709-37e98bb45d2b",
+      "human_id": "A134"
+    },
+    {
+      "id": "C",
+      "label": "Battle of Ivry: Henry of Navarre and the Huguenots defeat the forces of the Catholic League under Charles, Duke of Mayenne, during the French Wars of Religion.",
+      "answer_fact_id": "333f011b-eb2c-5fa4-8bfe-a9d640ce2609",
+      "human_id": "A135"
+    },
+    {
+      "id": "D",
+      "label": "Battle of Mogyor\u00f3d: Dukes G\u00e9za and Ladislaus defeat their cousin Solomon, King of Hungary, forcing him to flee to Hungary's western borderland.",
+      "answer_fact_id": "148e0538-4ee1-5668-b881-8df9808a67ad",
+      "human_id": "A136"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/14",
+    "retrieved_at": "2026-03-14T06:10:08Z",
+    "events_used": [
+      {
+        "event_id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+        "text": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+        "year": 1647,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Thirty_Years'_War"
+      },
+      {
+        "event_id": "fc94d272-aba6-5a0c-b709-37e98bb45d2b",
+        "text": "Jack Ruby is convicted of killing Lee Harvey Oswald, the assassin who had shot and killed John F. Kennedy the previous year.",
+        "year": 1964,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Jack_Ruby"
+      },
+      {
+        "event_id": "333f011b-eb2c-5fa4-8bfe-a9d640ce2609",
+        "text": "Battle of Ivry: Henry of Navarre and the Huguenots defeat the forces of the Catholic League under Charles, Duke of Mayenne, during the French Wars of Religion.",
+        "year": 1590,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Ivry"
+      },
+      {
+        "event_id": "148e0538-4ee1-5668-b881-8df9808a67ad",
+        "text": "Battle of Mogyor\u00f3d: Dukes G\u00e9za and Ladislaus defeat their cousin Solomon, King of Hungary, forcing him to flee to Hungary's western borderland.",
+        "year": 1074,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Mogyor%C3%B3d"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-14T06:10:08Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

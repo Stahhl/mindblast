@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-13T06:12:13Z"
+    "updated_at": "2026-03-14T06:10:13Z"
   },
   "counters": {
-    "question": 55,
-    "answer": 131
+    "question": 58,
+    "answer": 140
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -62,7 +62,10 @@
     "83ef184c-4d8b-5404-afef-64c4c2226130": "Q52",
     "59889398-dec8-5014-ab66-24286e6fd537": "Q53",
     "2d01045b-1cb6-5af5-8076-6c4cd501cdf2": "Q54",
-    "3e450d27-d0b1-51b9-bcb1-5f898ea14dba": "Q55"
+    "3e450d27-d0b1-51b9-bcb1-5f898ea14dba": "Q55",
+    "eb6dd38c-5047-5d92-bbce-84439195a343": "Q56",
+    "02b1f88a-a81d-5d83-a4e6-944bd96bfdf9": "Q57",
+    "3212b05d-f69e-5a05-8b78-4de16d6b8de6": "Q58"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -195,7 +198,16 @@
     "d411034c-d83c-5741-bfa9-63c7391f2edd": "A128",
     "49e7206c-f074-55d5-8472-0a6118155e94": "A129",
     "bb1e7ee3-ca8a-5170-9630-3da991d1fa15": "A130",
-    "c596ef56-2df8-5ad7-b7a9-f84693cfa53e": "A131"
+    "c596ef56-2df8-5ad7-b7a9-f84693cfa53e": "A131",
+    "7c7fcb38-a6cf-53c7-b14d-aa3b28e7a5d0": "A132",
+    "804f7dae-0cae-5410-8120-5fbb443b741a": "A133",
+    "fc94d272-aba6-5a0c-b709-37e98bb45d2b": "A134",
+    "333f011b-eb2c-5fa4-8bfe-a9d640ce2609": "A135",
+    "148e0538-4ee1-5668-b881-8df9808a67ad": "A136",
+    "7428408b-3b56-54ba-bad3-9b19a6c91d0c": "A137",
+    "77296537-8444-5f0a-aa8f-6fae4fd8688f": "A138",
+    "c841819f-a4bf-5717-83c4-898ded3850de": "A139",
+    "6017a23f-520d-5b95-bd60-41fbcee40c6f": "A140"
   },
   "questions": {
     "Q1": {
@@ -580,6 +592,27 @@
       "question_id": "3e450d27-d0b1-51b9-bcb1-5f898ea14dba",
       "quiz_file": "quizzes/06a44fc9-2a2c-5fde-a49f-be92031ef9b0.json",
       "date": "2026-03-13",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q56": {
+      "question_id": "eb6dd38c-5047-5d92-bbce-84439195a343",
+      "quiz_file": "quizzes/9efe130b-c16e-5f05-8f40-245d042687cf.json",
+      "date": "2026-03-14",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q57": {
+      "question_id": "02b1f88a-a81d-5d83-a4e6-944bd96bfdf9",
+      "quiz_file": "quizzes/5753e77c-d188-55d2-ae42-55fafba7b65e.json",
+      "date": "2026-03-14",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q58": {
+      "question_id": "3212b05d-f69e-5a05-8b78-4de16d6b8de6",
+      "quiz_file": "quizzes/bf981730-4931-59c4-875d-cafbd6d63e92.json",
+      "date": "2026-03-14",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1239,6 +1272,51 @@
       "answer_fact_id": "c596ef56-2df8-5ad7-b7a9-f84693cfa53e",
       "label": "Breonna Taylor is killed by police officers who were forcibly entering her home in Louisville, Kentucky; her death sparked extensive protests against racism and police brutality.",
       "year": 2020
+    },
+    "A132": {
+      "answer_fact_id": "7c7fcb38-a6cf-53c7-b14d-aa3b28e7a5d0",
+      "label": "The Third Anglo-Dutch War: The Battle of Ronas Voe results in the Dutch East India Company ship Wapen van Rotterdam being captured with a death toll of up to 300 Dutch crew and soldiers.",
+      "year": 1674
+    },
+    "A133": {
+      "answer_fact_id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+      "label": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+      "year": 1647
+    },
+    "A134": {
+      "answer_fact_id": "fc94d272-aba6-5a0c-b709-37e98bb45d2b",
+      "label": "Jack Ruby is convicted of killing Lee Harvey Oswald, the assassin who had shot and killed John F. Kennedy the previous year.",
+      "year": 1964
+    },
+    "A135": {
+      "answer_fact_id": "333f011b-eb2c-5fa4-8bfe-a9d640ce2609",
+      "label": "Battle of Ivry: Henry of Navarre and the Huguenots defeat the forces of the Catholic League under Charles, Duke of Mayenne, during the French Wars of Religion.",
+      "year": 1590
+    },
+    "A136": {
+      "answer_fact_id": "148e0538-4ee1-5668-b881-8df9808a67ad",
+      "label": "Battle of Mogyor\u00f3d: Dukes G\u00e9za and Ladislaus defeat their cousin Solomon, King of Hungary, forcing him to flee to Hungary's western borderland.",
+      "year": 1074
+    },
+    "A137": {
+      "answer_fact_id": "7428408b-3b56-54ba-bad3-9b19a6c91d0c",
+      "label": "Norman Thagard",
+      "year": 1995
+    },
+    "A138": {
+      "answer_fact_id": "77296537-8444-5f0a-aa8f-6fae4fd8688f",
+      "label": "Pelican Island National Wildlife",
+      "year": 1903
+    },
+    "A139": {
+      "answer_fact_id": "c841819f-a4bf-5717-83c4-898ded3850de",
+      "label": "Rossini's Petite",
+      "year": 1864
+    },
+    "A140": {
+      "answer_fact_id": "6017a23f-520d-5b95-bd60-41fbcee40c6f",
+      "label": "The South African",
+      "year": 1982
     }
   }
 }

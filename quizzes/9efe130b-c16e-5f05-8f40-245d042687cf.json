@@ -1,0 +1,139 @@
+{
+  "date": "2026-03-14",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "eb6dd38c-5047-5d92-bbce-84439195a343",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "7c7fcb38-a6cf-53c7-b14d-aa3b28e7a5d0",
+        "804f7dae-0cae-5410-8120-5fbb443b741a"
+      ],
+      "correct_answer_fact_id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q56"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "7c7fcb38-a6cf-53c7-b14d-aa3b28e7a5d0",
+      "label": "The Third Anglo-Dutch War: The Battle of Ronas Voe results in the Dutch East India Company ship Wapen van Rotterdam being captured with a death toll of up to 300 Dutch crew and soldiers.",
+      "year": 1674,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "17th-century",
+        "1670s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "17th-century",
+        "temporal_decade": "1670s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1674,
+          "temporal_century": "17th-century",
+          "temporal_decade": "1670s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Third Anglo-Dutch War: The Battle of Ronas Voe results in the Dutch East India Company ship Wapen van Rotterdam being captured with a death toll of up to 300 Dutch crew and soldiers.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A132"
+    },
+    {
+      "id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+      "label": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+      "year": 1647,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "17th-century",
+        "1640s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "17th-century",
+        "temporal_decade": "1640s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1647,
+          "temporal_century": "17th-century",
+          "temporal_decade": "1640s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A133"
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The Third Anglo-Dutch War: The Battle of Ronas Voe results in the Dutch East India Company ship Wapen van Rotterdam being captured with a death toll of up to 300 Dutch crew and soldiers.",
+      "year": 1674,
+      "answer_fact_id": "7c7fcb38-a6cf-53c7-b14d-aa3b28e7a5d0",
+      "human_id": "A132"
+    },
+    {
+      "id": "B",
+      "label": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+      "year": 1647,
+      "answer_fact_id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+      "human_id": "A133"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/14",
+    "retrieved_at": "2026-03-14T06:10:08Z",
+    "events_used": [
+      {
+        "event_id": "7c7fcb38-a6cf-53c7-b14d-aa3b28e7a5d0",
+        "text": "The Third Anglo-Dutch War: The Battle of Ronas Voe results in the Dutch East India Company ship Wapen van Rotterdam being captured with a death toll of up to 300 Dutch crew and soldiers.",
+        "year": 1674,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Third_Anglo-Dutch_War"
+      },
+      {
+        "event_id": "804f7dae-0cae-5410-8120-5fbb443b741a",
+        "text": "Thirty Years' War: Bavaria, Cologne, France and Sweden sign the Truce of Ulm.",
+        "year": 1647,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Thirty_Years'_War"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-14T06:10:08Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
