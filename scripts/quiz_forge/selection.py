@@ -7,6 +7,8 @@ import datetime as dt
 import re
 from typing import Any
 
+from .model import build_factoid_answer_fact_id
+
 
 def build_seed(target_date: dt.date, quiz_type: str, edition: int) -> int:
     key = f"{target_date.isoformat()}:{quiz_type}:{edition}"
@@ -472,28 +474,60 @@ def _factoid_candidate_sort_key(candidate: dict[str, Any]) -> tuple[str, int, st
     )
 
 
+def _source_event_key(event: dict[str, Any]) -> tuple[int, str, str]:
+    return (
+        int(event["year"]),
+        str(event["text"]),
+        str(event["wikipedia_url"]),
+    )
+
+
+def _factoid_candidate_id(candidate: dict[str, Any]) -> str:
+    return build_factoid_answer_fact_id(
+        candidate["source_event"],
+        answer_label=str(candidate["answer_label"]),
+        entity_type=str(candidate["answer_kind"]),
+    )
+
+
 def _pick_factoid_candidates_of_kind(
     extracted_candidates: list[dict[str, Any]],
     seed: int,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     ordered = sorted(extracted_candidates, key=_factoid_candidate_sort_key)
+    unique_ordered: list[dict[str, Any]] = []
+    seen_candidate_ids: set[str] = set()
+    for candidate in ordered:
+        candidate_id = _factoid_candidate_id(candidate)
+        if candidate_id in seen_candidate_ids:
+            continue
+        unique_ordered.append(candidate)
+        seen_candidate_ids.add(candidate_id)
+
+    ordered = unique_ordered
+    if not ordered:
+        raise ValueError("No eligible factoid candidates found.")
+
     correct_idx = seed % len(ordered)
     correct = ordered[correct_idx]
 
     step = (seed % (len(ordered) - 1)) + 1
     distractors: list[dict[str, Any]] = []
     seen_labels = {correct["answer_label"].casefold()}
+    seen_candidate_ids = {_factoid_candidate_id(correct)}
 
     for offset in range(len(ordered)):
         idx = (correct_idx + step + offset) % len(ordered)
         if idx == correct_idx:
             continue
         candidate = ordered[idx]
+        candidate_id = _factoid_candidate_id(candidate)
         answer_label = candidate["answer_label"].casefold()
-        if answer_label in seen_labels:
+        if answer_label in seen_labels or candidate_id in seen_candidate_ids:
             continue
         distractors.append(candidate)
         seen_labels.add(answer_label)
+        seen_candidate_ids.add(candidate_id)
         if len(distractors) == 3:
             break
 
@@ -517,11 +551,18 @@ def build_history_factoid_distractors_for_candidate(
         if (candidate := extractor(event)) is not None
     ]
     source_event = correct_candidate.get("source_event")
+    if not isinstance(source_event, dict):
+        raise ValueError("Typed factoid correct candidate is missing source_event.")
+    source_event_key = _source_event_key(source_event)
+    correct_candidate_id = _factoid_candidate_id(correct_candidate)
     correct_answer_label = str(correct_candidate.get("answer_label", "")).casefold()
     distractor_pool = [
         candidate
         for candidate in extracted_candidates
-        if candidate.get("source_event") is not source_event and candidate.get("answer_label", "").casefold() != correct_answer_label
+        if isinstance(candidate.get("source_event"), dict)
+        and _source_event_key(candidate["source_event"]) != source_event_key
+        and candidate.get("answer_label", "").casefold() != correct_answer_label
+        and _factoid_candidate_id(candidate) != correct_candidate_id
     ]
     if len({candidate["answer_label"].casefold() for candidate in distractor_pool}) < 3:
         raise ValueError(f"Not enough valid {answer_kind} distractors for history_factoid_mcq_4.")

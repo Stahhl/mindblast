@@ -874,3 +874,117 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
     assert payload["questions"][0]["facets"]["answer_kind"] == "person"
     assert payload["questions"][0]["facets"]["prompt_style"] == "who"
     assert any(choice["label"] == "Neil Armstrong" for choice in payload["choices"])
+
+
+def test_ai_factoid_distractors_exclude_same_source_event_value_copies() -> None:
+    from quiz_forge.selection import build_history_factoid_distractors_for_candidate
+
+    original_event = {
+        "text": "In Karachi, Pakistan, a bomb blast kills at least 48 people in a predominantly Shia Muslim area.",
+        "year": 2013,
+        "wikipedia_url": "https://example.com/karachi",
+    }
+    duplicate_value_event = dict(original_event)
+    candidates = [
+        original_event,
+        duplicate_value_event,
+        {
+            "text": "In Kyoto, Emperor Komei grants an imperial audience to foreign diplomats for the first time.",
+            "year": 1863,
+            "wikipedia_url": "https://example.com/kyoto",
+        },
+        {
+            "text": "At Waterloo, Napoleon Bonaparte is defeated by the Seventh Coalition.",
+            "year": 1815,
+            "wikipedia_url": "https://example.com/waterloo",
+        },
+        {
+            "text": "In Honolulu, Amelia Earhart departs in her attempt to fly around the world.",
+            "year": 1937,
+            "wikipedia_url": "https://example.com/honolulu",
+        },
+        {
+            "text": "At the Winter Palace, demonstrators demand political reform from the Russian Empire.",
+            "year": 1905,
+            "wikipedia_url": "https://example.com/winter-palace",
+        },
+    ]
+    correct_candidate = {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": "Karachi",
+        "question_text": "Where did this happen: a bomb blast kills at least 48 people in a predominantly Shia Muslim area?",
+        "source_event": original_event,
+    }
+
+    distractors = build_history_factoid_distractors_for_candidate(
+        candidates,
+        seed=1,
+        correct_candidate=correct_candidate,
+    )
+
+    assert len(distractors) == 3
+    assert all(
+        distractor["source_event"]["text"] != duplicate_value_event["text"]
+        or distractor["source_event"]["year"] != duplicate_value_event["year"]
+        or distractor["source_event"]["wikipedia_url"] != duplicate_value_event["wikipedia_url"]
+        for distractor in distractors
+    )
+
+
+def test_build_history_factoid_quiz_rejects_duplicate_answer_fact_ids(monkeypatch) -> None:
+    import datetime as dt
+
+    from quiz_forge.builders import build_history_factoid_mcq_4_quiz
+
+    correct_candidate = {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": "Karachi, Pakistan",
+        "question_text": "Where did this happen: a bomb blast kills at least 48 people in a predominantly Shia Muslim area?",
+        "source_event": {
+            "text": "In Karachi, Pakistan, a bomb blast kills at least 48 people in a predominantly Shia Muslim area.",
+            "year": 2013,
+            "wikipedia_url": "https://example.com/karachi",
+        },
+    }
+    duplicate_distractor = {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": "Karachi, Pakistan",
+        "question_text": "Where did this happen: a bomb blast kills at least 48 people in a predominantly Shia Muslim area?",
+        "source_event": dict(correct_candidate["source_event"]),
+    }
+
+    monkeypatch.setattr(
+        "quiz_forge.builders.build_history_factoid_distractors_for_candidate",
+        lambda *args, **kwargs: [duplicate_distractor, _extract_place_candidate("Kyoto"), _extract_place_candidate("Waterloo")],
+    )
+
+    with pytest.raises(ValueError, match="unique answer_fact ids"):
+        build_history_factoid_mcq_4_quiz(
+            dt.date(2026, 3, 15),
+            dt.datetime(2026, 3, 15, 6, 0, tzinfo=dt.timezone.utc),
+            "https://example.com/source",
+            _place_factoid_candidates(),
+            seed=1,
+            edition=1,
+            generation_mode="daily",
+            ai_selected_factoid_candidate=correct_candidate,
+        )
+
+
+def _extract_place_candidate(label: str) -> dict[str, object]:
+    candidates_by_label = {
+        "Kyoto": _place_factoid_candidates()[0],
+        "Waterloo": _place_factoid_candidates()[1],
+        "Karachi, Pakistan": _place_factoid_candidates()[2],
+    }
+    event = candidates_by_label[label]
+    return {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": label,
+        "question_text": "Where did this happen?",
+        "source_event": event,
+    }

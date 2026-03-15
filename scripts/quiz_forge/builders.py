@@ -63,6 +63,16 @@ def _build_history_factoid_typed_quiz(
     answer_kind = correct_factoid["answer_kind"]
     prompt_style = correct_factoid["prompt_style"]
     question_text = correct_factoid["question_text"]
+    factoid_option_ids = [
+        build_factoid_answer_fact_id(
+            option["source_event"],
+            answer_label=option["answer_label"],
+            entity_type=answer_kind,
+        )
+        for option in factoid_options
+    ]
+    if len(set(factoid_option_ids)) != len(factoid_option_ids):
+        raise ValueError("history_factoid_mcq_4 options must produce unique answer_fact ids.")
 
     choice_ids = ("A", "B", "C", "D")
     choices = []
