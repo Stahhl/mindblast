@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-14T06:10:13Z"
+    "updated_at": "2026-03-15T07:16:11Z"
   },
   "counters": {
-    "question": 58,
-    "answer": 140
+    "question": 59,
+    "answer": 144
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -65,7 +65,8 @@
     "3e450d27-d0b1-51b9-bcb1-5f898ea14dba": "Q55",
     "eb6dd38c-5047-5d92-bbce-84439195a343": "Q56",
     "02b1f88a-a81d-5d83-a4e6-944bd96bfdf9": "Q57",
-    "3212b05d-f69e-5a05-8b78-4de16d6b8de6": "Q58"
+    "3212b05d-f69e-5a05-8b78-4de16d6b8de6": "Q58",
+    "94d5f23d-0513-5f58-94e3-2c3bfba0c698": "Q59"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -207,7 +208,11 @@
     "7428408b-3b56-54ba-bad3-9b19a6c91d0c": "A137",
     "77296537-8444-5f0a-aa8f-6fae4fd8688f": "A138",
     "c841819f-a4bf-5717-83c4-898ded3850de": "A139",
-    "6017a23f-520d-5b95-bd60-41fbcee40c6f": "A140"
+    "6017a23f-520d-5b95-bd60-41fbcee40c6f": "A140",
+    "e82a9505-2a01-5e16-ba8d-5a8808e747c6": "A141",
+    "20709d01-ee3d-53d6-9af9-9feb968a29da": "A142",
+    "48ed9595-3ac1-5db9-a507-127da96c2221": "A143",
+    "a9eb6635-33aa-5de3-a870-3ac9413c66c1": "A144"
   },
   "questions": {
     "Q1": {
@@ -613,6 +618,13 @@
       "question_id": "3212b05d-f69e-5a05-8b78-4de16d6b8de6",
       "quiz_file": "quizzes/bf981730-4931-59c4-875d-cafbd6d63e92.json",
       "date": "2026-03-14",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q59": {
+      "question_id": "94d5f23d-0513-5f58-94e3-2c3bfba0c698",
+      "quiz_file": "quizzes/dca3c593-56d1-5430-b467-d12795d04425.json",
+      "date": "2026-03-15",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1317,6 +1329,26 @@
       "answer_fact_id": "6017a23f-520d-5b95-bd60-41fbcee40c6f",
       "label": "The South African",
       "year": 1982
+    },
+    "A141": {
+      "answer_fact_id": "e82a9505-2a01-5e16-ba8d-5a8808e747c6",
+      "label": "Newburgh, New York",
+      "year": 1783
+    },
+    "A142": {
+      "answer_fact_id": "20709d01-ee3d-53d6-9af9-9feb968a29da",
+      "label": "the MCG Stadium",
+      "year": 1877
+    },
+    "A143": {
+      "answer_fact_id": "48ed9595-3ac1-5db9-a507-127da96c2221",
+      "label": "Hungary",
+      "year": 1848
+    },
+    "A144": {
+      "answer_fact_id": "a9eb6635-33aa-5de3-a870-3ac9413c66c1",
+      "label": "the United Kingdom",
+      "year": 1922
     }
   }
 }

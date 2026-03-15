@@ -1,0 +1,23 @@
+{
+  "date": "2026-03-15",
+  "quiz_files": {
+    "history_factoid_mcq_4": "quizzes/dca3c593-56d1-5430-b467-d12795d04425.json"
+  },
+  "quizzes_by_type": {
+    "history_factoid_mcq_4": [
+      {
+        "edition": 1,
+        "mode": "daily",
+        "quiz_file": "quizzes/dca3c593-56d1-5430-b467-d12795d04425.json",
+        "generated_at": "2026-03-15T07:16:05Z"
+      }
+    ]
+  },
+  "available_types": [
+    "history_factoid_mcq_4"
+  ],
+  "metadata": {
+    "version": 2,
+    "generated_at": "2026-03-15T07:16:11Z"
+  }
+}

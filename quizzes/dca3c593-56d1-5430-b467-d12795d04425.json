@@ -1,0 +1,231 @@
+{
+  "date": "2026-03-15",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "94d5f23d-0513-5f58-94e3-2c3bfba0c698",
+      "type": "history_factoid_mcq_4",
+      "prompt": "Where did this happen: First ever official cricket test match is played: Australia vs England in Melbourne, Australia?",
+      "answer_fact_ids": [
+        "e82a9505-2a01-5e16-ba8d-5a8808e747c6",
+        "20709d01-ee3d-53d6-9af9-9feb968a29da",
+        "48ed9595-3ac1-5db9-a507-127da96c2221",
+        "a9eb6635-33aa-5de3-a870-3ac9413c66c1"
+      ],
+      "correct_answer_fact_id": "20709d01-ee3d-53d6-9af9-9feb968a29da",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "place",
+        "prompt_style": "where"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1877
+      },
+      "human_id": "Q59"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "e82a9505-2a01-5e16-ba8d-5a8808e747c6",
+      "label": "Newburgh, New York",
+      "year": 1783,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "18th-century",
+        "1780s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "18th-century",
+        "temporal_decade": "1780s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1783,
+          "temporal_century": "18th-century",
+          "temporal_decade": "1780s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Newburgh, New York -- In an emotional speech in Newburgh, New York, George Washington asks his officers not to support the Newburgh Conspiracy. The plea is successful, and the threatened coup d'\u00e9tat never takes place.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A141"
+    },
+    {
+      "id": "20709d01-ee3d-53d6-9af9-9feb968a29da",
+      "label": "the MCG Stadium",
+      "year": 1877,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "19th-century",
+        "1870s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1870s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1877,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1870s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "the MCG Stadium -- First ever official cricket test match is played: Australia vs England at the MCG Stadium, in Melbourne, Australia.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A142"
+    },
+    {
+      "id": "48ed9595-3ac1-5db9-a507-127da96c2221",
+      "label": "Hungary",
+      "year": 1848,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1840s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1840s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1848,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1840s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Hungary -- A revolution breaks out in Hungary, and the Habsburg rulers are compelled to meet the demands of the reform party.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A143"
+    },
+    {
+      "id": "a9eb6635-33aa-5de3-a870-3ac9413c66c1",
+      "label": "the United Kingdom",
+      "year": 1922,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1920s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1920s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1922,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1920s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "the United Kingdom -- After Egypt gains nominal independence from the United Kingdom, Fuad I becomes King of Egypt.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A144"
+    }
+  ],
+  "question": "Where did this happen: First ever official cricket test match is played: Australia vs England in Melbourne, Australia?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Newburgh, New York",
+      "answer_fact_id": "e82a9505-2a01-5e16-ba8d-5a8808e747c6",
+      "human_id": "A141"
+    },
+    {
+      "id": "B",
+      "label": "the MCG Stadium",
+      "answer_fact_id": "20709d01-ee3d-53d6-9af9-9feb968a29da",
+      "human_id": "A142"
+    },
+    {
+      "id": "C",
+      "label": "Hungary",
+      "answer_fact_id": "48ed9595-3ac1-5db9-a507-127da96c2221",
+      "human_id": "A143"
+    },
+    {
+      "id": "D",
+      "label": "the United Kingdom",
+      "answer_fact_id": "a9eb6635-33aa-5de3-a870-3ac9413c66c1",
+      "human_id": "A144"
+    }
+  ],
+  "correct_choice_id": "B",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/15",
+    "retrieved_at": "2026-03-15T07:16:05Z",
+    "events_used": [
+      {
+        "event_id": "e82a9505-2a01-5e16-ba8d-5a8808e747c6",
+        "text": "In an emotional speech in Newburgh, New York, George Washington asks his officers not to support the Newburgh Conspiracy. The plea is successful, and the threatened coup d'\u00e9tat never takes place.",
+        "year": 1783,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Newburgh%2C_New_York"
+      },
+      {
+        "event_id": "20709d01-ee3d-53d6-9af9-9feb968a29da",
+        "text": "First ever official cricket test match is played: Australia vs England at the MCG Stadium, in Melbourne, Australia.",
+        "year": 1877,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/English_cricket_team_in_Australia_and_New_Zealand_in_1876%E2%80%9377"
+      },
+      {
+        "event_id": "48ed9595-3ac1-5db9-a507-127da96c2221",
+        "text": "A revolution breaks out in Hungary, and the Habsburg rulers are compelled to meet the demands of the reform party.",
+        "year": 1848,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Hungarian_Revolution_of_1848"
+      },
+      {
+        "event_id": "a9eb6635-33aa-5de3-a870-3ac9413c66c1",
+        "text": "After Egypt gains nominal independence from the United Kingdom, Fuad I becomes King of Egypt.",
+        "year": 1922,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Egypt"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-15T07:16:05Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
