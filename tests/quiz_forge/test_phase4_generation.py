@@ -932,7 +932,7 @@ def test_ai_factoid_distractors_exclude_same_source_event_value_copies() -> None
     )
 
 
-def test_build_history_factoid_quiz_rejects_duplicate_answer_fact_ids(monkeypatch) -> None:
+def test_build_history_factoid_quiz_falls_back_when_ai_candidate_produces_duplicate_answer_fact_ids(monkeypatch) -> None:
     import datetime as dt
 
     from quiz_forge.builders import build_history_factoid_mcq_4_quiz
@@ -961,16 +961,56 @@ def test_build_history_factoid_quiz_rejects_duplicate_answer_fact_ids(monkeypatc
         lambda *args, **kwargs: [duplicate_distractor, _extract_place_candidate("Kyoto"), _extract_place_candidate("Waterloo")],
     )
 
+    payload = build_history_factoid_mcq_4_quiz(
+        dt.date(2026, 3, 15),
+        dt.datetime(2026, 3, 15, 6, 0, tzinfo=dt.timezone.utc),
+        "https://example.com/source",
+        _place_factoid_candidates(),
+        seed=1,
+        edition=1,
+        generation_mode="daily",
+        ai_selected_factoid_candidate=correct_candidate,
+    )
+
+    assert payload["type"] == "history_factoid_mcq_4"
+    assert len(payload["answer_facts"]) == 4
+    assert len({fact["id"] for fact in payload["answer_facts"]}) == 4
+
+
+def test_build_history_factoid_typed_quiz_rejects_duplicate_answer_fact_ids() -> None:
+    import datetime as dt
+
+    from quiz_forge.builders import _build_history_factoid_typed_quiz
+
+    correct_candidate = {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": "Karachi, Pakistan",
+        "question_text": "Where did this happen: a bomb blast kills at least 48 people in a predominantly Shia Muslim area?",
+        "source_event": {
+            "text": "In Karachi, Pakistan, a bomb blast kills at least 48 people in a predominantly Shia Muslim area.",
+            "year": 2013,
+            "wikipedia_url": "https://example.com/karachi",
+        },
+    }
+    duplicate_distractor = {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": "Karachi, Pakistan",
+        "question_text": "Where did this happen: a bomb blast kills at least 48 people in a predominantly Shia Muslim area?",
+        "source_event": dict(correct_candidate["source_event"]),
+    }
+
     with pytest.raises(ValueError, match="unique answer_fact ids"):
-        build_history_factoid_mcq_4_quiz(
-            dt.date(2026, 3, 15),
-            dt.datetime(2026, 3, 15, 6, 0, tzinfo=dt.timezone.utc),
-            "https://example.com/source",
-            _place_factoid_candidates(),
+        _build_history_factoid_typed_quiz(
+            target_date=dt.date(2026, 3, 15),
+            retrieval_time=dt.datetime(2026, 3, 15, 6, 0, tzinfo=dt.timezone.utc),
+            source_url="https://example.com/source",
             seed=1,
             edition=1,
             generation_mode="daily",
-            ai_selected_factoid_candidate=correct_candidate,
+            correct_factoid=correct_candidate,
+            distractor_factoids=[duplicate_distractor, _extract_place_candidate("Kyoto"), _extract_place_candidate("Waterloo")],
         )
 
 

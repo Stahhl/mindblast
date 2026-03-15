@@ -357,21 +357,26 @@ def build_history_factoid_mcq_4_quiz(
         raise ValueError(f"Unsupported generation mode: {generation_mode}")
 
     if ai_selected_factoid_candidate is not None:
-        distractors = build_history_factoid_distractors_for_candidate(
-            candidates,
-            seed=seed,
-            correct_candidate=ai_selected_factoid_candidate,
-        )
-        return _build_history_factoid_typed_quiz(
-            target_date=target_date,
-            retrieval_time=retrieval_time,
-            source_url=source_url,
-            seed=seed,
-            edition=edition,
-            generation_mode=generation_mode,
-            correct_factoid=ai_selected_factoid_candidate,
-            distractor_factoids=distractors,
-        )
+        try:
+            distractors = build_history_factoid_distractors_for_candidate(
+                candidates,
+                seed=seed,
+                correct_candidate=ai_selected_factoid_candidate,
+            )
+            return _build_history_factoid_typed_quiz(
+                target_date=target_date,
+                retrieval_time=retrieval_time,
+                source_url=source_url,
+                seed=seed,
+                edition=edition,
+                generation_mode=generation_mode,
+                correct_factoid=ai_selected_factoid_candidate,
+                distractor_factoids=distractors,
+            )
+        except ValueError:
+            # AI-selected factoids are opportunistic. If they cannot produce four
+            # unique answer facts, fall back to the deterministic typed/time flow.
+            pass
 
     try:
         correct_factoid, distractor_factoids = pick_history_factoid_typed_candidates(
