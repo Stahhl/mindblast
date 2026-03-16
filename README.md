@@ -16,7 +16,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields
 - discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
 - support artifact: `quizzes/human_id_lookup.json` (`Q...`/`A...` alias lookup)
-- output committed as JSON to this repository
+- output stored in the private content repository `Stahhl/mindblast-content`
 
 ## Repository Structure
 
@@ -71,7 +71,6 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 ├── scripts/
 │   ├── generate_quiz.py
 │   └── quiz_forge/
-└── quizzes/
 ```
 
 ## Key Docs
@@ -87,6 +86,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - Phase 6.5 Terraform access/IAM parameterization: `docs/PHASE6_5.md`
 - Phase 7 auth scope: `docs/PHASE7.md`
 - Phase 7.5 edge hardening scope: `docs/PHASE7_5.md`
+- Phase 8 weekly feedback review scope: `docs/PHASE8.md`
 - Hosting rollout plan: `docs/HOSTING_ROLLOUT.md`
 - Environment posture and risk model: `docs/ENVIRONMENTS.md`
 - Backend service architecture: `docs/BACKEND_SERVICE_DESIGN.md`
@@ -128,18 +128,34 @@ pnpm test
 pnpm dev
 ```
 
+Expected local layout:
+
+```text
+../mindblast
+../mindblast-content
+```
+
+Local quiz content is served from the sibling checkout `../mindblast-content/quizzes` by default.
+Override that path when needed:
+
+```zsh
+export MINDBLAST_CONTENT_DIR="../mindblast-content/quizzes"
+```
+
 ## Local quiz-forge Run (uv)
 
 ```zsh
 cd <repo-root>
 uv sync --locked --no-dev --python 3.12
-uv run --python 3.12 python scripts/generate_quiz.py --quiz-types "which_came_first,history_mcq_4,history_factoid_mcq_4"
+uv run --python 3.12 python scripts/generate_quiz.py \
+  --quiz-types "which_came_first,history_mcq_4,history_factoid_mcq_4" \
+  --output-dir ../mindblast-content/quizzes
 ```
 
 Backfill human-friendly IDs for already generated quiz files:
 
 ```zsh
-uv run --python 3.12 python scripts/generate_quiz.py --backfill-human-ids --output-dir quizzes
+uv run --python 3.12 python scripts/generate_quiz.py --backfill-human-ids --output-dir ../mindblast-content/quizzes
 ```
 
 This backfill mode can also normalize legacy schema v1 quiz payloads to v2.
@@ -151,6 +167,15 @@ cd <repo-root>
 uv sync --locked --dev --python 3.12
 uv run --python 3.12 pytest tests/quiz_forge
 ```
+
+## Content Repo Workflow Prerequisites
+
+Repository variable:
+- `QUIZ_CONTENT_REPO`: `Stahhl/mindblast-content`
+
+Repository secrets:
+- `CONTENT_REPO_WRITE_TOKEN`: fine-grained PAT with read/write access to `Stahhl/mindblast-content`
+- `CONTENT_REPO_READ_TOKEN`: fine-grained PAT with read access to `Stahhl/mindblast-content`
 
 ## Feedback API Build + Tests (pnpm)
 
@@ -175,11 +200,12 @@ firebase deploy --only functions:feedback-api:quizFeedbackApi,firestore:rules,fi
 ## Staging Deploy (GitHub Actions)
 
 - Workflow: `.github/workflows/deploy-frontend-staging.yml`
-- Trigger: push to `main` when frontend, Firebase config, or `quizzes/` content changes
+- Trigger: push to `main` when frontend or Firebase config changes, and after successful `Daily Quiz Generation` runs
 - Target project/site: `mindblast-staging` (via `.firebaserc` hosting target `staging`)
 
 Required repository secrets:
 - `FIREBASE_SERVICE_ACCOUNT_STAGING`: service account JSON for Firebase Hosting deploy
+- `CONTENT_REPO_READ_TOKEN`: fine-grained PAT with read access to `Stahhl/mindblast-content`
 
 ## Feedback API Staging Deploy (GitHub Actions)
 
@@ -200,11 +226,12 @@ Operational runbook:
 ## Production Deploy (GitHub Actions)
 
 - Workflow: `.github/workflows/deploy-frontend-production.yml`
-- Trigger: push to `main` when frontend, Firebase config, or `quizzes/` content changes
+- Trigger: push to `main` when frontend or Firebase config changes, and after successful `Daily Quiz Generation` runs
 - Target project/site: `mindblast-prod` (via `.firebaserc` hosting target `production`)
 
 Required repository secrets:
 - `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: service account JSON for Firebase Hosting deploy
+- `CONTENT_REPO_READ_TOKEN`: fine-grained PAT with read access to `Stahhl/mindblast-content`
 
 ## Secret Guardrails
 

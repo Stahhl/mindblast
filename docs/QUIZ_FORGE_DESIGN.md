@@ -1,7 +1,7 @@
 # quiz-forge Design Doc
 
 ## Purpose
-`quiz-forge` is the backend generator that creates daily quiz payloads and commits them to this repository.  
+`quiz-forge` is the backend generator that creates daily quiz payloads and commits them to the private content repository `Stahhl/mindblast-content`.
 In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `history_mcq_4`).
 
 ## Naming
@@ -25,7 +25,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - It fetches source data from Wikimedia On This Day.
 - It writes one file at `quizzes/<uuid>.json` per generated edition using a deterministic UUIDv5 derived from UTC date + quiz type + edition.
 - It writes discovery artifacts at `quizzes/index/YYYY-MM-DD.json` and `quizzes/latest.json`.
-- The `Mindblast` app consumes this file later.
+- The `Mindblast` app consumes these artifacts later after `mindblast` deploy workflows bundle them from `mindblast-content`.
 
 ## Proposed Tech Stack
 - Runtime: Python 3.12
@@ -33,7 +33,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - CI/Scheduler: GitHub Actions cron
 - HTTP client: Python standard library (`urllib`) or `requests`
 - Validation: built-in checks in Python (optionally add `jsonschema` later)
-- Storage: Git repository JSON files (Phase 1 source of truth)
+- Storage: Git repository JSON files in `Stahhl/mindblast-content` (Phase 1 source of truth)
 - Phase 3 AI providers (intended):
   - external: OpenAI API
   - local: Ollama
@@ -61,7 +61,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
 10. Write/update discovery artifacts for static client lookup.
-11. Commit and push only when new files are created.
+11. Commit and push only when new files are created in `mindblast-content`.
 
 ## Data Contract Ownership
 - Contract lives in `docs/PHASE1.md`.
@@ -99,7 +99,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 
 ### Security Guardrails
 - Minimal GitHub permissions in workflow:
-  - `contents: write` only (needed for commit/push)
+  - `contents: read` for `mindblast`; cross-repo write uses a dedicated token scoped to `Stahhl/mindblast-content`
 - No secrets required in Phase 1.
 - Sanitize/log only non-sensitive data.
 - In Phase 3, provider credentials are required for external AI mode and must be stored in CI secrets (never in repo).
@@ -110,11 +110,12 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - No push/PR triggers in Phase 1.
 - Workflow steps:
   1. checkout
-  2. setup python
-  3. install `uv` and sync locked environment
-  4. run generator with `uv run`
-  5. emit operational summary report to Discord (including AI usage when enabled)
-  6. git add/commit/push if changes exist
+  2. checkout `Stahhl/mindblast-content`
+  3. setup python
+  4. install `uv` and sync locked environment
+  5. run generator with `uv run`
+  6. emit operational summary report to Discord (including AI usage when enabled)
+  7. git add/commit/push in `mindblast-content` if changes exist
 - Bot commit message format:
   - `quiz-forge: add quiz for YYYY-MM-DD`
 
@@ -125,7 +126,6 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 ├── pyproject.toml
 ├── uv.lock
 ├── scripts/generate_quiz.py
-├── quizzes/
 └── docs/
     ├── PHASE1.md
     ├── FUTURE_FEATURES.md

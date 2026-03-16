@@ -7,7 +7,16 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "../../..");
-const QUIZZES_DIR = path.resolve(REPO_ROOT, "quizzes");
+
+function resolveQuizzesDir(): string {
+  const configured = process.env.MINDBLAST_CONTENT_DIR?.trim();
+  if (configured) {
+    return path.resolve(REPO_ROOT, configured);
+  }
+  return path.resolve(REPO_ROOT, "../mindblast-content/quizzes");
+}
+
+const QUIZZES_DIR = resolveQuizzesDir();
 
 function getContentType(filePath: string): string {
   if (filePath.endsWith(".json")) {

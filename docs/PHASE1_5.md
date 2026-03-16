@@ -11,7 +11,7 @@ Add a lightweight discovery/index layer so clients can find daily quiz files wit
 ## Scope (Phase 1.5)
 - Keep current quiz generation behavior from `docs/PHASE1.md`.
 - Add deterministic index artifacts after successful daily generation.
-- Keep everything file-based in this repository (no always-on backend API).
+- Keep everything file-based in git storage, with generated artifacts written under `quizzes/` in the private content repository `Stahhl/mindblast-content` (no always-on backend API).
 
 ## Out of Scope
 - User authentication.
@@ -144,15 +144,15 @@ Example:
 
 ## CI/CD Behavior
 - Continue using the current scheduled GitHub Actions workflow.
-- Commit/push only when quiz or discovery files changed.
+- Commit/push generated quiz and discovery files only in the content repository.
 - Commit message may stay date-based (same as current Phase 1 behavior).
 
 ## Validation Rules
 - `date` fields must be valid UTC dates in `YYYY-MM-DD`.
 - `quizzes_by_type` keys must be known enabled types.
 - `quiz_files` keys must be known enabled types (compatibility view).
-- Every `quiz_files` path must exist in the repository at generation time.
-- Every `quizzes_by_type[*][*].quiz_file` path must exist in the repository at generation time.
+- Every `quiz_files` path must exist in the content repository at generation time.
+- Every `quizzes_by_type[*][*].quiz_file` path must exist in the content repository at generation time.
 - `available_types` must match `quizzes_by_type` keys.
 - Metadata timestamps must be UTC ISO-8601 strings with `Z`.
 

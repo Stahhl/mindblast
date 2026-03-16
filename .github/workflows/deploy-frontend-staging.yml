@@ -9,7 +9,6 @@ on:
       - ".firebaserc"
       - "firebase.json"
       - "src/apps/frontend/**"
-      - "quizzes/**"
   workflow_run:
     workflows:
       - Daily Quiz Generation
@@ -33,6 +32,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
+      QUIZ_CONTENT_REPO: ${{ vars.QUIZ_CONTENT_REPO }}
       FIREBASE_PROJECT_ID: mindblast-staging
       FIREBASE_HOSTING_TARGET: staging
       VITE_APP_ENV: staging
@@ -46,6 +46,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Checkout content repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.QUIZ_CONTENT_REPO }}
+          token: ${{ secrets.CONTENT_REPO_READ_TOKEN }}
+          path: .content-repo
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -71,7 +78,7 @@ jobs:
           mkdir -p .firebase/staging
           cp -R src/apps/frontend/dist/. .firebase/staging/
           mkdir -p .firebase/staging/quizzes
-          cp -R quizzes/. .firebase/staging/quizzes/
+          cp -R .content-repo/quizzes/. .firebase/staging/quizzes/
 
       - name: Validate hosting artifact
         run: |

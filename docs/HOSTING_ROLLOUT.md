@@ -23,7 +23,9 @@ Why this fits current and future needs:
 - Out of scope now: full backend API, account system, or mobile app implementation.
 
 ## Target Architecture
-- `GitHub` remains source of truth for quiz JSON and frontend code.
+- `GitHub` remains source of truth, split across:
+  - `mindblast` for frontend code, workflows, and infra
+  - `mindblast-content` for generated quiz JSON artifacts
 - `GitHub Actions` builds/deploys frontend to `Firebase Hosting`.
 - `quizzes/` JSON remains statically served with cache-control rules.
 - Terraform IaC scaffold lives in `infra/terraform/`.

@@ -29,7 +29,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quiz-forge-daily
@@ -39,6 +39,7 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     env:
+      QUIZ_CONTENT_REPO: ${{ vars.QUIZ_CONTENT_REPO }}
       QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4,history_factoid_mcq_4' }}
       QUIZ_MODE: ${{ inputs.mode || 'daily' }}
       QUIZ_COUNT: ${{ inputs.count || '1' }}
@@ -61,6 +62,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Checkout content repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.QUIZ_CONTENT_REPO }}
+          token: ${{ secrets.CONTENT_REPO_WRITE_TOKEN }}
+          path: .content-repo
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -86,20 +94,23 @@ jobs:
             --quiz-types "${QUIZ_TYPES}" \
             --mode "${QUIZ_MODE}" \
             --count "${QUIZ_COUNT}" \
+            --output-dir ".content-repo/quizzes" \
             "${EXTRA_ARGS[@]}"
 
       - name: Commit and push if new quiz was created
+        working-directory: .content-repo
         run: |
           if [ -z "$(git status --porcelain -- quizzes)" ]; then
-            echo "No changes in quizzes/"
+            echo "No changes in content repo quizzes/"
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add quizzes
-          git commit -m "quiz-forge: add quiz for $(date -u +%F)"
-          git push
+          COMMIT_DATE="${QUIZ_DATE:-$(date -u +%F)}"
+          git commit -m "quiz-forge: add quiz for ${COMMIT_DATE}"
+          git push origin HEAD:main
 
       - name: Send Discord status notification
         if: always()

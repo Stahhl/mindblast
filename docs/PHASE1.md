@@ -6,7 +6,7 @@
 - Backend generator service name: `quiz-forge`.
 
 ## Objective
-Build a minimal `quiz-forge` service for `Mindblast` that generates deterministic daily history quizzes and stores them as JSON in this repository.
+Build a minimal `quiz-forge` service for `Mindblast` that generates deterministic daily history quizzes and stores them as JSON in git-backed storage.
 
 ## Scope (Phase 1)
 - One repository: `quiz-forge`.
@@ -17,7 +17,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
   - `history_mcq_4`
 - Use a normalized question/answer-fact model so answer facts are reusable across question generation.
 - Each quiz has exactly **1** correct answer.
-- Output is committed and pushed back to the repo as JSON.
+- Output is committed and pushed as JSON under `quizzes/` in the private content repository `Stahhl/mindblast-content`.
 
 ## Out of Scope (for now)
 - User-facing app.
