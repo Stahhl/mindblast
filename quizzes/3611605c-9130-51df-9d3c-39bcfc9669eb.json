@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-16",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "c6d4b4ef-bf18-5a53-8a5d-addc29f522c8",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1979?",
+      "answer_fact_ids": [
+        "a21b15f0-4544-5f3f-8565-f3a745810a2e",
+        "635dd5d1-e752-5fc0-8eca-02dc06f22954",
+        "84000d38-0616-5a4c-8018-deffabf96919",
+        "bfddace7-1d06-59d7-9182-7a85c2f1f071"
+      ],
+      "correct_answer_fact_id": "84000d38-0616-5a4c-8018-deffabf96919",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1979
+      },
+      "human_id": "Q61"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "a21b15f0-4544-5f3f-8565-f3a745810a2e",
+      "label": "A series of bomb blasts in the city of Shijiazhuang, China kill 108 people and injure 38 others, the biggest mass murder in China in decades.",
+      "year": 2001,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "21th-century",
+        "2000s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "21th-century",
+        "temporal_decade": "2000s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 2001,
+          "temporal_century": "21th-century",
+          "temporal_decade": "2000s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "A series of bomb blasts in the city of Shijiazhuang, China kill 108 people and injure 38 others, the biggest mass murder in China in decades.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A147"
+    },
+    {
+      "id": "635dd5d1-e752-5fc0-8eca-02dc06f22954",
+      "label": "Mississippi formally ratifies the Thirteenth Amendment to the United States Constitution, becoming the last state to approve the abolition of slavery. The Thirteenth Amendment was officially ratified in 1865.",
+      "year": 1995,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1990s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1990s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1995,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1990s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Mississippi formally ratifies the Thirteenth Amendment to the United States Constitution, becoming the last state to approve the abolition of slavery. The Thirteenth Amendment was officially ratified in 1865.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A148"
+    },
+    {
+      "id": "84000d38-0616-5a4c-8018-deffabf96919",
+      "label": "Sino-Vietnamese War: The People's Liberation Army crosses the border back into China, ending the war.",
+      "year": 1979,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1970s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1970s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1979,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1970s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Sino-Vietnamese War: The People's Liberation Army crosses the border back into China, ending the war.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A149"
+    },
+    {
+      "id": "bfddace7-1d06-59d7-9182-7a85c2f1f071",
+      "label": "Former Italian Prime Minister Aldo Moro is kidnapped; he is later murdered by his captors.",
+      "year": 1978,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1970s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1970s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1978,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1970s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Former Italian Prime Minister Aldo Moro is kidnapped; he is later murdered by his captors.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A145"
+    }
+  ],
+  "question": "Which event happened in 1979?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "A series of bomb blasts in the city of Shijiazhuang, China kill 108 people and injure 38 others, the biggest mass murder in China in decades.",
+      "answer_fact_id": "a21b15f0-4544-5f3f-8565-f3a745810a2e",
+      "human_id": "A147"
+    },
+    {
+      "id": "B",
+      "label": "Mississippi formally ratifies the Thirteenth Amendment to the United States Constitution, becoming the last state to approve the abolition of slavery. The Thirteenth Amendment was officially ratified in 1865.",
+      "answer_fact_id": "635dd5d1-e752-5fc0-8eca-02dc06f22954",
+      "human_id": "A148"
+    },
+    {
+      "id": "C",
+      "label": "Sino-Vietnamese War: The People's Liberation Army crosses the border back into China, ending the war.",
+      "answer_fact_id": "84000d38-0616-5a4c-8018-deffabf96919",
+      "human_id": "A149"
+    },
+    {
+      "id": "D",
+      "label": "Former Italian Prime Minister Aldo Moro is kidnapped; he is later murdered by his captors.",
+      "answer_fact_id": "bfddace7-1d06-59d7-9182-7a85c2f1f071",
+      "human_id": "A145"
+    }
+  ],
+  "correct_choice_id": "C",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/16",
+    "retrieved_at": "2026-03-16T06:26:11Z",
+    "events_used": [
+      {
+        "event_id": "a21b15f0-4544-5f3f-8565-f3a745810a2e",
+        "text": "A series of bomb blasts in the city of Shijiazhuang, China kill 108 people and injure 38 others, the biggest mass murder in China in decades.",
+        "year": 2001,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/2001_Shijiazhuang_bombings"
+      },
+      {
+        "event_id": "635dd5d1-e752-5fc0-8eca-02dc06f22954",
+        "text": "Mississippi formally ratifies the Thirteenth Amendment to the United States Constitution, becoming the last state to approve the abolition of slavery. The Thirteenth Amendment was officially ratified in 1865.",
+        "year": 1995,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Mississippi"
+      },
+      {
+        "event_id": "84000d38-0616-5a4c-8018-deffabf96919",
+        "text": "Sino-Vietnamese War: The People's Liberation Army crosses the border back into China, ending the war.",
+        "year": 1979,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Sino-Vietnamese_War"
+      },
+      {
+        "event_id": "bfddace7-1d06-59d7-9182-7a85c2f1f071",
+        "text": "Former Italian Prime Minister Aldo Moro is kidnapped; he is later murdered by his captors.",
+        "year": 1978,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Aldo_Moro"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-16T06:26:11Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

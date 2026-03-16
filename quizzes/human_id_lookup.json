@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-15T07:16:11Z"
+    "updated_at": "2026-03-16T06:26:18Z"
   },
   "counters": {
-    "question": 59,
-    "answer": 144
+    "question": 62,
+    "answer": 153
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -66,7 +66,10 @@
     "eb6dd38c-5047-5d92-bbce-84439195a343": "Q56",
     "02b1f88a-a81d-5d83-a4e6-944bd96bfdf9": "Q57",
     "3212b05d-f69e-5a05-8b78-4de16d6b8de6": "Q58",
-    "94d5f23d-0513-5f58-94e3-2c3bfba0c698": "Q59"
+    "94d5f23d-0513-5f58-94e3-2c3bfba0c698": "Q59",
+    "00b96ff9-3fe8-514d-ba25-18675720fcb9": "Q60",
+    "c6d4b4ef-bf18-5a53-8a5d-addc29f522c8": "Q61",
+    "141b02a0-0a21-57ec-832f-5d14dc099049": "Q62"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -212,7 +215,16 @@
     "e82a9505-2a01-5e16-ba8d-5a8808e747c6": "A141",
     "20709d01-ee3d-53d6-9af9-9feb968a29da": "A142",
     "48ed9595-3ac1-5db9-a507-127da96c2221": "A143",
-    "a9eb6635-33aa-5de3-a870-3ac9413c66c1": "A144"
+    "a9eb6635-33aa-5de3-a870-3ac9413c66c1": "A144",
+    "bfddace7-1d06-59d7-9182-7a85c2f1f071": "A145",
+    "3b48bfbc-5824-5450-bdfe-9f246d8eda9f": "A146",
+    "a21b15f0-4544-5f3f-8565-f3a745810a2e": "A147",
+    "635dd5d1-e752-5fc0-8eca-02dc06f22954": "A148",
+    "84000d38-0616-5a4c-8018-deffabf96919": "A149",
+    "92229364-1bf5-5d9a-8d46-b1e879d8265b": "A150",
+    "fae69052-1922-5132-9435-009a624d6572": "A151",
+    "ed04131c-535e-5062-9074-c6339e3104c2": "A152",
+    "ae955e82-936c-57b7-8205-f5864bdc5657": "A153"
   },
   "questions": {
     "Q1": {
@@ -625,6 +637,27 @@
       "question_id": "94d5f23d-0513-5f58-94e3-2c3bfba0c698",
       "quiz_file": "quizzes/dca3c593-56d1-5430-b467-d12795d04425.json",
       "date": "2026-03-15",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q60": {
+      "question_id": "00b96ff9-3fe8-514d-ba25-18675720fcb9",
+      "quiz_file": "quizzes/33f92f3f-ec48-5ba6-b66f-17569a57c41c.json",
+      "date": "2026-03-16",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q61": {
+      "question_id": "c6d4b4ef-bf18-5a53-8a5d-addc29f522c8",
+      "quiz_file": "quizzes/3611605c-9130-51df-9d3c-39bcfc9669eb.json",
+      "date": "2026-03-16",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q62": {
+      "question_id": "141b02a0-0a21-57ec-832f-5d14dc099049",
+      "quiz_file": "quizzes/b5ac83d1-e377-5aac-918a-fbf3ca2ce1c8.json",
+      "date": "2026-03-16",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1349,6 +1382,51 @@
       "answer_fact_id": "a9eb6635-33aa-5de3-a870-3ac9413c66c1",
       "label": "the United Kingdom",
       "year": 1922
+    },
+    "A145": {
+      "answer_fact_id": "bfddace7-1d06-59d7-9182-7a85c2f1f071",
+      "label": "Former Italian Prime Minister Aldo Moro is kidnapped; he is later murdered by his captors.",
+      "year": 1978
+    },
+    "A146": {
+      "answer_fact_id": "3b48bfbc-5824-5450-bdfe-9f246d8eda9f",
+      "label": "William Buckley, the CIA station chief in Lebanon, is kidnapped by Hezbollah; he later dies in captivity.",
+      "year": 1984
+    },
+    "A147": {
+      "answer_fact_id": "a21b15f0-4544-5f3f-8565-f3a745810a2e",
+      "label": "A series of bomb blasts in the city of Shijiazhuang, China kill 108 people and injure 38 others, the biggest mass murder in China in decades.",
+      "year": 2001
+    },
+    "A148": {
+      "answer_fact_id": "635dd5d1-e752-5fc0-8eca-02dc06f22954",
+      "label": "Mississippi formally ratifies the Thirteenth Amendment to the United States Constitution, becoming the last state to approve the abolition of slavery. The Thirteenth Amendment was officially ratified in 1865.",
+      "year": 1995
+    },
+    "A149": {
+      "answer_fact_id": "84000d38-0616-5a4c-8018-deffabf96919",
+      "label": "Sino-Vietnamese War: The People's Liberation Army crosses the border back into China, ending the war.",
+      "year": 1979
+    },
+    "A150": {
+      "answer_fact_id": "92229364-1bf5-5d9a-8d46-b1e879d8265b",
+      "label": "Kamal Jumblatt",
+      "year": 1977
+    },
+    "A151": {
+      "answer_fact_id": "fae69052-1922-5132-9435-009a624d6572",
+      "label": "Adolf Hitler",
+      "year": 1935
+    },
+    "A152": {
+      "answer_fact_id": "ed04131c-535e-5062-9074-c6339e3104c2",
+      "label": "Supertanker Amoco Cadiz",
+      "year": 1978
+    },
+    "A153": {
+      "answer_fact_id": "ae955e82-936c-57b7-8205-f5864bdc5657",
+      "label": "Operation Appearance",
+      "year": 1941
     }
   }
 }
