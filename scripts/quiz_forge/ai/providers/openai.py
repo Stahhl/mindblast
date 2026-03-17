@@ -18,6 +18,79 @@ from .openai_contract import (
 class OpenAIProvider:
     endpoint = OPENAI_CHAT_COMPLETIONS_ENDPOINT
 
+    @staticmethod
+    def _message_shape_summary(message: Any) -> str:
+        if not isinstance(message, dict):
+            return f"message_type={type(message).__name__}"
+
+        content = message.get("content")
+        content_parts = message.get("content_parts")
+        tool_calls = message.get("tool_calls")
+        refusal = message.get("refusal")
+        summary_parts = [
+            f"keys={sorted(message.keys())}",
+            f"content_type={type(content).__name__}",
+            f"content_parts_type={type(content_parts).__name__}",
+            f"has_refusal={bool(refusal)}",
+            f"has_tool_calls={isinstance(tool_calls, list) and bool(tool_calls)}",
+        ]
+        if isinstance(content, list):
+            part_types = [
+                str(part.get('type', type(part).__name__))
+                for part in content
+                if isinstance(part, dict)
+            ]
+            summary_parts.append(f"content_part_types={part_types}")
+        if isinstance(content_parts, list):
+            part_types = [
+                str(part.get('type', type(part).__name__))
+                for part in content_parts
+                if isinstance(part, dict)
+            ]
+            summary_parts.append(f"alt_content_part_types={part_types}")
+        return ", ".join(summary_parts)
+
+    @staticmethod
+    def _strip_code_fences(content: str) -> str:
+        stripped = content.strip()
+        if not stripped.startswith("```"):
+            return stripped
+
+        lines = stripped.splitlines()
+        if len(lines) >= 2 and lines[0].startswith("```") and lines[-1].strip() == "```":
+            body = "\n".join(lines[1:-1]).strip()
+            return body
+        return stripped
+
+    def _message_content_to_text(self, message: dict[str, Any]) -> str:
+        refusal = message.get("refusal")
+        if isinstance(refusal, str) and refusal.strip():
+            raise RuntimeError(
+                "OpenAI response parse failure [refusal]: "
+                f"{self._message_shape_summary(message)}"
+            )
+
+        for field_name in ("content", "content_parts"):
+            value = message.get(field_name)
+            if isinstance(value, str) and value.strip():
+                return self._strip_code_fences(value)
+
+            if isinstance(value, list):
+                text_chunks: list[str] = []
+                for item in value:
+                    if not isinstance(item, dict):
+                        continue
+                    item_type = item.get("type")
+                    if item_type == "text" and isinstance(item.get("text"), str) and item["text"].strip():
+                        text_chunks.append(item["text"].strip())
+                if text_chunks:
+                    return self._strip_code_fences("\n".join(text_chunks))
+
+        raise RuntimeError(
+            "OpenAI response parse failure [empty_content]: "
+            f"{self._message_shape_summary(message)}"
+        )
+
     def _require_api_key(self) -> str:
         api_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not api_key:
@@ -60,19 +133,31 @@ class OpenAIProvider:
 
     def _extract_content_json(self, payload_json: dict[str, Any]) -> dict[str, Any]:
         try:
-            content = (
-                payload_json["choices"][0]["message"]["content"]
+            message = (
+                payload_json["choices"][0]["message"]
                 if isinstance(payload_json.get("choices"), list) and payload_json["choices"]
                 else None
             )
-            if not isinstance(content, str) or not content.strip():
-                raise ValueError("OpenAI response did not contain text content.")
-            content_json = json.loads(content)
-        except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:
-            raise RuntimeError(f"Could not parse OpenAI response content: {exc}") from exc
+            if not isinstance(message, dict):
+                raise RuntimeError("OpenAI response parse failure [missing_message]: choices[0].message missing.")
+
+            content_text = self._message_content_to_text(message)
+            content_json = json.loads(content_text)
+        except RuntimeError:
+            raise
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                "OpenAI response parse failure [json_decode_error]: "
+                f"{exc}; {self._message_shape_summary(message)}"
+            ) from exc
+        except (KeyError, TypeError) as exc:
+            raise RuntimeError(f"OpenAI response parse failure [shape_error]: {exc}") from exc
 
         if not isinstance(content_json, dict):
-            raise RuntimeError("OpenAI response content must decode to a JSON object.")
+            raise RuntimeError(
+                "OpenAI response parse failure [non_object_json]: "
+                f"{type(content_json).__name__}"
+            )
         return content_json
 
     @staticmethod

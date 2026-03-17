@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from quiz_forge.ai.providers.openai import OpenAIProvider
 from quiz_forge.ai.types import AISettings
 
@@ -146,3 +148,148 @@ def test_openai_provider_run_json_task_uses_requested_model_and_tokens(monkeypat
     assert body.get("model") == "gpt-4o-mini"
     assert body.get("max_tokens") == 321
     assert "max_completion_tokens" not in body
+
+
+def test_openai_provider_run_json_task_accepts_fenced_json(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        del req, timeout
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [{"message": {"content": "```json\n{\"result\":\"ok\"}\n```"}}],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    response = provider.run_json_task(
+        system_prompt="Return JSON only.",
+        user_payload={"task": "test"},
+        settings=_settings("gpt-5-mini"),
+        model="gpt-5-mini",
+        max_output_tokens=321,
+    )
+
+    assert response.payload == {"result": "ok"}
+
+
+def test_openai_provider_run_json_task_accepts_content_part_array(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        del req, timeout
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": [
+                                    {"type": "text", "text": "{\"result\":\"ok\",\"source\":\"content-array\"}"}
+                                ]
+                            }
+                        }
+                    ],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    response = provider.run_json_task(
+        system_prompt="Return JSON only.",
+        user_payload={"task": "test"},
+        settings=_settings("gpt-5-mini"),
+        model="gpt-5-mini",
+        max_output_tokens=321,
+    )
+
+    assert response.payload == {"result": "ok", "source": "content-array"}
+
+
+def test_openai_provider_run_json_task_raises_refusal_label(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        del req, timeout
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [{"message": {"content": "", "refusal": "I can’t help with that."}}],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    with pytest.raises(RuntimeError, match=r"parse failure \[refusal\]"):
+        provider.run_json_task(
+            system_prompt="Return JSON only.",
+            user_payload={"task": "test"},
+            settings=_settings("gpt-5-mini"),
+            model="gpt-5-mini",
+            max_output_tokens=321,
+        )
+
+
+def test_openai_provider_run_json_task_raises_empty_content_label(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        del req, timeout
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [{"message": {"content": []}}],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    with pytest.raises(RuntimeError, match=r"parse failure \[empty_content\]"):
+        provider.run_json_task(
+            system_prompt="Return JSON only.",
+            user_payload={"task": "test"},
+            settings=_settings("gpt-5-mini"),
+            model="gpt-5-mini",
+            max_output_tokens=321,
+        )
+
+
+def test_openai_provider_run_json_task_raises_json_decode_label(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        del req, timeout
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [{"message": {"content": "not json"}}],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    with pytest.raises(RuntimeError, match=r"parse failure \[json_decode_error\]"):
+        provider.run_json_task(
+            system_prompt="Return JSON only.",
+            user_payload={"task": "test"},
+            settings=_settings("gpt-5-mini"),
+            model="gpt-5-mini",
+            max_output_tokens=321,
+        )

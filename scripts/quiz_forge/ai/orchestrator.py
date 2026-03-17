@@ -35,6 +35,10 @@ def _provider_error_label(exc: Exception) -> str:
     message = _normalize_error_text(str(exc))
     lowered = message.lower()
 
+    parse_label_match = re.search(r"parse failure \[([a-z0-9_]+)\]", lowered)
+    if parse_label_match is not None:
+        return parse_label_match.group(1)
+
     http_match = re.search(r"http\s+(\d{3})", message, flags=re.IGNORECASE)
     if http_match is not None:
         return f"http_{http_match.group(1)}"

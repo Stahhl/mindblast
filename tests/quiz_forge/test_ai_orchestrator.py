@@ -125,6 +125,31 @@ def test_orchestrator_provider_error_includes_actionable_label(tmp_path, mocker)
     assert "provider_error:RuntimeError:http_401:1" in report["fallback_reasons"]
 
 
+def test_orchestrator_run_json_task_uses_specific_parse_failure_label(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+
+    mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=RuntimeError(
+            "OpenAI response parse failure [json_decode_error]: Expecting value: line 1 column 1 (char 0)"
+        ),
+    )
+
+    payload, reason = orchestrator.run_json_task(
+        task_name="weekly_feedback_review",
+        system_prompt="Return JSON.",
+        user_payload={"task": "test"},
+    )
+    orchestrator.write_report()
+
+    assert payload is None
+    assert reason == "weekly_feedback_review:provider_error:RuntimeError:json_decode_error"
+
+    report = json.loads(Path(settings.report_path).read_text(encoding="utf-8"))
+    assert "weekly_feedback_review:provider_error:RuntimeError:json_decode_error:1" in report["fallback_reasons"]
+
+
 def test_orchestrator_run_json_task_records_usage(tmp_path, mocker) -> None:
     settings = _settings(tmp_path, mode="on")
     orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
