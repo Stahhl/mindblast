@@ -241,6 +241,41 @@ def test_openai_provider_run_json_task_raises_refusal_label(monkeypatch) -> None
         )
 
 
+def test_openai_provider_run_json_task_raises_refusal_label_from_content_array(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        del req, timeout
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": [
+                                    {"type": "refusal", "refusal": "I can’t comply with that request."}
+                                ]
+                            }
+                        }
+                    ],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    with pytest.raises(RuntimeError, match=r"parse failure \[refusal\]"):
+        provider.run_json_task(
+            system_prompt="Return JSON only.",
+            user_payload={"task": "test"},
+            settings=_settings("gpt-5-mini"),
+            model="gpt-5-mini",
+            max_output_tokens=321,
+        )
+
+
 def test_openai_provider_run_json_task_raises_empty_content_label(monkeypatch) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
 

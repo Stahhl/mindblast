@@ -83,6 +83,11 @@ class OpenAIProvider:
                     item_type = item.get("type")
                     if item_type == "text" and isinstance(item.get("text"), str) and item["text"].strip():
                         text_chunks.append(item["text"].strip())
+                    if item_type == "refusal" and isinstance(item.get("refusal"), str) and item["refusal"].strip():
+                        raise RuntimeError(
+                            "OpenAI response parse failure [refusal]: "
+                            f"{self._message_shape_summary(message)}"
+                        )
                 if text_chunks:
                     return self._strip_code_fences("\n".join(text_chunks))
 
