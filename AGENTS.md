@@ -62,6 +62,10 @@ If there is any conflict, follow `docs/PHASE1.md` for current implementation beh
 - Add clear validation before writing output.
 - Fail closed on invalid data (no partial or malformed commits).
 - Keep logs concise and operationally useful.
+- For external AI/provider calls, prefer API-enforced request/response schemas whenever the provider supports them.
+- Do not rely on prompt-only "return JSON" instructions when strict provider-side structured outputs are available.
+- Keep provider schema assumptions centralized in code, docs, and tests together (for example `scripts/.../openai_contract.py`, `docs/api_contracts/`, and `tests/`).
+- If a provider cannot enforce a strict schema, validate aggressively in application code and treat parser/runtime mismatches as first-class fallback reasons.
 
 ## Change Management
 

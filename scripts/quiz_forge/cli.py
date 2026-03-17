@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import datetime as dt
+import json
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,7 @@ from .discovery import write_discovery_artifacts
 from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings, propose_ai_factoid_candidate
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
+from .quality import QualityRunStats, lint_quiz_payload
 from .storage import (
     apply_human_ids_to_quiz,
     build_output_path,
@@ -175,6 +177,19 @@ def _preferred_factoid_answer_kind(recent_kinds: list[str]) -> str | None:
     return "person"
 
 
+def _write_quality_report(report_path: str | None, *, quality_stats: QualityRunStats, date_utc: str) -> None:
+    if not report_path:
+        return
+    payload: dict[str, Any] = {}
+    report_file = Path(report_path)
+    if report_file.exists():
+        payload = json.loads(report_file.read_text(encoding="utf-8"))
+    payload["date_utc"] = payload.get("date_utc", date_utc)
+    payload["quality"] = quality_stats.to_report_payload()
+    report_file.parent.mkdir(parents=True, exist_ok=True)
+    report_file.write_text(json.dumps(payload, ensure_ascii=True, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     args = parse_args()
     if getattr(args, "backfill_human_ids", False):
@@ -187,6 +202,7 @@ def main() -> int:
     ai_settings = load_ai_settings(output_dir=args.output_dir)
     ai_orchestrator = AIOrchestrator(settings=ai_settings, target_date=target_date)
     factoid_pipeline_settings = load_factoid_pipeline_settings(ai_settings.model)
+    quality_stats = QualityRunStats()
 
     pending = _build_generation_plan(
         output_dir=args.output_dir,
@@ -261,6 +277,20 @@ def main() -> int:
                     ai_ranked_distractor_ids=ai_ranked_distractor_ids,
                     preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
                     ai_selected_factoid_candidate=ai_selected_factoid_candidate,
+                    quality_stats=quality_stats,
+                )
+            elif quiz_type == QUIZ_TYPE_HISTORY_MCQ_4:
+                quiz = builder(
+                    target_date,
+                    retrieval_time,
+                    source_url,
+                    candidates,
+                    seed,
+                    edition,
+                    generation_mode,
+                    preferred_distractor_events=reusable_correct_events,
+                    ai_ranked_distractor_ids=ai_ranked_distractor_ids,
+                    quality_stats=quality_stats,
                 )
             else:
                 quiz = builder(
@@ -287,12 +317,25 @@ def main() -> int:
                 factoid_facets = quiz.get("questions", [{}])[0].get("facets") if isinstance(quiz.get("questions"), list) and quiz.get("questions") else None
                 uses_time_builder = isinstance(factoid_facets, dict) and factoid_facets.get("answer_kind") == "time"
                 factoid_reason: str | None = None
+                base_factoid_quiz = copy.deepcopy(quiz)
                 if uses_time_builder:
                     quiz, factoid_reason = apply_factoid_ai_pipeline(
                         quiz=quiz,
                         settings=factoid_pipeline_settings,
                         ai_orchestrator=ai_orchestrator,
                     )
+                    if factoid_reason is None:
+                        factoid_issues = lint_quiz_payload(quiz)
+                        if factoid_issues:
+                            quality_stats.add_issues(factoid_issues)
+                            quality_stats.add_fallback_path("history_factoid_mcq_4:ai_pipeline_rejected")
+                            quality_stats.add_ai_quality_rejection()
+                            print(
+                                "AI factoid pipeline rejected by quality lint for history_factoid_mcq_4: "
+                                + ", ".join(factoid_issues)
+                            )
+                            quiz = base_factoid_quiz
+                            factoid_reason = "quality_lint_rejected"
                 if factoid_pipeline_settings.enabled and uses_time_builder:
                     if factoid_reason is None:
                         print("AI factoid pipeline applied for history_factoid_mcq_4.")
@@ -304,6 +347,7 @@ def main() -> int:
                 if answer_kind is not None:
                     recent_factoid_answer_kinds.append(answer_kind)
                     recent_factoid_answer_kinds = recent_factoid_answer_kinds[-6:]
+                print(f"Final factoid subtype for history_factoid_mcq_4: {answer_kind or 'unknown'}")
 
             if apply_human_ids_to_quiz(quiz=quiz, quiz_path=output_path, lookup=human_id_lookup):
                 human_id_lookup_changed = True
@@ -367,6 +411,7 @@ def main() -> int:
 
     ai_orchestrator.finalize()
     ai_orchestrator.write_report()
+    _write_quality_report(ai_settings.report_path, quality_stats=quality_stats, date_utc=target_date.isoformat())
     if ai_settings.report_path:
         print(f"Wrote AI run report: {ai_settings.report_path}")
 

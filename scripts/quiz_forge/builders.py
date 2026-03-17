@@ -22,8 +22,10 @@ from .model import (
     build_question_id,
     build_question_object,
 )
-from .selection import pick_history_factoid_typed_candidates, pick_history_mcq_distractor_pool, pick_two_events
+from .selection import pick_history_mcq_distractor_pool, pick_two_events
 from .selection import build_history_factoid_distractors_for_candidate
+from .selection import iter_history_factoid_typed_candidate_sets, iter_history_mcq_correct_events
+from .quality import QualityRunStats, lint_quiz_payload
 
 
 def _format_year_label(year: int) -> str:
@@ -176,6 +178,155 @@ def build_source(
     }
 
 
+def _build_history_mcq_4_payload(
+    *,
+    target_date: dt.date,
+    retrieval_time: dt.datetime,
+    source_url: str,
+    seed: int,
+    edition: int,
+    generation_mode: str,
+    correct: dict[str, Any],
+    selected_distractors: list[dict[str, Any]],
+) -> dict[str, Any]:
+    options = [correct, *selected_distractors]
+    options.sort(
+        key=lambda item: hashlib.sha256(
+            f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
+        ).hexdigest()
+    )
+    question_text = f"Which event happened in {correct['year']}?"
+
+    choice_ids = ("A", "B", "C", "D")
+    choices: list[dict[str, Any]] = []
+    correct_choice_id: str | None = None
+    answer_facts: list[dict[str, Any]] = []
+
+    for choice_id, option in zip(choice_ids, options):
+        role = "correct" if option is correct else "distractor"
+        fact = build_answer_fact(option, quiz_type=QUIZ_TYPE_HISTORY_MCQ_4, role=role)
+        answer_facts.append(fact)
+        choices.append({"id": choice_id, "label": option["text"], "answer_fact_id": fact["id"]})
+        if option is correct:
+            correct_choice_id = choice_id
+
+    if correct_choice_id is None:
+        raise ValueError("Could not determine correct choice id for history_mcq_4.")
+
+    question_object = build_question_object(
+        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_MCQ_4, edition),
+        prompt=question_text,
+        quiz_type=QUIZ_TYPE_HISTORY_MCQ_4,
+        answer_fact_ids=[fact["id"] for fact in answer_facts],
+        correct_answer_fact_id=build_answer_fact_id(correct),
+        target_year=correct["year"],
+    )
+
+    return {
+        "date": target_date.isoformat(),
+        "topics": ["history"],
+        "type": QUIZ_TYPE_HISTORY_MCQ_4,
+        "questions": [question_object],
+        "answer_facts": answer_facts,
+        "question": question_text,
+        "choices": choices,
+        "correct_choice_id": correct_choice_id,
+        "source": build_source(retrieval_time, source_url, options),
+        "generation": {
+            "mode": generation_mode,
+            "edition": edition,
+            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        },
+        "metadata": {
+            "version": QUIZ_SCHEMA_VERSION,
+            "normalized_model": NORMALIZED_MODEL_VERSION,
+        },
+    }
+
+
+def _build_history_factoid_time_quiz(
+    *,
+    target_date: dt.date,
+    retrieval_time: dt.datetime,
+    source_url: str,
+    seed: int,
+    edition: int,
+    generation_mode: str,
+    correct: dict[str, Any],
+    distractors: list[dict[str, Any]],
+) -> dict[str, Any]:
+    options = [correct, *distractors]
+    options.sort(
+        key=lambda item: hashlib.sha256(
+            f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
+        ).hexdigest()
+    )
+    question_text = _build_factoid_when_question(correct["text"])
+
+    choice_ids = ("A", "B", "C", "D")
+    choices: list[dict[str, Any]] = []
+    correct_choice_id: str | None = None
+    answer_facts: list[dict[str, Any]] = []
+
+    for choice_id, option in zip(choice_ids, options):
+        role = "correct" if option is correct else "distractor"
+        fact = build_answer_fact(
+            option,
+            quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
+            role=role,
+            entity_type="time",
+        )
+        answer_facts.append(fact)
+        choices.append(
+            {
+                "id": choice_id,
+                "label": _format_year_label(option["year"]),
+                "answer_fact_id": fact["id"],
+            }
+        )
+        option["answer_fact_id"] = fact["id"]
+        if option is correct:
+            correct_choice_id = choice_id
+
+    if correct_choice_id is None:
+        raise ValueError("Could not determine correct choice id for history_factoid_mcq_4.")
+
+    question_object = build_question_object(
+        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_FACTOID_MCQ_4, edition),
+        prompt=question_text,
+        quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
+        answer_fact_ids=[fact["id"] for fact in answer_facts],
+        correct_answer_fact_id=build_answer_fact_id(correct),
+        target_year=correct["year"],
+        extra_facets={
+            "question_format": "factoid",
+            "answer_kind": "time",
+            "prompt_style": "when",
+        },
+    )
+
+    return {
+        "date": target_date.isoformat(),
+        "topics": ["history"],
+        "type": QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
+        "questions": [question_object],
+        "answer_facts": answer_facts,
+        "question": question_text,
+        "choices": choices,
+        "correct_choice_id": correct_choice_id,
+        "source": build_source(retrieval_time, source_url, options),
+        "generation": {
+            "mode": generation_mode,
+            "edition": edition,
+            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        },
+        "metadata": {
+            "version": QUIZ_SCHEMA_VERSION,
+            "normalized_model": NORMALIZED_MODEL_VERSION,
+        },
+    }
+
+
 def build_which_came_first_quiz(
     target_date: dt.date,
     retrieval_time: dt.datetime,
@@ -262,81 +413,57 @@ def build_history_mcq_4_quiz(
     generation_mode: str,
     preferred_distractor_events: list[dict[str, Any]] | None = None,
     ai_ranked_distractor_ids: list[str] | None = None,
+    quality_stats: QualityRunStats | None = None,
 ) -> dict[str, Any]:
     if generation_mode not in SUPPORTED_GENERATION_MODES:
         raise ValueError(f"Unsupported generation mode: {generation_mode}")
-    correct, distractor_pool = pick_history_mcq_distractor_pool(
-        candidates,
-        seed,
-        preferred_distractor_events=preferred_distractor_events,
-        max_distractors=8,
+    last_issues: tuple[str, ...] = ()
+    for attempt_index, correct in enumerate(iter_history_mcq_correct_events(candidates, seed)):
+        correct_seed = seed + attempt_index
+        correct_event_for_pool = correct if attempt_index else None
+        _, distractor_pool = pick_history_mcq_distractor_pool(
+            candidates,
+            correct_seed,
+            preferred_distractor_events=preferred_distractor_events,
+            max_distractors=8,
+            correct_event=correct_event_for_pool,
+        )
+        selected_distractors = distractor_pool[:3]
+        if attempt_index == 0 and ai_ranked_distractor_ids:
+            by_fact_id = {build_answer_fact_id(item): item for item in distractor_pool}
+            ranked_selection: list[dict[str, Any]] = []
+            for fact_id in ai_ranked_distractor_ids:
+                candidate = by_fact_id.get(fact_id)
+                if candidate is None:
+                    ranked_selection = []
+                    break
+                ranked_selection.append(candidate)
+            if len(ranked_selection) == 3 and len({item["year"] for item in ranked_selection}) == 3:
+                selected_distractors = ranked_selection
+
+        payload = _build_history_mcq_4_payload(
+            target_date=target_date,
+            retrieval_time=retrieval_time,
+            source_url=source_url,
+            seed=correct_seed,
+            edition=edition,
+            generation_mode=generation_mode,
+            correct=correct,
+            selected_distractors=selected_distractors,
+        )
+        issues = lint_quiz_payload(payload)
+        if not issues:
+            return payload
+        last_issues = issues
+        if quality_stats is not None:
+            quality_stats.add_issues(issues)
+            quality_stats.add_fallback_path("history_mcq_4:alternate_correct_event")
+
+    raise ValueError(
+        "Could not build lint-clean history_mcq_4 quiz."
+        if not last_issues
+        else f"Could not build lint-clean history_mcq_4 quiz: {', '.join(last_issues)}."
     )
-    selected_distractors = distractor_pool[:3]
-    if ai_ranked_distractor_ids:
-        by_fact_id = {build_answer_fact_id(item): item for item in distractor_pool}
-        ranked_selection: list[dict[str, Any]] = []
-        for fact_id in ai_ranked_distractor_ids:
-            candidate = by_fact_id.get(fact_id)
-            if candidate is None:
-                ranked_selection = []
-                break
-            ranked_selection.append(candidate)
-        if len(ranked_selection) == 3 and len({item["year"] for item in ranked_selection}) == 3:
-            selected_distractors = ranked_selection
-
-    options = [correct, *selected_distractors]
-    options.sort(
-        key=lambda item: hashlib.sha256(
-            f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
-        ).hexdigest()
-    )
-    question_text = f"Which event happened in {correct['year']}?"
-
-    choice_ids = ("A", "B", "C", "D")
-    choices: list[dict[str, Any]] = []
-    correct_choice_id: str | None = None
-    answer_facts: list[dict[str, Any]] = []
-
-    for choice_id, option in zip(choice_ids, options):
-        role = "correct" if option is correct else "distractor"
-        fact = build_answer_fact(option, quiz_type=QUIZ_TYPE_HISTORY_MCQ_4, role=role)
-        answer_facts.append(fact)
-        choices.append({"id": choice_id, "label": option["text"], "answer_fact_id": fact["id"]})
-        if option is correct:
-            correct_choice_id = choice_id
-
-    if correct_choice_id is None:
-        raise ValueError("Could not determine correct choice id for history_mcq_4.")
-
-    question_object = build_question_object(
-        question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_MCQ_4, edition),
-        prompt=question_text,
-        quiz_type=QUIZ_TYPE_HISTORY_MCQ_4,
-        answer_fact_ids=[fact["id"] for fact in answer_facts],
-        correct_answer_fact_id=build_answer_fact_id(correct),
-        target_year=correct["year"],
-    )
-
-    return {
-        "date": target_date.isoformat(),
-        "topics": ["history"],
-        "type": QUIZ_TYPE_HISTORY_MCQ_4,
-        "questions": [question_object],
-        "answer_facts": answer_facts,
-        "question": question_text,
-        "choices": choices,
-        "correct_choice_id": correct_choice_id,
-        "source": build_source(retrieval_time, source_url, options),
-        "generation": {
-            "mode": generation_mode,
-            "edition": edition,
-            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        },
-        "metadata": {
-            "version": QUIZ_SCHEMA_VERSION,
-            "normalized_model": NORMALIZED_MODEL_VERSION,
-        },
-    }
 
 
 def build_history_factoid_mcq_4_quiz(
@@ -351,6 +478,7 @@ def build_history_factoid_mcq_4_quiz(
     ai_ranked_distractor_ids: list[str] | None = None,
     preferred_answer_kind: str | None = None,
     ai_selected_factoid_candidate: dict[str, Any] | None = None,
+    quality_stats: QualityRunStats | None = None,
 ) -> dict[str, Any]:
     del ai_ranked_distractor_ids
     if generation_mode not in SUPPORTED_GENERATION_MODES:
@@ -363,7 +491,7 @@ def build_history_factoid_mcq_4_quiz(
                 seed=seed,
                 correct_candidate=ai_selected_factoid_candidate,
             )
-            return _build_history_factoid_typed_quiz(
+            payload = _build_history_factoid_typed_quiz(
                 target_date=target_date,
                 retrieval_time=retrieval_time,
                 source_url=source_url,
@@ -373,106 +501,80 @@ def build_history_factoid_mcq_4_quiz(
                 correct_factoid=ai_selected_factoid_candidate,
                 distractor_factoids=distractors,
             )
+            issues = lint_quiz_payload(payload)
+            if not issues:
+                if quality_stats is not None:
+                    quality_stats.add_factoid_subtype(f"typed:{ai_selected_factoid_candidate['answer_kind']}")
+                return payload
+            if quality_stats is not None:
+                quality_stats.add_issues(issues)
+                quality_stats.add_fallback_path("history_factoid_mcq_4:ai_candidate_rejected")
         except ValueError:
             # AI-selected factoids are opportunistic. If they cannot produce four
             # unique answer facts, fall back to the deterministic typed/time flow.
-            pass
+            if quality_stats is not None:
+                quality_stats.add_fallback_path("history_factoid_mcq_4:ai_candidate_invalid")
 
     try:
-        correct_factoid, distractor_factoids = pick_history_factoid_typed_candidates(
+        typed_candidate_sets = iter_history_factoid_typed_candidate_sets(
             candidates,
             seed,
-            preferred_distractor_events=preferred_distractor_events,
             preferred_answer_kind=preferred_answer_kind,
         )
     except ValueError:
-        correct, distractor_pool = pick_history_mcq_distractor_pool(
+        typed_candidate_sets = []
+
+    for attempt_index, (correct_factoid, distractor_factoids, selected_kind) in enumerate(typed_candidate_sets):
+        payload = _build_history_factoid_typed_quiz(
+            target_date=target_date,
+            retrieval_time=retrieval_time,
+            source_url=source_url,
+            seed=seed + attempt_index,
+            edition=edition,
+            generation_mode=generation_mode,
+            correct_factoid=correct_factoid,
+            distractor_factoids=distractor_factoids,
+        )
+        issues = lint_quiz_payload(payload)
+        if not issues:
+            if quality_stats is not None:
+                quality_stats.add_factoid_subtype(f"typed:{selected_kind}")
+            return payload
+        if quality_stats is not None:
+            quality_stats.add_issues(issues)
+            quality_stats.add_fallback_path("history_factoid_mcq_4:alternate_typed_candidate")
+
+    for attempt_index, correct in enumerate(iter_history_mcq_correct_events(candidates, seed)):
+        correct_seed = seed + attempt_index
+        _, distractor_pool = pick_history_mcq_distractor_pool(
             candidates,
-            seed,
+            correct_seed,
             preferred_distractor_events=preferred_distractor_events,
             max_distractors=3,
+            correct_event=correct,
         )
-        options = [correct, *distractor_pool[:3]]
-        options.sort(
-            key=lambda item: hashlib.sha256(
-                f"{seed}:{item['year']}:{item['text']}".encode("utf-8")
-            ).hexdigest()
+        payload = _build_history_factoid_time_quiz(
+            target_date=target_date,
+            retrieval_time=retrieval_time,
+            source_url=source_url,
+            seed=correct_seed,
+            edition=edition,
+            generation_mode=generation_mode,
+            correct=correct,
+            distractors=distractor_pool[:3],
         )
-        question_text = _build_factoid_when_question(correct["text"])
+        issues = lint_quiz_payload(payload)
+        if not issues:
+            if quality_stats is not None:
+                quality_stats.add_factoid_subtype("time")
+                if attempt_index > 0 or typed_candidate_sets:
+                    quality_stats.add_fallback_path("history_factoid_mcq_4:time_builder")
+            return payload
+        if quality_stats is not None:
+            quality_stats.add_issues(issues)
+            quality_stats.add_fallback_path("history_factoid_mcq_4:alternate_time_candidate")
 
-        choice_ids = ("A", "B", "C", "D")
-        choices: list[dict[str, Any]] = []
-        correct_choice_id: str | None = None
-        answer_facts: list[dict[str, Any]] = []
-
-        for choice_id, option in zip(choice_ids, options):
-            role = "correct" if option is correct else "distractor"
-            fact = build_answer_fact(
-                option,
-                quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
-                role=role,
-                entity_type="time",
-            )
-            answer_facts.append(fact)
-            choices.append(
-                {
-                    "id": choice_id,
-                    "label": _format_year_label(option["year"]),
-                    "answer_fact_id": fact["id"],
-                }
-            )
-            option["answer_fact_id"] = fact["id"]
-            if option is correct:
-                correct_choice_id = choice_id
-
-        if correct_choice_id is None:
-            raise ValueError("Could not determine correct choice id for history_factoid_mcq_4.")
-
-        question_object = build_question_object(
-            question_id=build_question_id(target_date, QUIZ_TYPE_HISTORY_FACTOID_MCQ_4, edition),
-            prompt=question_text,
-            quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
-            answer_fact_ids=[fact["id"] for fact in answer_facts],
-            correct_answer_fact_id=build_answer_fact_id(correct),
-            target_year=correct["year"],
-            extra_facets={
-                "question_format": "factoid",
-                "answer_kind": "time",
-                "prompt_style": "when",
-            },
-        )
-
-        return {
-            "date": target_date.isoformat(),
-            "topics": ["history"],
-            "type": QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
-            "questions": [question_object],
-            "answer_facts": answer_facts,
-            "question": question_text,
-            "choices": choices,
-            "correct_choice_id": correct_choice_id,
-            "source": build_source(retrieval_time, source_url, options),
-            "generation": {
-                "mode": generation_mode,
-                "edition": edition,
-                "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-            },
-            "metadata": {
-                "version": QUIZ_SCHEMA_VERSION,
-                "normalized_model": NORMALIZED_MODEL_VERSION,
-            },
-        }
-
-    return _build_history_factoid_typed_quiz(
-        target_date=target_date,
-        retrieval_time=retrieval_time,
-        source_url=source_url,
-        seed=seed,
-        edition=edition,
-        generation_mode=generation_mode,
-        correct_factoid=correct_factoid,
-        distractor_factoids=distractor_factoids,
-    )
+    raise ValueError("Could not build lint-clean history_factoid_mcq_4 quiz.")
 
 
 QUIZ_BUILDERS = {

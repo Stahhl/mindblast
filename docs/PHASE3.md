@@ -122,6 +122,7 @@ Provider selection/config contract:
 - external provider credentials via environment secret(s)
 - local provider endpoint/model via environment config
 - provider schema snapshots under `docs/api_contracts/` (review-date stamped)
+- when the provider supports structured outputs / strict response schemas, use them instead of prompt-only JSON instructions
 
 ## Provider Architecture Contract
 Define task/provider interfaces under `scripts/quiz_forge/ai/`:
@@ -143,6 +144,9 @@ Schema guardrail:
   - `scripts/quiz_forge/ai/providers/openai_contract.py`
   - `docs/api_contracts/openai_chat_completions_rerank.snapshot.json`
   - CI-backed tests in `tests/quiz_forge/`
+- Provider-enforced schemas should be preferred whenever available.
+- `response_format: {"type":"json_object"}` is not sufficient when a strict schema can be supplied.
+- Runtime validation remains required even when provider-enforced schemas are used.
 
 ## Budget and Safety Controls
 Environment-controlled hard limits:

@@ -158,6 +158,20 @@ jobs:
               f"  month spend usd: {payload.get('month_spend_usd', 0)} / {payload.get('month_limit_usd', 0)}",
               f"  fallbacks: {payload.get('fallback_count', 0)} ({reasons_text})",
           ]
+          quality = payload.get("quality")
+          if isinstance(quality, dict):
+              lint_failures = ", ".join(quality.get("lint_failures") or []) or "none"
+              fallback_paths = ", ".join(quality.get("fallback_paths") or []) or "none"
+              factoid_subtypes = ", ".join(quality.get("factoid_final_subtypes") or []) or "none"
+              lines.extend(
+                  [
+                      "quality:",
+                      f"  lint failures: {quality.get('lint_failure_count', 0)} ({lint_failures})",
+                      f"  fallback paths: {quality.get('fallback_count', 0)} ({fallback_paths})",
+                      f"  factoid subtypes: {factoid_subtypes}",
+                      f"  ai quality rejections: {quality.get('ai_quality_rejection_count', 0)}",
+                  ]
+              )
           print("\n".join(lines))
           PY
             )"

@@ -21,6 +21,7 @@ def aggregate_feedback_submissions(
 ) -> WeeklyFeedbackAggregate:
     ratings_histogram = _empty_histogram()
     commented_submissions = 0
+    issue_counts: dict[str, int] = {}
     grouped: dict[tuple[str, str], list[FeedbackSubmission]] = defaultdict(list)
 
     for submission in submissions:
@@ -69,8 +70,11 @@ def aggregate_feedback_submissions(
                 latest_feedback_at=latest_feedback_at,
                 ratings_histogram=question_histogram,
                 sanitized_excerpts=unique_excerpts,
+                issue_tags=context.issue_tags,
             )
         )
+        for issue_tag in context.issue_tags:
+            issue_counts[issue_tag] = issue_counts.get(issue_tag, 0) + 1
 
     question_summaries.sort(
         key=lambda item: (
@@ -88,6 +92,7 @@ def aggregate_feedback_submissions(
         ratings_histogram=ratings_histogram,
         commented_submissions=commented_submissions,
         question_summaries=tuple(question_summaries),
+        issue_counts=issue_counts,
     )
 
 

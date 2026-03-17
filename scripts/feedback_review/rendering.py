@@ -41,6 +41,7 @@ def build_weekly_report_payload(
             "latest_feedback_at": summary.latest_feedback_at,
             "ratings_histogram": summary.ratings_histogram,
             "sanitized_excerpts": list(summary.sanitized_excerpts),
+            "issue_tags": list(summary.issue_tags),
         }
         for summary in aggregate.question_summaries
     ]
@@ -58,6 +59,7 @@ def build_weekly_report_payload(
             "ratings_histogram": aggregate.ratings_histogram,
             "commented_submissions": aggregate.commented_submissions,
             "question_count": len(aggregate.question_summaries),
+            "issue_counts": aggregate.issue_counts,
         },
         "questions": questions,
         "llm_summary": llm_summary,

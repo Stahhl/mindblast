@@ -10,6 +10,7 @@ import pytest
 
 from quiz_forge.ai.types import AIJsonTaskResponse, AIUsage
 from quiz_forge.discovery import write_discovery_artifacts
+from quiz_forge.quality import QualityRunStats, lint_quiz_payload
 from quiz_forge.storage import (
     build_output_path,
     load_json_file,
@@ -1028,3 +1029,176 @@ def _extract_place_candidate(label: str) -> dict[str, object]:
         "question_text": "Where did this happen?",
         "source_event": event,
     }
+
+
+def test_build_history_mcq_4_quiz_retries_when_first_correct_choice_leaks_target_year() -> None:
+    import datetime as dt
+
+    from quiz_forge.builders import build_history_mcq_4_quiz
+
+    candidates = [
+        {
+            "text": "Economist is sworn in during the 2010 earthquake ceremony.",
+            "year": 2010,
+            "wikipedia_url": "https://example.com/leaky-2010",
+        },
+        {
+            "text": "A constitution is signed after months of negotiations.",
+            "year": 1919,
+            "wikipedia_url": "https://example.com/1919",
+        },
+        {
+            "text": "A fleet reaches port after a long voyage.",
+            "year": 1888,
+            "wikipedia_url": "https://example.com/1888",
+        },
+        {
+            "text": "A treaty is ratified by the senate.",
+            "year": 1935,
+            "wikipedia_url": "https://example.com/1935",
+        },
+        {
+            "text": "A republic declares independence from a neighboring empire.",
+            "year": 1991,
+            "wikipedia_url": "https://example.com/1991",
+        },
+    ]
+    quality_stats = QualityRunStats()
+
+    payload = build_history_mcq_4_quiz(
+        dt.date(2026, 3, 17),
+        dt.datetime(2026, 3, 17, 6, 0, tzinfo=dt.timezone.utc),
+        "https://example.com/source",
+        candidates,
+        seed=4,
+        edition=1,
+        generation_mode="daily",
+        quality_stats=quality_stats,
+    )
+
+    assert lint_quiz_payload(payload) == ()
+    assert "prompt_leak_year:1" in quality_stats.to_report_payload()["lint_failures"]
+
+
+def test_build_history_factoid_quiz_rejects_leaky_ai_candidate_and_falls_back(monkeypatch) -> None:
+    import datetime as dt
+
+    from quiz_forge.builders import build_history_factoid_mcq_4_quiz
+
+    ai_candidate = {
+        "answer_kind": "place",
+        "prompt_style": "where",
+        "answer_label": "the MCG Stadium",
+        "question_text": "Where did this happen: First ever official cricket test match is played: Australia vs England in Melbourne, Australia?",
+        "source_event": {
+            "text": "First ever official cricket test match is played: Australia vs England in Melbourne, Australia.",
+            "year": 1877,
+            "wikipedia_url": "https://example.com/mcg",
+        },
+    }
+
+    monkeypatch.setattr(
+        "quiz_forge.builders.build_history_factoid_distractors_for_candidate",
+        lambda *args, **kwargs: [
+            {
+                "answer_kind": "place",
+                "prompt_style": "where",
+                "answer_label": "Kyoto",
+                "question_text": "Where did this happen?",
+                "source_event": _place_factoid_candidates()[0],
+            },
+            {
+                "answer_kind": "place",
+                "prompt_style": "where",
+                "answer_label": "Waterloo",
+                "question_text": "Where did this happen?",
+                "source_event": _place_factoid_candidates()[1],
+            },
+            {
+                "answer_kind": "place",
+                "prompt_style": "where",
+                "answer_label": "Karachi, Pakistan",
+                "question_text": "Where did this happen?",
+                "source_event": _place_factoid_candidates()[2],
+            },
+        ],
+    )
+    quality_stats = QualityRunStats()
+
+    payload = build_history_factoid_mcq_4_quiz(
+        dt.date(2026, 3, 17),
+        dt.datetime(2026, 3, 17, 6, 0, tzinfo=dt.timezone.utc),
+        "https://example.com/source",
+        _place_factoid_candidates(),
+        seed=1,
+        edition=1,
+        generation_mode="daily",
+        ai_selected_factoid_candidate=ai_candidate,
+        quality_stats=quality_stats,
+    )
+
+    assert lint_quiz_payload(payload) == ()
+    assert payload["question"] != ai_candidate["question_text"]
+    assert "history_factoid_mcq_4:ai_candidate_rejected:1" in quality_stats.to_report_payload()["fallback_paths"]
+
+
+def test_cli_discards_ai_time_factoid_update_when_quality_lint_fails(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-03-17"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    class _Settings:
+        enabled = True
+        model_qgen = "gpt-5-mini"
+        model_ranker = "gpt-5-mini"
+        model_distractors = "gpt-5-mini"
+        model_judge = "gpt-5-mini"
+        max_stage_tokens = 200
+        min_question_score = 0.5
+        min_final_score = 0.5
+
+    monkeypatch.setattr(cli, "load_factoid_pipeline_settings", lambda _model: _Settings())
+    monkeypatch.setattr(cli, "propose_ai_factoid_candidate", lambda **_kwargs: (None, "not_used"))
+
+    def _bad_ai_update(*, quiz, **_kwargs):
+        updated = json.loads(json.dumps(quiz))
+        correct_choice = next(choice for choice in updated["choices"] if choice["id"] == updated["correct_choice_id"])
+        updated["question"] = f"When did this happen in {correct_choice['label']}?"
+        updated["questions"][0]["prompt"] = updated["question"]
+        return updated, None
+
+    monkeypatch.setattr(cli, "apply_factoid_ai_pipeline", _bad_ai_update)
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+    payload = records[0].payload
+    assert lint_quiz_payload(payload) == ()
+    assert payload["question"] != next(
+        f"When did this happen in {choice['label']}?"
+        for choice in payload["choices"]
+        if choice["id"] == payload["correct_choice_id"]
+    )
+
+    report_payload = json.loads((tmp_path / "ai-report.json").read_text(encoding="utf-8"))
+    assert report_payload["quality"]["ai_quality_rejection_count"] == 1

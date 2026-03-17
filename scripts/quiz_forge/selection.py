@@ -64,6 +64,7 @@ def pick_history_mcq_distractor_pool(
     preferred_distractor_events: list[dict[str, Any]] | None = None,
     *,
     max_distractors: int,
+    correct_event: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if max_distractors < 3:
         raise ValueError("max_distractors must be at least 3.")
@@ -72,8 +73,19 @@ def pick_history_mcq_distractor_pool(
         raise ValueError("Not enough valid events to build a 4-option history MCQ.")
 
     ordered = sorted(candidates, key=lambda item: (item["year"], item["text"]))
-    correct_idx = seed % len(ordered)
-    correct = ordered[correct_idx]
+    if correct_event is None:
+        correct_idx = seed % len(ordered)
+        correct = ordered[correct_idx]
+    else:
+        key = (correct_event["text"], correct_event["year"], correct_event["wikipedia_url"])
+        indexed_ordered = {
+            (event["text"], event["year"], event["wikipedia_url"]): (index, event)
+            for index, event in enumerate(ordered)
+        }
+        match = indexed_ordered.get(key)
+        if match is None:
+            raise ValueError("Requested correct event is not present in candidate pool.")
+        correct_idx, correct = match
 
     step = (seed % (len(ordered) - 1)) + 1
     distractors: list[dict[str, Any]] = []
@@ -126,6 +138,24 @@ def pick_history_mcq_distractor_pool(
         raise ValueError("Could not pick three distinct-year distractors for history_mcq_4.")
 
     return correct, distractors
+
+
+def iter_history_mcq_correct_events(
+    candidates: list[dict[str, Any]],
+    seed: int,
+) -> list[dict[str, Any]]:
+    if len(candidates) < 4:
+        raise ValueError("Not enough valid events to build a 4-option history MCQ.")
+    ordered = sorted(candidates, key=lambda item: (item["year"], item["text"]))
+    first_idx = seed % len(ordered)
+    step = (seed % (len(ordered) - 1)) + 1
+    indices = [first_idx]
+    for offset in range(len(ordered) - 1):
+        idx = (first_idx + step + offset) % len(ordered)
+        if idx in indices:
+            continue
+        indices.append(idx)
+    return [ordered[index] for index in indices]
 
 
 _PERSON_CONNECTORS = {
@@ -199,6 +229,13 @@ _NON_PERSON_KEYWORDS = {
     "University",
     "USS",
     "War",
+    "Wildlife",
+    "National",
+    "Operation",
+    "Stadium",
+    "Theatre",
+    "Theater",
+    "Supertanker",
 }
 _SUBJECT_RE = re.compile(
     r"^(?P<subject>[A-Z][\w'.-]+(?:\s+(?:[A-Z][\w'.-]+|[ivxlcdmIVXLCDM]+|Jr\.|Sr\.|St\.|[a-z]{1,4})){1,6})\s+(?P<rest>.+)$"
@@ -288,7 +325,11 @@ def _looks_like_person_name(subject: str) -> bool:
     tokens = subject.split()
     if len(tokens) < 2:
         return False
+    if subject.startswith("The "):
+        return False
     if any(any(char.isdigit() for char in token) for token in tokens if token.upper() != token):
+        return False
+    if any(token.endswith("'s") or token.endswith("’s") for token in tokens):
         return False
 
     non_title_tokens = [token for token in tokens if token not in _PERSON_TITLES]
@@ -297,6 +338,8 @@ def _looks_like_person_name(subject: str) -> bool:
 
     first = non_title_tokens[0]
     if first in _NON_PERSON_KEYWORDS or any(keyword in subject for keyword in _NON_PERSON_KEYWORDS):
+        return False
+    if any(token.rstrip(".,") in _PLACE_HINT_TOKENS for token in non_title_tokens):
         return False
 
     capitalized_token_count = 0
@@ -312,6 +355,10 @@ def _looks_like_person_name(subject: str) -> bool:
         return False
 
     return capitalized_token_count >= 2
+
+
+def looks_like_person_label(label: str) -> bool:
+    return _looks_like_person_name(_normalize_ws(label.strip()))
 
 
 def _extract_person_factoid_candidate(event: dict[str, Any]) -> dict[str, Any] | None:
@@ -382,6 +429,10 @@ def _looks_like_place_label(label: str) -> bool:
             return False
 
     return capitalized_token_count >= 1
+
+
+def looks_like_place_label(label: str) -> bool:
+    return _looks_like_place_label(label)
 
 
 def _split_place_segments(text: str, *, prefix: str) -> tuple[str, str] | None:
@@ -493,6 +544,8 @@ def _factoid_candidate_id(candidate: dict[str, Any]) -> str:
 def _pick_factoid_candidates_of_kind(
     extracted_candidates: list[dict[str, Any]],
     seed: int,
+    *,
+    correct_index_offset: int = 0,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     ordered = sorted(extracted_candidates, key=_factoid_candidate_sort_key)
     unique_ordered: list[dict[str, Any]] = []
@@ -508,7 +561,7 @@ def _pick_factoid_candidates_of_kind(
     if not ordered:
         raise ValueError("No eligible factoid candidates found.")
 
-    correct_idx = seed % len(ordered)
+    correct_idx = (seed + correct_index_offset) % len(ordered)
     correct = ordered[correct_idx]
 
     step = (seed % (len(ordered) - 1)) + 1
@@ -610,3 +663,53 @@ def pick_history_factoid_typed_candidates(
         raise ValueError(f"Could not pick three distinct {selected_kind} distractors for history_factoid_mcq_4.")
 
     return correct, distractors
+
+
+def iter_history_factoid_typed_candidate_sets(
+    candidates: list[dict[str, Any]],
+    seed: int,
+    *,
+    preferred_answer_kind: str | None = None,
+) -> list[tuple[dict[str, Any], list[dict[str, Any]], str]]:
+    by_kind = {
+        "person": [
+            candidate
+            for event in candidates
+            if (candidate := _extract_person_factoid_candidate(event)) is not None
+        ],
+        "place": [
+            candidate
+            for event in candidates
+            if (candidate := _extract_place_factoid_candidate(event)) is not None
+        ],
+    }
+    eligible_kinds = [
+        answer_kind
+        for answer_kind in ("person", "place")
+        if len({candidate["answer_label"].casefold() for candidate in by_kind[answer_kind]}) >= 4
+    ]
+    if not eligible_kinds:
+        raise ValueError("Not enough typed factoid candidates to build a 4-option history factoid MCQ.")
+
+    if preferred_answer_kind in eligible_kinds:
+        primary_kind = preferred_answer_kind
+    else:
+        primary_kind = eligible_kinds[seed % len(eligible_kinds)]
+    kind_order = [primary_kind, *[kind for kind in eligible_kinds if kind != primary_kind]]
+
+    candidate_sets: list[tuple[dict[str, Any], list[dict[str, Any]], str]] = []
+    for kind in kind_order:
+        unique_candidate_count = len({_factoid_candidate_id(candidate) for candidate in by_kind[kind]})
+        for offset in range(unique_candidate_count):
+            correct, distractors = _pick_factoid_candidates_of_kind(
+                by_kind[kind],
+                seed,
+                correct_index_offset=offset,
+            )
+            if len(distractors) < 3:
+                continue
+            candidate_sets.append((correct, distractors[:3], kind))
+
+    if not candidate_sets:
+        raise ValueError(f"Could not pick typed factoid candidates for eligible kinds: {eligible_kinds}.")
+    return candidate_sets

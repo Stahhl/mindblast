@@ -79,6 +79,7 @@ def test_load_quiz_card_context_reads_prompt_and_choices(tmp_path: Path) -> None
     assert context.question_prompt == "Who did the thing?"
     assert context.choice_labels == ("Ada", "Grace", "Linus", "Margaret")
     assert context.edition == 2
+    assert context.issue_tags == ()
 
 
 def test_aggregate_feedback_submissions_builds_sorted_question_summaries(tmp_path: Path) -> None:
@@ -146,6 +147,7 @@ def test_aggregate_feedback_submissions_builds_sorted_question_summaries(tmp_pat
         "Bad distractor. contact me [redacted-email]",
         "Too easy",
     )
+    assert aggregate.issue_counts == {}
 
 
 class _FakeDocument:
@@ -282,6 +284,8 @@ def test_rendering_includes_ai_unavailable_fallback(tmp_path: Path) -> None:
     assert "AI summary unavailable: `ai_disabled`" in markdown
     assert payload["aggregates"]["total_submissions"] == 1
     assert payload["questions"][0]["question_human_id"] == "Q77"
+    assert payload["aggregates"]["issue_counts"] == {}
+    assert payload["questions"][0]["issue_tags"] == []
     assert payload["ai_unavailable_reason"] == "ai_disabled"
 
 
@@ -439,3 +443,76 @@ def test_weekly_feedback_cli_writes_markdown_and_json_reports(tmp_path: Path, mo
     assert "Weekly Feedback Review" in markdown_path.read_text(encoding="utf-8")
     payload = json.loads(json_path.read_text(encoding="utf-8"))
     assert payload["window"] == {"start_date": "2026-03-09", "end_date": "2026-03-15"}
+
+
+def test_feedback_report_payload_includes_deterministic_issue_tags(tmp_path: Path) -> None:
+    content_root = tmp_path / "mindblast-content"
+    payload_path = content_root / "quizzes" / "q48.json"
+    payload_path.parent.mkdir(parents=True, exist_ok=True)
+    payload_path.write_text(
+        json.dumps(
+            {
+                "date": "2026-03-11",
+                "type": "history_mcq_4",
+                "question": "Which event happened in 2010?",
+                "questions": [
+                    {
+                        "id": "question-1",
+                        "human_id": "Q48",
+                        "prompt": "Which event happened in 2010?",
+                        "answer_fact_ids": ["a1", "a2", "a3", "a4"],
+                        "correct_answer_fact_id": "a2",
+                        "selection_rules": {"target_year": 2010},
+                    }
+                ],
+                "choices": [
+                    {"id": "A", "label": "Event in 1928.", "answer_fact_id": "a1"},
+                    {"id": "B", "label": "Economist is sworn in during the 2010 earthquake ceremony.", "answer_fact_id": "a2"},
+                    {"id": "C", "label": "Event in 1990.", "answer_fact_id": "a3"},
+                    {"id": "D", "label": "Event in 1985.", "answer_fact_id": "a4"},
+                ],
+                "correct_choice_id": "B",
+                "generation": {"edition": 1},
+                "answer_facts": [
+                    {"id": "a1", "label": "Event in 1928."},
+                    {"id": "a2", "label": "Economist is sworn in during the 2010 earthquake ceremony."},
+                    {"id": "a3", "label": "Event in 1990."},
+                    {"id": "a4", "label": "Event in 1985."},
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    aggregate = aggregate_feedback_submissions(
+        submissions=[
+            FeedbackSubmission(
+                feedback_id="f1",
+                quiz_file="quizzes/q48.json",
+                date="2026-03-11",
+                quiz_type="history_mcq_4",
+                edition=1,
+                question_id="question-1",
+                question_human_id="Q48",
+                rating=1,
+                comment="Too easy",
+                feedback_date_utc="2026-03-12",
+                created_at="2026-03-12T08:00:00Z",
+                updated_at="2026-03-12T08:00:00Z",
+            )
+        ],
+        content_repo_root=content_root.as_posix(),
+        window=build_previous_completed_days_window(dt.date(2026, 3, 16)),
+    )
+
+    payload = build_weekly_report_payload(
+        aggregate=aggregate,
+        generated_at="2026-03-16T07:00:00Z",
+        llm_summary=None,
+        ai_unavailable_reason="ai_disabled",
+    )
+
+    assert payload["aggregates"]["issue_counts"] == {"prompt_leak_year": 1}
+    assert payload["questions"][0]["issue_tags"] == ["prompt_leak_year"]

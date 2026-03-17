@@ -145,6 +145,7 @@ def summarize_weekly_feedback(
             "latest_feedback_at": summary.latest_feedback_at,
             "ratings_histogram": summary.ratings_histogram,
             "sanitized_excerpts": list(summary.sanitized_excerpts),
+            "issue_tags": list(summary.issue_tags),
         }
         for summary in aggregate.question_summaries
     ]
@@ -166,6 +167,7 @@ def summarize_weekly_feedback(
                 "total_submissions": aggregate.total_submissions,
                 "commented_submissions": aggregate.commented_submissions,
                 "ratings_histogram": aggregate.ratings_histogram,
+                "issue_counts": aggregate.issue_counts,
             },
             "question_summaries": question_summaries,
         },

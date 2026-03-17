@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from quiz_forge.quality import lint_quiz_payload
 from quiz_forge.storage import load_json_file
 
 from .types import QuizCardContext
@@ -103,4 +104,5 @@ def load_quiz_card_context(
         question_human_id=matched_human_id if isinstance(matched_human_id, str) else None,
         question_prompt=question_prompt.strip(),
         choice_labels=_choice_labels(payload, selected_question),
+        issue_tags=lint_quiz_payload(payload),
     )

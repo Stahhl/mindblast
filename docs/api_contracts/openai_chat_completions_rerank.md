@@ -48,6 +48,11 @@
   - `max_completion_tokens`
   - `reasoning_effort`
 
+## Schema Guardrail
+- `response_format: {"type":"json_object"}` is acceptable for low-risk rerank calls, but it is not a strict schema.
+- For higher-risk or broader JSON payloads, prefer `response_format: {"type":"json_schema", ...}` with `strict: true` when the provider/model supports it.
+- Application-side validation is still required even when provider-side structured outputs are enabled.
+
 ## Response Parsing Rules
 - Preferred ranked ID key: `ranked_distractor_ids`
 - Accepted fallback keys:

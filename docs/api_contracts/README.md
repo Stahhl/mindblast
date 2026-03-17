@@ -6,6 +6,8 @@ This directory stores provider-specific API contract snapshots used by `quiz-for
 - Keep request/response assumptions explicit and reviewable.
 - Prevent schema drift in provider client code.
 - Tie CI tests to a known contract snapshot.
+- Prefer provider-enforced structured outputs / strict response schemas when the provider supports them.
+- Treat prompt-only `json_object` style output requests as a weaker fallback, not the preferred contract.
 
 ## Current Scope
 - OpenAI Chat Completions contract for `history_mcq_4` rerank calls.

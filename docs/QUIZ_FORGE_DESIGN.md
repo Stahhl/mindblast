@@ -96,6 +96,9 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - Atomic write pattern (write temp file then move).
 - No partial commits on failure.
 - Provider API schema assumptions must be centralized and tested (see `docs/api_contracts/` + `tests/quiz_forge/`).
+- When an AI/provider API supports strict structured outputs or explicit response schemas, use them instead of prompt-only JSON instructions.
+- Treat provider-side schema enforcement as the first guard and local validation/parsing as the second guard.
+- Provider fallback/error labels should preserve schema/runtime failure details (for example `empty_content`, `json_decode_error`, `refusal`) so CI reports are actionable.
 
 ### Security Guardrails
 - Minimal GitHub permissions in workflow:

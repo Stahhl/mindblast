@@ -46,6 +46,7 @@ class QuizCardContext:
     question_human_id: str | None
     question_prompt: str
     choice_labels: tuple[str, ...]
+    issue_tags: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -63,6 +64,7 @@ class QuestionFeedbackSummary:
     latest_feedback_at: str
     ratings_histogram: dict[int, int]
     sanitized_excerpts: tuple[str, ...]
+    issue_tags: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -72,3 +74,4 @@ class WeeklyFeedbackAggregate:
     ratings_histogram: dict[int, int]
     commented_submissions: int
     question_summaries: tuple[QuestionFeedbackSummary, ...]
+    issue_counts: dict[str, int]
