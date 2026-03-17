@@ -1,0 +1,109 @@
+name: Weekly Feedback Review
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "UTC run date override (YYYY-MM-DD). Leave empty for today."
+        required: false
+        type: string
+      disable_ai:
+        description: "Skip AI summary and render deterministic report only."
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-feedback-review
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    env:
+      QUIZ_CONTENT_REPO: ${{ vars.QUIZ_CONTENT_REPO }}
+      FIRESTORE_PROJECT_ID: mindblast-prod
+      FIRESTORE_COLLECTION: quiz_feedback
+      RUN_DATE: ${{ inputs.run_date || '' }}
+      DISABLE_AI: ${{ inputs.disable_ai || false }}
+      AI_MODE: ${{ vars.FEEDBACK_REPORT_AI_MODE }}
+      AI_PROVIDER: ${{ vars.FEEDBACK_REPORT_AI_PROVIDER }}
+      AI_MODEL: ${{ vars.FEEDBACK_REPORT_AI_MODEL }}
+      AI_MAX_CALLS_PER_RUN: ${{ vars.FEEDBACK_REPORT_AI_MAX_CALLS_PER_RUN }}
+      AI_MAX_INPUT_TOKENS: ${{ vars.FEEDBACK_REPORT_AI_MAX_INPUT_TOKENS }}
+      AI_MAX_OUTPUT_TOKENS: ${{ vars.FEEDBACK_REPORT_AI_MAX_OUTPUT_TOKENS }}
+      AI_MAX_DAILY_USD: ${{ vars.FEEDBACK_REPORT_AI_MAX_DAILY_USD }}
+      AI_MAX_MONTHLY_USD: ${{ vars.FEEDBACK_REPORT_AI_MAX_MONTHLY_USD }}
+      FEEDBACK_REVIEW_AI_STATE_DIR: ${{ github.workspace }}/.tmp/feedback-review-ai
+      QUIZ_FORGE_AI_REPORT_PATH: ${{ github.workspace }}/.tmp/feedback-review-ai-report.json
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Checkout content repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.QUIZ_CONTENT_REPO }}
+          token: ${{ secrets.CONTENT_REPO_WRITE_TOKEN }}
+          path: .content-repo
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: python -m pip install --upgrade uv
+
+      - name: Sync Python environment
+        run: uv sync --locked --no-dev --python 3.12
+
+      - name: Write production Firestore credentials
+        env:
+          FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION: ${{ secrets.FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION }}
+        run: |
+          if [ -z "${FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION}" ]; then
+            echo "Missing FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION secret."
+            exit 1
+          fi
+          mkdir -p .tmp
+          printf '%s' "${FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION}" > .tmp/feedback-report-firestore.json
+
+      - name: Generate weekly feedback review report
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          EXTRA_ARGS=()
+          if [ -n "${RUN_DATE}" ]; then
+            EXTRA_ARGS+=(--run-date "${RUN_DATE}")
+          fi
+          if [ "${DISABLE_AI}" = "true" ]; then
+            EXTRA_ARGS+=(--disable-ai)
+          fi
+
+          uv run --python 3.12 python scripts/generate_weekly_feedback_report.py \
+            --content-repo-root ".content-repo" \
+            --firestore-project-id "${FIRESTORE_PROJECT_ID}" \
+            --firestore-credentials-path ".tmp/feedback-report-firestore.json" \
+            --firestore-collection "${FIRESTORE_COLLECTION}" \
+            "${EXTRA_ARGS[@]}"
+
+      - name: Commit and push report changes
+        working-directory: .content-repo
+        run: |
+          if [ -z "$(git status --porcelain -- reports/feedback/weekly)" ]; then
+            echo "No weekly feedback report changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/feedback/weekly
+          COMMIT_DATE="${RUN_DATE:-$(date -u +%F)}"
+          git commit -m "feedback-review: add weekly report for ${COMMIT_DATE}"
+          git push origin HEAD:main

@@ -3,7 +3,9 @@ name = "mindblast-quiz-forge"
 version = "0.1.0"
 description = "Mindblast quiz-forge daily quiz generator"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+  "google-cloud-firestore>=2.21.0",
+]
 
 [dependency-groups]
 dev = [

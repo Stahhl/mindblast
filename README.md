@@ -168,6 +168,34 @@ uv sync --locked --dev --python 3.12
 uv run --python 3.12 pytest tests/quiz_forge
 ```
 
+## Weekly Feedback Review Run (uv)
+
+```zsh
+cd <repo-root>
+uv sync --locked --no-dev --python 3.12
+uv run --python 3.12 python scripts/generate_weekly_feedback_report.py \
+  --content-repo-root ../mindblast-content \
+  --feedback-json /path/to/feedback_fixture.json \
+  --run-date 2026-03-16 \
+  --disable-ai
+```
+
+The fixture file should contain production-shaped feedback records whose `quiz_file` values exist under `../mindblast-content/quizzes`.
+
+Production workflow prerequisites:
+- `FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: read-only Firestore service account JSON for `mindblast-prod`
+- `OPENAI_API_KEY`: reused for the optional AI summary step
+
+Recommended repository variables:
+- `FEEDBACK_REPORT_AI_MODE`: `on`
+- `FEEDBACK_REPORT_AI_PROVIDER`: `openai`
+- `FEEDBACK_REPORT_AI_MODEL`: `gpt-5-mini`
+- `FEEDBACK_REPORT_AI_MAX_CALLS_PER_RUN`: `3`
+- `FEEDBACK_REPORT_AI_MAX_INPUT_TOKENS`: `12000`
+- `FEEDBACK_REPORT_AI_MAX_OUTPUT_TOKENS`: `800`
+- `FEEDBACK_REPORT_AI_MAX_DAILY_USD`: `1`
+- `FEEDBACK_REPORT_AI_MAX_MONTHLY_USD`: `5`
+
 ## Content Repo Workflow Prerequisites
 
 Repository variable:
@@ -232,6 +260,18 @@ Operational runbook:
 Required repository secrets:
 - `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: service account JSON for Firebase Hosting deploy
 - `CONTENT_REPO_READ_TOKEN`: fine-grained PAT with read access to `Stahhl/mindblast-content`
+
+## Weekly Feedback Review (GitHub Actions)
+
+- Workflow: `.github/workflows/weekly-feedback-review.yml`
+- Trigger: every Monday at `07:00 UTC` and manual dispatch
+- Data source: production Firestore `quiz_feedback`
+- Output: `reports/feedback/weekly/YYYY/YYYY-Www.{md,json}` in `Stahhl/mindblast-content`
+
+Required repository secrets:
+- `FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: read-only Firestore service account JSON for `mindblast-prod`
+- `CONTENT_REPO_WRITE_TOKEN`: fine-grained PAT with read/write access to `Stahhl/mindblast-content`
+- `OPENAI_API_KEY`: optional for AI summary; deterministic report still works with `disable_ai`
 
 ## Secret Guardrails
 

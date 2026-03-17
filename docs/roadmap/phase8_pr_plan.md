@@ -17,35 +17,35 @@ Maps to Phase 8 sections:
 - `Comment Sanitization Rules`
 
 Scope:
-- [ ] Add report-side production feedback reader for Firestore `quiz_feedback`.
-- [ ] Add weekly UTC window resolution for the previous 7 completed days.
-- [ ] Load quiz context from `mindblast-content/quizzes/*.json` using `quiz_file`.
-- [ ] Exclude sensitive fields from all report/LLM payload shapes:
-  - [ ] `auth_uid`
-  - [ ] `client_id`
-  - [ ] `user_agent_hash`
-- [ ] Implement comment sanitization:
-  - [ ] strip emails
-  - [ ] strip URLs
-  - [ ] strip likely identifiers / long numeric strings
-  - [ ] normalize whitespace
-  - [ ] cap excerpt length
-- [ ] Build deterministic aggregates:
-  - [ ] total submissions
-  - [ ] ratings histogram
-  - [ ] total commented submissions
-  - [ ] per-question submission count
-  - [ ] per-question average rating
-  - [ ] per-question latest feedback timestamp
-- [ ] Implement deterministic ordering:
-  - [ ] lowest average rating
-  - [ ] then highest submission count
-  - [ ] then latest update timestamp
-- [ ] Add tests for:
-  - [ ] weekly window filtering
-  - [ ] context join by `quiz_file`
-  - [ ] sanitization
-  - [ ] aggregate ordering
+- [x] Add report-side production feedback reader for Firestore `quiz_feedback`.
+- [x] Add weekly UTC window resolution for the previous 7 completed days.
+- [x] Load quiz context from `mindblast-content/quizzes/*.json` using `quiz_file`.
+- [x] Exclude sensitive fields from all report/LLM payload shapes:
+  - [x] `auth_uid`
+  - [x] `client_id`
+  - [x] `user_agent_hash`
+- [x] Implement comment sanitization:
+  - [x] strip emails
+  - [x] strip URLs
+  - [x] strip likely identifiers / long numeric strings
+  - [x] normalize whitespace
+  - [x] cap excerpt length
+- [x] Build deterministic aggregates:
+  - [x] total submissions
+  - [x] ratings histogram
+  - [x] total commented submissions
+  - [x] per-question submission count
+  - [x] per-question average rating
+  - [x] per-question latest feedback timestamp
+- [x] Implement deterministic ordering:
+  - [x] lowest average rating
+  - [x] then highest submission count
+  - [x] then latest update timestamp
+- [x] Add tests for:
+  - [x] weekly window filtering
+  - [x] context join by `quiz_file`
+  - [x] sanitization
+  - [x] aggregate ordering
 
 Exit criteria:
 - A deterministic in-memory weekly review payload can be built from production-style feedback records and quiz artifacts without any LLM dependency.
@@ -58,32 +58,32 @@ Maps to Phase 8 sections:
 - `Provider and Budget Posture`
 
 Scope:
-- [ ] Add a structured LLM task contract for weekly feedback review output:
-  - [ ] `executive_summary`
-  - [ ] `themes`
-  - [ ] `positive_signals`
-  - [ ] `questions_to_review`
-  - [ ] `action_items`
-- [ ] Reuse the existing provider abstraction for report summarization.
-- [ ] Keep report AI settings budget-limited and low-call-count.
-- [ ] Implement fail-closed fallback:
-  - [ ] deterministic report still renders when AI fails
-  - [ ] markdown includes `AI summary unavailable`
-- [ ] Render committed report outputs:
-  - [ ] `reports/feedback/weekly/YYYY/YYYY-Www.md`
-  - [ ] `reports/feedback/weekly/YYYY/YYYY-Www.json`
-- [ ] Ensure markdown includes:
-  - [ ] date range
-  - [ ] aggregate metrics
-  - [ ] recurring themes
-  - [ ] action items
-  - [ ] sanitized excerpts
-  - [ ] per-question references
-- [ ] Add tests for:
-  - [ ] LLM output parsing/validation
-  - [ ] markdown rendering
-  - [ ] JSON companion rendering
-  - [ ] AI fallback behavior
+- [x] Add a structured LLM task contract for weekly feedback review output:
+  - [x] `executive_summary`
+  - [x] `themes`
+  - [x] `positive_signals`
+  - [x] `questions_to_review`
+  - [x] `action_items`
+- [x] Reuse the existing provider abstraction for report summarization.
+- [x] Keep report AI settings budget-limited and low-call-count.
+- [x] Implement fail-closed fallback:
+  - [x] deterministic report still renders when AI fails
+  - [x] markdown includes `AI summary unavailable`
+- [x] Render committed report outputs:
+  - [x] `reports/feedback/weekly/YYYY/YYYY-Www.md`
+  - [x] `reports/feedback/weekly/YYYY/YYYY-Www.json`
+- [x] Ensure markdown includes:
+  - [x] date range
+  - [x] aggregate metrics
+  - [x] recurring themes
+  - [x] action items
+  - [x] sanitized excerpts
+  - [x] per-question references
+- [x] Add tests for:
+  - [x] LLM output parsing/validation
+  - [x] markdown rendering
+  - [x] JSON companion rendering
+  - [x] AI fallback behavior
 
 Exit criteria:
 - Weekly review reports render deterministically, with optional LLM summary content, and never expose raw sensitive fields.
@@ -95,20 +95,20 @@ Maps to Phase 8 sections:
 - `Secrets and Config`
 
 Scope:
-- [ ] Add a weekly GitHub Actions workflow in `mindblast`.
-- [ ] Check out:
-  - [ ] `mindblast`
-  - [ ] `mindblast-content`
-- [ ] Add production Firestore read-only credential wiring.
-- [ ] Add report-specific workflow config:
-  - [ ] provider/model
-  - [ ] per-run call limit
-  - [ ] token/budget limits
-- [ ] Generate reports and commit them to `mindblast-content` only when changed.
-- [ ] Exit cleanly without commit when:
-  - [ ] no feedback exists in the weekly window
-  - [ ] rendered report content is unchanged
-- [ ] Document required secrets/variables for operations.
+- [x] Add a weekly GitHub Actions workflow in `mindblast`.
+- [x] Check out:
+  - [x] `mindblast`
+  - [x] `mindblast-content`
+- [x] Add production Firestore read-only credential wiring.
+- [x] Add report-specific workflow config:
+  - [x] provider/model
+  - [x] per-run call limit
+  - [x] token/budget limits
+- [x] Generate reports and commit them to `mindblast-content` only when changed.
+- [x] Exit cleanly without commit when:
+  - [x] no feedback exists in the weekly window
+  - [x] rendered report content is unchanged
+- [x] Document required secrets/variables for operations.
 
 Exit criteria:
 - A weekly run can produce and commit report artifacts into `mindblast-content` without mutating `mindblast`.
