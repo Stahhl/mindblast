@@ -209,6 +209,7 @@ class AIOrchestrator:
         user_payload: dict[str, Any],
         model: str | None = None,
         max_output_tokens: int | None = None,
+        response_schema: dict[str, Any] | None = None,
     ) -> tuple[dict[str, Any] | None, str | None]:
         if self.settings.mode == AI_MODE_OFF:
             return self._json_fallback(self._task_reason(task_name, "ai_mode_off"))
@@ -247,6 +248,7 @@ class AIOrchestrator:
                 settings=self.settings,
                 model=effective_model,
                 max_output_tokens=effective_max_output,
+                response_schema=response_schema,
             )
         except Exception as exc:  # noqa: BLE001 - keep fallback behavior resilient
             reason = self._task_reason(task_name, f"provider_error:{type(exc).__name__}:{_provider_error_label(exc)}")

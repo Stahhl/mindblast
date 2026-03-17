@@ -101,7 +101,9 @@ class OllamaProvider:
         settings: AISettings,
         model: str,
         max_output_tokens: int,
+        response_schema: dict[str, Any] | None = None,
     ) -> AIJsonTaskResponse:
+        del response_schema
         payload_json, usage = self._run_ollama_chat(
             system_prompt=system_prompt,
             payload=user_payload,

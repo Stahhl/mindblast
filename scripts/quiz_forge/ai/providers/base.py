@@ -19,5 +19,6 @@ class AIRerankProvider(Protocol):
         settings: AISettings,
         model: str,
         max_output_tokens: int,
+        response_schema: dict[str, Any] | None = None,
     ) -> AIJsonTaskResponse:
         """Run a generic JSON task and return parsed payload + usage metadata."""

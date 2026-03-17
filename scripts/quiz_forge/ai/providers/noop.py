@@ -20,8 +20,9 @@ class NoopProvider:
         settings: AISettings,
         model: str,
         max_output_tokens: int,
+        response_schema: dict[str, Any] | None = None,
     ) -> AIJsonTaskResponse:
-        del system_prompt, user_payload, settings, model, max_output_tokens
+        del system_prompt, user_payload, settings, model, max_output_tokens, response_schema
         raise RuntimeError("Noop provider cannot perform JSON task calls.")
 
 

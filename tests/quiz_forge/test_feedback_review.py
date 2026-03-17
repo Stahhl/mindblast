@@ -289,11 +289,13 @@ class _FakeSummaryOrchestrator:
     def __init__(self, response: dict[str, object] | None, reason: str | None = None) -> None:
         self._response = response
         self._reason = reason
+        self.last_kwargs: dict[str, object] | None = None
 
     def is_enabled(self) -> bool:
         return True
 
     def run_json_task(self, **_: object) -> tuple[dict[str, object] | None, str | None]:
+        self.last_kwargs = dict(_)
         return self._response, self._reason
 
 
@@ -320,22 +322,28 @@ def test_summarize_weekly_feedback_validates_payload(tmp_path: Path) -> None:
         window=build_previous_completed_days_window(dt.date(2026, 3, 16)),
     )
 
+    orchestrator = _FakeSummaryOrchestrator(
+        {
+            "executive_summary": "Feedback is sparse but one question should be reviewed.",
+            "themes": ["Question clarity needs work."],
+            "positive_signals": ["Users are leaving actionable comments."],
+            "questions_to_review": [{"question_human_id": "Q77", "reason": "Low rating this week."}],
+            "action_items": [{"title": "Review Q77", "detail": "Tighten the prompt wording.", "priority": "high"}],
+        }
+    )
     summary, reason = summarize_weekly_feedback(
         aggregate=aggregate,
-        ai_orchestrator=_FakeSummaryOrchestrator(
-            {
-                "executive_summary": "Feedback is sparse but one question should be reviewed.",
-                "themes": ["Question clarity needs work."],
-                "positive_signals": ["Users are leaving actionable comments."],
-                "questions_to_review": [{"question_human_id": "Q77", "reason": "Low rating this week."}],
-                "action_items": [{"title": "Review Q77", "detail": "Tighten the prompt wording.", "priority": "high"}],
-            }
-        ),
+        ai_orchestrator=orchestrator,
     )
 
     assert reason is None
     assert summary is not None
     assert summary["questions_to_review"][0]["question_human_id"] == "Q77"
+    assert orchestrator.last_kwargs is not None
+    response_schema = orchestrator.last_kwargs.get("response_schema")
+    assert isinstance(response_schema, dict)
+    assert response_schema.get("name") == "weekly_feedback_review"
+    assert response_schema.get("strict") is True
 
 
 def test_summarize_weekly_feedback_falls_back_on_invalid_payload(tmp_path: Path) -> None:

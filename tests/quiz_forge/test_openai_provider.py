@@ -148,6 +148,66 @@ def test_openai_provider_run_json_task_uses_requested_model_and_tokens(monkeypat
     assert body.get("model") == "gpt-4o-mini"
     assert body.get("max_tokens") == 321
     assert "max_completion_tokens" not in body
+    assert body.get("response_format") == {"type": "json_object"}
+
+
+def test_openai_provider_run_json_task_uses_json_schema_when_provided(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    captured: dict[str, object] = {}
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        captured["timeout"] = timeout
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return _FakeResponse(
+            json.dumps(
+                {
+                    "choices": [{"message": {"content": json.dumps({"result": "ok"})}}],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+                }
+            )
+        )
+
+    monkeypatch.setattr("quiz_forge.ai.providers.openai.request.urlopen", fake_urlopen)
+
+    provider = OpenAIProvider()
+    response = provider.run_json_task(
+        system_prompt="Return JSON only.",
+        user_payload={"task": "test"},
+        settings=_settings("gpt-5-mini"),
+        model="gpt-5-mini",
+        max_output_tokens=321,
+        response_schema={
+            "name": "test_schema",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["result"],
+                "properties": {
+                    "result": {"type": "string"},
+                },
+            },
+        },
+    )
+
+    assert response.payload == {"result": "ok"}
+    body = captured["body"]
+    assert isinstance(body, dict)
+    assert body.get("response_format") == {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "test_schema",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["result"],
+                "properties": {
+                    "result": {"type": "string"},
+                },
+            },
+        },
+    }
 
 
 def test_openai_provider_run_json_task_accepts_fenced_json(monkeypatch) -> None:

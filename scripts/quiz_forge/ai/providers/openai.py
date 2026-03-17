@@ -225,6 +225,7 @@ class OpenAIProvider:
         settings: AISettings,
         model: str,
         max_output_tokens: int,
+        response_schema: dict[str, Any] | None = None,
     ) -> AIJsonTaskResponse:
         api_key = self._require_api_key()
 
@@ -233,6 +234,7 @@ class OpenAIProvider:
             max_output_tokens=max_output_tokens,
             system_prompt=system_prompt,
             user_payload=user_payload,
+            response_schema=response_schema,
         )
         payload_json = self._post_chat_completion(
             api_key=api_key,

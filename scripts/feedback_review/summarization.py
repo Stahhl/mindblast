@@ -9,6 +9,63 @@ from quiz_forge.ai import AIOrchestrator
 from .types import WeeklyFeedbackAggregate
 
 
+def _weekly_feedback_response_schema() -> dict[str, Any]:
+    return {
+        "name": "weekly_feedback_review",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": [
+                "executive_summary",
+                "themes",
+                "positive_signals",
+                "questions_to_review",
+                "action_items",
+            ],
+            "properties": {
+                "executive_summary": {"type": "string"},
+                "themes": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                },
+                "positive_signals": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                },
+                "questions_to_review": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["question_human_id", "reason"],
+                        "properties": {
+                            "question_human_id": {"type": "string"},
+                            "reason": {"type": "string"},
+                        },
+                    },
+                },
+                "action_items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["title", "detail", "priority"],
+                        "properties": {
+                            "title": {"type": "string"},
+                            "detail": {"type": "string"},
+                            "priority": {
+                                "type": "string",
+                                "enum": ["low", "medium", "high"],
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+
 def _validate_summary_payload(payload: dict[str, Any]) -> dict[str, Any]:
     executive_summary = payload.get("executive_summary")
     themes = payload.get("themes")
@@ -113,6 +170,7 @@ def summarize_weekly_feedback(
             "question_summaries": question_summaries,
         },
         max_output_tokens=800,
+        response_schema=_weekly_feedback_response_schema(),
     )
     if response is None:
         return None, reason
