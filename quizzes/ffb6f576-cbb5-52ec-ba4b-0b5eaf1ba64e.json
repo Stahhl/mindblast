@@ -1,0 +1,231 @@
+{
+  "date": "2026-03-17",
+  "topics": [
+    "history"
+  ],
+  "type": "history_factoid_mcq_4",
+  "questions": [
+    {
+      "id": "d803f400-c032-5674-ac98-a3e10bccbf30",
+      "type": "history_factoid_mcq_4",
+      "prompt": "Where did the U.S. Army Chemical Corps conduct nerve gas testing that led to over 6,000 sheep being found dead?",
+      "answer_fact_ids": [
+        "8ea135c2-9da2-5742-954b-4d95060204e7",
+        "4b87f78a-61b2-5906-b7b9-ddfa879570c3",
+        "404347ff-1855-5098-a77d-45a4ce87f098",
+        "eb1b1b71-40e1-5811-a6e4-d979ccc8444c"
+      ],
+      "correct_answer_fact_id": "8ea135c2-9da2-5742-954b-4d95060204e7",
+      "tags": [
+        "history",
+        "history_factoid_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline",
+        "question_format": "factoid",
+        "answer_kind": "place",
+        "prompt_style": "where"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1968
+      },
+      "human_id": "Q65"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "8ea135c2-9da2-5742-954b-4d95060204e7",
+      "label": "Skull Valley, Utah",
+      "year": 1968,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1960s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1968,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Skull Valley, Utah -- As a result of nerve gas testing by the U.S. Army Chemical Corps in Skull Valley, Utah, over 6,000 sheep are found dead.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A159"
+    },
+    {
+      "id": "4b87f78a-61b2-5906-b7b9-ddfa879570c3",
+      "label": "the University of California",
+      "year": 1950,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1950s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1950s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1950,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1950s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "the University of California -- Researchers at the University of California, Berkeley announce the creation of element 98, which they name \"californium\".",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A160"
+    },
+    {
+      "id": "404347ff-1855-5098-a77d-45a4ce87f098",
+      "label": "Cebu",
+      "year": 1957,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1950s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1950s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1957,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1950s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Cebu -- A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A161"
+    },
+    {
+      "id": "eb1b1b71-40e1-5811-a6e4-d979ccc8444c",
+      "label": "the Mediterranean",
+      "year": 1966,
+      "tags": [
+        "history",
+        "history_factoid_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1960s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1960s",
+        "source": "wikipedia_on_this_day",
+        "entity_type": "place"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1966,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1960s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "the Mediterranean -- Off the coast of Spain in the Mediterranean, the DSV\u00a0Alvin submarine finds a missing American hydrogen bomb.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A162"
+    }
+  ],
+  "question": "Where did the U.S. Army Chemical Corps conduct nerve gas testing that led to over 6,000 sheep being found dead?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Skull Valley, Utah",
+      "answer_fact_id": "8ea135c2-9da2-5742-954b-4d95060204e7",
+      "human_id": "A159"
+    },
+    {
+      "id": "B",
+      "label": "the University of California",
+      "answer_fact_id": "4b87f78a-61b2-5906-b7b9-ddfa879570c3",
+      "human_id": "A160"
+    },
+    {
+      "id": "C",
+      "label": "Cebu",
+      "answer_fact_id": "404347ff-1855-5098-a77d-45a4ce87f098",
+      "human_id": "A161"
+    },
+    {
+      "id": "D",
+      "label": "the Mediterranean",
+      "answer_fact_id": "eb1b1b71-40e1-5811-a6e4-d979ccc8444c",
+      "human_id": "A162"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/17",
+    "retrieved_at": "2026-03-17T06:18:20Z",
+    "events_used": [
+      {
+        "event_id": "8ea135c2-9da2-5742-954b-4d95060204e7",
+        "text": "As a result of nerve gas testing by the U.S. Army Chemical Corps in Skull Valley, Utah, over 6,000 sheep are found dead.",
+        "year": 1968,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Nerve_agent"
+      },
+      {
+        "event_id": "4b87f78a-61b2-5906-b7b9-ddfa879570c3",
+        "text": "Researchers at the University of California, Berkeley announce the creation of element 98, which they name \"californium\".",
+        "year": 1950,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_California%2C_Berkeley"
+      },
+      {
+        "event_id": "404347ff-1855-5098-a77d-45a4ce87f098",
+        "text": "A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+        "year": 1957,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/1957_Cebu_Douglas_C-47_crash"
+      },
+      {
+        "event_id": "eb1b1b71-40e1-5811-a6e4-d979ccc8444c",
+        "text": "Off the coast of Spain in the Mediterranean, the DSV\u00a0Alvin submarine finds a missing American hydrogen bomb.",
+        "year": 1966,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/DSV_Alvin"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-17T06:18:20Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

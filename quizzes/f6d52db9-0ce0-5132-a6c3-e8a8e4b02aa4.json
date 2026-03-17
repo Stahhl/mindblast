@@ -1,0 +1,224 @@
+{
+  "date": "2026-03-17",
+  "topics": [
+    "history"
+  ],
+  "type": "history_mcq_4",
+  "questions": [
+    {
+      "id": "af1aa68f-dfff-55c2-b3cc-f4763e534dd7",
+      "type": "history_mcq_4",
+      "prompt": "Which event happened in 1988?",
+      "answer_fact_ids": [
+        "f1d494ae-03fe-5628-a762-d0f010b2ccdd",
+        "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+        "9efaaac9-af1b-5f4a-af85-3ddaf6dc0de3",
+        "7deea5e1-c873-5ad8-9e5b-88b2c7434644"
+      ],
+      "correct_answer_fact_id": "f1d494ae-03fe-5628-a762-d0f010b2ccdd",
+      "tags": [
+        "history",
+        "history_mcq_4"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false,
+        "target_year": 1988
+      },
+      "human_id": "Q64"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "f1d494ae-03fe-5628-a762-d0f010b2ccdd",
+      "label": "Eritrean War of Independence: The Nadew Command, an Ethiopian army corps in Eritrea, is attacked on three sides by military units of the Eritrean People's Liberation Front in the opening action of the Battle of Afabet.",
+      "year": 1988,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:correct",
+        "20th-century",
+        "1980s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1980s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1988,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1980s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Eritrean War of Independence: The Nadew Command, an Ethiopian army corps in Eritrea, is attacked on three sides by military units of the Eritrean People's Liberation Front in the opening action of the Battle of Afabet.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A156"
+    },
+    {
+      "id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+      "label": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+      "year": 1860,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "19th-century",
+        "1860s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1860s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1860,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1860s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A154"
+    },
+    {
+      "id": "9efaaac9-af1b-5f4a-af85-3ddaf6dc0de3",
+      "label": "Serial killer Richard Ramirez, aka the \"Night Stalker\", commits the first two murders in his Los Angeles murder spree.",
+      "year": 1985,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1980s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1980s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1985,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1980s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "Serial killer Richard Ramirez, aka the \"Night Stalker\", commits the first two murders in his Los Angeles murder spree.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A157"
+    },
+    {
+      "id": "7deea5e1-c873-5ad8-9e5b-88b2c7434644",
+      "label": "The Penmanshiel Tunnel collapses during engineering works, killing two workers.",
+      "year": 1979,
+      "tags": [
+        "history",
+        "history_mcq_4",
+        "role:distractor",
+        "20th-century",
+        "1970s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1970s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1979,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1970s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The Penmanshiel Tunnel collapses during engineering works, killing two workers.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A158"
+    }
+  ],
+  "question": "Which event happened in 1988?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "Eritrean War of Independence: The Nadew Command, an Ethiopian army corps in Eritrea, is attacked on three sides by military units of the Eritrean People's Liberation Front in the opening action of the Battle of Afabet.",
+      "answer_fact_id": "f1d494ae-03fe-5628-a762-d0f010b2ccdd",
+      "human_id": "A156"
+    },
+    {
+      "id": "B",
+      "label": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+      "answer_fact_id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+      "human_id": "A154"
+    },
+    {
+      "id": "C",
+      "label": "Serial killer Richard Ramirez, aka the \"Night Stalker\", commits the first two murders in his Los Angeles murder spree.",
+      "answer_fact_id": "9efaaac9-af1b-5f4a-af85-3ddaf6dc0de3",
+      "human_id": "A157"
+    },
+    {
+      "id": "D",
+      "label": "The Penmanshiel Tunnel collapses during engineering works, killing two workers.",
+      "answer_fact_id": "7deea5e1-c873-5ad8-9e5b-88b2c7434644",
+      "human_id": "A158"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/17",
+    "retrieved_at": "2026-03-17T06:18:20Z",
+    "events_used": [
+      {
+        "event_id": "f1d494ae-03fe-5628-a762-d0f010b2ccdd",
+        "text": "Eritrean War of Independence: The Nadew Command, an Ethiopian army corps in Eritrea, is attacked on three sides by military units of the Eritrean People's Liberation Front in the opening action of the Battle of Afabet.",
+        "year": 1988,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Eritrean_War_of_Independence"
+      },
+      {
+        "event_id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+        "text": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+        "year": 1860,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/First_Taranaki_War"
+      },
+      {
+        "event_id": "9efaaac9-af1b-5f4a-af85-3ddaf6dc0de3",
+        "text": "Serial killer Richard Ramirez, aka the \"Night Stalker\", commits the first two murders in his Los Angeles murder spree.",
+        "year": 1985,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Richard_Ramirez"
+      },
+      {
+        "event_id": "7deea5e1-c873-5ad8-9e5b-88b2c7434644",
+        "text": "The Penmanshiel Tunnel collapses during engineering works, killing two workers.",
+        "year": 1979,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/Penmanshiel_Tunnel"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-17T06:18:20Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}

@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": 1,
-    "updated_at": "2026-03-16T06:26:18Z"
+    "updated_at": "2026-03-17T06:18:29Z"
   },
   "counters": {
-    "question": 62,
-    "answer": 153
+    "question": 65,
+    "answer": 162
   },
   "question_uuid_to_human_id": {
     "bcdf8161-5029-578f-970c-54e87cfe0085": "Q1",
@@ -69,7 +69,10 @@
     "94d5f23d-0513-5f58-94e3-2c3bfba0c698": "Q59",
     "00b96ff9-3fe8-514d-ba25-18675720fcb9": "Q60",
     "c6d4b4ef-bf18-5a53-8a5d-addc29f522c8": "Q61",
-    "141b02a0-0a21-57ec-832f-5d14dc099049": "Q62"
+    "141b02a0-0a21-57ec-832f-5d14dc099049": "Q62",
+    "86bbf821-b6ea-5db1-bf92-fd7db7f9cc1d": "Q63",
+    "af1aa68f-dfff-55c2-b3cc-f4763e534dd7": "Q64",
+    "d803f400-c032-5674-ac98-a3e10bccbf30": "Q65"
   },
   "answer_uuid_to_human_id": {
     "2a62dc33-7d82-5122-a43b-3dfc98979bf4": "A1",
@@ -224,7 +227,16 @@
     "92229364-1bf5-5d9a-8d46-b1e879d8265b": "A150",
     "fae69052-1922-5132-9435-009a624d6572": "A151",
     "ed04131c-535e-5062-9074-c6339e3104c2": "A152",
-    "ae955e82-936c-57b7-8205-f5864bdc5657": "A153"
+    "ae955e82-936c-57b7-8205-f5864bdc5657": "A153",
+    "33e4a51c-815b-5b9d-8339-a8da4ff0ab29": "A154",
+    "4cd991b7-d7d4-5038-a6ae-6371d4552861": "A155",
+    "f1d494ae-03fe-5628-a762-d0f010b2ccdd": "A156",
+    "9efaaac9-af1b-5f4a-af85-3ddaf6dc0de3": "A157",
+    "7deea5e1-c873-5ad8-9e5b-88b2c7434644": "A158",
+    "8ea135c2-9da2-5742-954b-4d95060204e7": "A159",
+    "4b87f78a-61b2-5906-b7b9-ddfa879570c3": "A160",
+    "404347ff-1855-5098-a77d-45a4ce87f098": "A161",
+    "eb1b1b71-40e1-5811-a6e4-d979ccc8444c": "A162"
   },
   "questions": {
     "Q1": {
@@ -658,6 +670,27 @@
       "question_id": "141b02a0-0a21-57ec-832f-5d14dc099049",
       "quiz_file": "quizzes/b5ac83d1-e377-5aac-918a-fbf3ca2ce1c8.json",
       "date": "2026-03-16",
+      "quiz_type": "history_factoid_mcq_4",
+      "edition": 1
+    },
+    "Q63": {
+      "question_id": "86bbf821-b6ea-5db1-bf92-fd7db7f9cc1d",
+      "quiz_file": "quizzes/1a3a2440-624b-50f2-83f2-b622ee8f2e20.json",
+      "date": "2026-03-17",
+      "quiz_type": "which_came_first",
+      "edition": 1
+    },
+    "Q64": {
+      "question_id": "af1aa68f-dfff-55c2-b3cc-f4763e534dd7",
+      "quiz_file": "quizzes/f6d52db9-0ce0-5132-a6c3-e8a8e4b02aa4.json",
+      "date": "2026-03-17",
+      "quiz_type": "history_mcq_4",
+      "edition": 1
+    },
+    "Q65": {
+      "question_id": "d803f400-c032-5674-ac98-a3e10bccbf30",
+      "quiz_file": "quizzes/ffb6f576-cbb5-52ec-ba4b-0b5eaf1ba64e.json",
+      "date": "2026-03-17",
       "quiz_type": "history_factoid_mcq_4",
       "edition": 1
     }
@@ -1427,6 +1460,51 @@
       "answer_fact_id": "ae955e82-936c-57b7-8205-f5864bdc5657",
       "label": "Operation Appearance",
       "year": 1941
+    },
+    "A154": {
+      "answer_fact_id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+      "label": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+      "year": 1860
+    },
+    "A155": {
+      "answer_fact_id": "4cd991b7-d7d4-5038-a6ae-6371d4552861",
+      "label": "A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+      "year": 1957
+    },
+    "A156": {
+      "answer_fact_id": "f1d494ae-03fe-5628-a762-d0f010b2ccdd",
+      "label": "Eritrean War of Independence: The Nadew Command, an Ethiopian army corps in Eritrea, is attacked on three sides by military units of the Eritrean People's Liberation Front in the opening action of the Battle of Afabet.",
+      "year": 1988
+    },
+    "A157": {
+      "answer_fact_id": "9efaaac9-af1b-5f4a-af85-3ddaf6dc0de3",
+      "label": "Serial killer Richard Ramirez, aka the \"Night Stalker\", commits the first two murders in his Los Angeles murder spree.",
+      "year": 1985
+    },
+    "A158": {
+      "answer_fact_id": "7deea5e1-c873-5ad8-9e5b-88b2c7434644",
+      "label": "The Penmanshiel Tunnel collapses during engineering works, killing two workers.",
+      "year": 1979
+    },
+    "A159": {
+      "answer_fact_id": "8ea135c2-9da2-5742-954b-4d95060204e7",
+      "label": "Skull Valley, Utah",
+      "year": 1968
+    },
+    "A160": {
+      "answer_fact_id": "4b87f78a-61b2-5906-b7b9-ddfa879570c3",
+      "label": "the University of California",
+      "year": 1950
+    },
+    "A161": {
+      "answer_fact_id": "404347ff-1855-5098-a77d-45a4ce87f098",
+      "label": "Cebu",
+      "year": 1957
+    },
+    "A162": {
+      "answer_fact_id": "eb1b1b71-40e1-5811-a6e4-d979ccc8444c",
+      "label": "the Mediterranean",
+      "year": 1966
     }
   }
 }

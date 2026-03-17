@@ -1,0 +1,139 @@
+{
+  "date": "2026-03-17",
+  "topics": [
+    "history"
+  ],
+  "type": "which_came_first",
+  "questions": [
+    {
+      "id": "86bbf821-b6ea-5db1-bf92-fd7db7f9cc1d",
+      "type": "which_came_first",
+      "prompt": "Which event happened earlier?",
+      "answer_fact_ids": [
+        "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+        "4cd991b7-d7d4-5038-a6ae-6371d4552861"
+      ],
+      "correct_answer_fact_id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+      "tags": [
+        "history",
+        "which_came_first"
+      ],
+      "facets": {
+        "topic": "history",
+        "difficulty_band": "baseline"
+      },
+      "selection_rules": {
+        "distractor_same_year_allowed": false
+      },
+      "human_id": "Q63"
+    }
+  ],
+  "answer_facts": [
+    {
+      "id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+      "label": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+      "year": 1860,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:correct",
+        "19th-century",
+        "1860s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "19th-century",
+        "temporal_decade": "1860s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1860,
+          "temporal_century": "19th-century",
+          "temporal_decade": "1860s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A154"
+    },
+    {
+      "id": "4cd991b7-d7d4-5038-a6ae-6371d4552861",
+      "label": "A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+      "year": 1957,
+      "tags": [
+        "history",
+        "which_came_first",
+        "role:distractor",
+        "20th-century",
+        "1950s"
+      ],
+      "facets": {
+        "topic": "history",
+        "temporal_century": "20th-century",
+        "temporal_decade": "1950s",
+        "source": "wikipedia_on_this_day"
+      },
+      "match": {
+        "distractor_profile": {
+          "year": 1957,
+          "temporal_century": "20th-century",
+          "temporal_decade": "1950s"
+        }
+      },
+      "vector_metadata": {
+        "text_for_embedding": "A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+        "embedding_status": "not_generated"
+      },
+      "human_id": "A155"
+    }
+  ],
+  "question": "Which event happened earlier?",
+  "choices": [
+    {
+      "id": "A",
+      "label": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+      "year": 1860,
+      "answer_fact_id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+      "human_id": "A154"
+    },
+    {
+      "id": "B",
+      "label": "A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+      "year": 1957,
+      "answer_fact_id": "4cd991b7-d7d4-5038-a6ae-6371d4552861",
+      "human_id": "A155"
+    }
+  ],
+  "correct_choice_id": "A",
+  "source": {
+    "name": "Wikipedia On This Day",
+    "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/3/17",
+    "retrieved_at": "2026-03-17T06:18:20Z",
+    "events_used": [
+      {
+        "event_id": "33e4a51c-815b-5b9d-8339-a8da4ff0ab29",
+        "text": "The First Taranaki War begins in Taranaki, New Zealand, a major phase of the New Zealand Wars.",
+        "year": 1860,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/First_Taranaki_War"
+      },
+      {
+        "event_id": "4cd991b7-d7d4-5038-a6ae-6371d4552861",
+        "text": "A plane crash in Cebu, Philippines kills Philippine President Ramon Magsaysay and 24 others.",
+        "year": 1957,
+        "wikipedia_url": "https://en.wikipedia.org/wiki/1957_Cebu_Douglas_C-47_crash"
+      }
+    ]
+  },
+  "generation": {
+    "mode": "daily",
+    "edition": 1,
+    "generated_at": "2026-03-17T06:18:20Z"
+  },
+  "metadata": {
+    "version": 2,
+    "normalized_model": "question_answer_facts_v1"
+  }
+}
