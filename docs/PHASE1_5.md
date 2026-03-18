@@ -12,6 +12,7 @@ Add a lightweight discovery/index layer so clients can find daily quiz files wit
 - Keep current quiz generation behavior from `docs/PHASE1.md`.
 - Add deterministic index artifacts after successful daily generation.
 - Keep everything file-based in git storage, with generated artifacts written under `quizzes/` in the private content repository `Stahhl/mindblast-content` (no always-on backend API).
+- Persist one internal debugging/operations JSON report per daily workflow run under `reports/quiz-forge/daily/` in the same content repository.
 
 ## Out of Scope
 - User authentication.
@@ -145,6 +146,8 @@ Example:
 ## CI/CD Behavior
 - Continue using the current scheduled GitHub Actions workflow.
 - Commit/push generated quiz and discovery files only in the content repository.
+- Persist one append-only daily run report JSON per workflow run, including reruns and failed generation attempts.
+- Render the Discord status notification from the persisted JSON report instead of treating Discord as the only copy of run diagnostics.
 - Commit message may stay date-based (same as current Phase 1 behavior).
 
 ## Validation Rules
@@ -163,3 +166,5 @@ Example:
   1. `quizzes/latest.json`
   2. the referenced daily index
   3. referenced quiz files
+- Internal run reports are stored at `reports/quiz-forge/daily/YYYY/MM/DD/<timestamp>-run-<github_run_id>.json`.
+- Frontend/static deploys continue to consume only `quizzes/**`, not `reports/**`.

@@ -1,7 +1,7 @@
 # quiz-forge Design Doc
 
 ## Purpose
-`quiz-forge` is the backend generator that creates daily quiz payloads and commits them to the private content repository `Stahhl/mindblast-content`.
+`quiz-forge` is the backend generator that creates daily quiz payloads and internal run reports, then commits them to the private content repository `Stahhl/mindblast-content`.
 In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `history_mcq_4`).
 
 ## Naming
@@ -25,6 +25,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - It fetches source data from Wikimedia On This Day.
 - It writes one file at `quizzes/<uuid>.json` per generated edition using a deterministic UUIDv5 derived from UTC date + quiz type + edition.
 - It writes discovery artifacts at `quizzes/index/YYYY-MM-DD.json` and `quizzes/latest.json`.
+- It writes one internal run report per workflow run at `reports/quiz-forge/daily/YYYY/MM/DD/<timestamp>-run-<github_run_id>.json`.
 - The `Mindblast` app consumes these artifacts later after `mindblast` deploy workflows bundle them from `mindblast-content`.
 
 ## Proposed Tech Stack
@@ -33,7 +34,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - CI/Scheduler: GitHub Actions cron
 - HTTP client: Python standard library (`urllib`) or `requests`
 - Validation: built-in checks in Python (optionally add `jsonschema` later)
-- Storage: Git repository JSON files in `Stahhl/mindblast-content` (Phase 1 source of truth)
+- Storage: Git repository JSON files in `Stahhl/mindblast-content` (quiz payloads under `quizzes/**`, internal reports under `reports/**`)
 - Phase 3 AI providers (intended):
   - external: OpenAI API
   - local: Ollama
@@ -61,7 +62,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
 10. Write/update discovery artifacts for static client lookup.
-11. Commit and push only when new files are created in `mindblast-content`.
+11. Persist a normalized daily run report and render the Discord message from that report.
+12. Commit and push content changes only in `mindblast-content`.
 
 ## Data Contract Ownership
 - Contract lives in `docs/PHASE1.md`.
@@ -107,6 +109,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - Sanitize/log only non-sensitive data.
 - In Phase 3, provider credentials are required for external AI mode and must be stored in CI secrets (never in repo).
 - Human operation should be limited to key generation/rotation, environment config updates, and daily report review.
+- Internal run reports are retained in git for debugging and must not be bundled into frontend deploy artifacts.
 
 ## CI/CD Design
 - Trigger: `schedule` (manual dispatch allowed for operational reruns).
@@ -117,8 +120,9 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
   3. setup python
   4. install `uv` and sync locked environment
   5. run generator with `uv run`
-  6. emit operational summary report to Discord (including AI usage when enabled)
-  7. git add/commit/push in `mindblast-content` if changes exist
+  6. persist normalized daily run report in `mindblast-content`
+  7. emit operational summary report to Discord from the persisted JSON report
+  8. git add/commit/push in `mindblast-content` if changes exist
 - Bot commit message format:
   - `quiz-forge: add quiz for YYYY-MM-DD`
 

@@ -16,6 +16,7 @@ Phase 1.5 focuses on `quiz-forge` + static discovery:
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields
 - discovery artifacts: `quizzes/index/YYYY-MM-DD.json`, `quizzes/latest.json`
 - support artifact: `quizzes/human_id_lookup.json` (`Q...`/`A...` alias lookup)
+- internal run reports: `reports/quiz-forge/daily/YYYY/MM/DD/<timestamp>-run-<github_run_id>.json`
 - output stored in the private content repository `Stahhl/mindblast-content`
 
 ## Repository Structure
@@ -205,6 +206,12 @@ Repository secrets:
 - `CONTENT_REPO_WRITE_TOKEN`: fine-grained PAT with read/write access to `Stahhl/mindblast-content`
 - `CONTENT_REPO_READ_TOKEN`: fine-grained PAT with read access to `Stahhl/mindblast-content`
 
+Artifact families stored in `Stahhl/mindblast-content`:
+- public client-facing quiz artifacts under `quizzes/**`
+- internal operational/debug artifacts under `reports/**`
+
+Frontend deploy workflows must continue to copy only `quizzes/**`.
+
 ## Feedback API Build + Tests (pnpm)
 
 ```zsh
@@ -272,6 +279,14 @@ Required repository secrets:
 - `FEEDBACK_REPORT_FIREBASE_SERVICE_ACCOUNT_PRODUCTION`: read-only Firestore service account JSON for `mindblast-prod`
 - `CONTENT_REPO_WRITE_TOKEN`: fine-grained PAT with read/write access to `Stahhl/mindblast-content`
 - `OPENAI_API_KEY`: optional for AI summary; deterministic report still works with `disable_ai`
+
+## Daily Quiz Run Reports (GitHub Actions)
+
+- Workflow: `.github/workflows/daily-quiz.yml`
+- Trigger: daily schedule and manual dispatch
+- Output: `reports/quiz-forge/daily/YYYY/MM/DD/<timestamp>-run-<github_run_id>.json` in `Stahhl/mindblast-content`
+- Retention: append-only, one JSON report per run including reruns and failures
+- Discord notification: rendered from the persisted JSON report rather than treated as the sole copy of debugging data
 
 ## Secret Guardrails
 

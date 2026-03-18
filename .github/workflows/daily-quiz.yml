@@ -40,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       QUIZ_CONTENT_REPO: ${{ vars.QUIZ_CONTENT_REPO }}
+      QUIZ_CONTENT_REPO_REF: main
       QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4,history_factoid_mcq_4' }}
       QUIZ_MODE: ${{ inputs.mode || 'daily' }}
       QUIZ_COUNT: ${{ inputs.count || '1' }}
@@ -81,7 +82,14 @@ jobs:
       - name: Sync Python environment
         run: uv sync --locked --no-dev --python 3.12
 
+      - name: Capture content repository baseline
+        id: content_repo_baseline
+        run: |
+          echo "sha=$(git -C .content-repo rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
+
       - name: Generate daily quiz
+        id: generate_daily_quiz
+        continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
@@ -97,85 +105,132 @@ jobs:
             --output-dir ".content-repo/quizzes" \
             "${EXTRA_ARGS[@]}"
 
-      - name: Commit and push if new quiz was created
+      - name: Persist daily run report
+        id: persist_daily_report
+        if: always()
+        continue-on-error: true
+        env:
+          RAW_REPORT_PATH: ${{ github.workspace }}/.tmp/quiz-forge-ai-report.json
+          CONTENT_REPO_COMMIT_BEFORE: ${{ steps.content_repo_baseline.outputs.sha }}
+          GENERATION_STEP_OUTCOME: ${{ steps.generate_daily_quiz.outcome }}
+        run: |
+          mkdir -p .tmp
+          git -C .content-repo status --porcelain --untracked-files=all -- quizzes > .tmp/content-repo-quizzes-status.txt
+          PYTHONPATH=scripts python3 - <<'PY'
+          import datetime as dt
+          import os
+          from pathlib import Path
+
+          from quiz_forge.daily_run_report import build_daily_run_report, write_daily_run_report
+
+          status_lines = Path(".tmp/content-repo-quizzes-status.txt").read_text(encoding="utf-8").splitlines()
+          changed_paths = []
+          for line in status_lines:
+              if len(line) >= 4:
+                  changed_paths.append(line[3:])
+
+          target_date = os.environ["QUIZ_DATE"].strip() or dt.datetime.now(dt.timezone.utc).date().isoformat()
+          generated_at = dt.datetime.now(dt.timezone.utc)
+          report_path, report = build_daily_run_report(
+              raw_report_path=Path(os.environ["RAW_REPORT_PATH"]),
+              generated_at=generated_at,
+              workflow=os.environ["GITHUB_WORKFLOW"],
+              repository=os.environ["GITHUB_REPOSITORY"],
+              run_id=os.environ["GITHUB_RUN_ID"],
+              run_attempt=os.environ["GITHUB_RUN_ATTEMPT"],
+              run_url=f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              job_status="success" if os.environ["GENERATION_STEP_OUTCOME"] == "success" else "failure",
+              trigger=os.environ["GITHUB_EVENT_NAME"],
+              target_date=target_date,
+              quiz_types=[item.strip() for item in os.environ["QUIZ_TYPES"].split(",") if item.strip()],
+              mode=os.environ["QUIZ_MODE"],
+              count=os.environ["QUIZ_COUNT"],
+              changed_paths=changed_paths,
+              content_repo=os.environ["QUIZ_CONTENT_REPO"],
+              content_repo_ref=os.environ["QUIZ_CONTENT_REPO_REF"],
+              content_repo_commit_before=os.environ.get("CONTENT_REPO_COMMIT_BEFORE"),
+          )
+          written_path = write_daily_run_report(
+              content_repo_root=Path(".content-repo"),
+              report_path=report_path,
+              report=report,
+          )
+          Path(".tmp/quiz-forge-daily-report-path.txt").write_text(report_path, encoding="utf-8")
+          print(f"Persisted daily run report: {written_path}")
+          PY
+
+      - name: Commit and push content changes
+        id: commit_content
+        if: always() && steps.persist_daily_report.outcome == 'success'
+        continue-on-error: true
         working-directory: .content-repo
         run: |
-          if [ -z "$(git status --porcelain -- quizzes)" ]; then
-            echo "No changes in content repo quizzes/"
+          if [ -z "$(git status --porcelain -- quizzes reports/quiz-forge/daily)" ]; then
+            echo "No content repo changes."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add quizzes
+          git add quizzes reports/quiz-forge/daily
           COMMIT_DATE="${QUIZ_DATE:-$(date -u +%F)}"
-          git commit -m "quiz-forge: add quiz for ${COMMIT_DATE}"
+          if [ -n "$(git status --porcelain -- quizzes)" ]; then
+            git commit -m "quiz-forge: add quiz for ${COMMIT_DATE}"
+          else
+            git commit -m "quiz-forge: add daily run report for ${COMMIT_DATE}"
+          fi
           git push origin HEAD:main
+
+      - name: Render Discord message from normalized report
+        if: always()
+        continue-on-error: true
+        env:
+          COMMIT_STEP_OUTCOME: ${{ steps.commit_content.outcome }}
+        run: |
+          if [ ! -f .tmp/quiz-forge-daily-report-path.txt ]; then
+            exit 0
+          fi
+
+          PYTHONPATH=scripts python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from quiz_forge.daily_run_report import render_daily_run_discord_message
+
+          report_relative_path = Path(".tmp/quiz-forge-daily-report-path.txt").read_text(encoding="utf-8").strip()
+          report_path = Path(".content-repo") / report_relative_path
+          if not report_path.exists():
+              raise SystemExit(0)
+
+          payload = json.loads(report_path.read_text(encoding="utf-8"))
+          artifact_outcomes = payload.get("artifact_outcomes")
+          if isinstance(artifact_outcomes, dict):
+              artifact_outcomes["content_repo_commit_occurred"] = os.environ["COMMIT_STEP_OUTCOME"] == "success"
+          message = render_daily_run_discord_message(payload)
+          Path(".tmp/quiz-forge-daily-discord-message.txt").write_text(message + "\n", encoding="utf-8")
+          PY
 
       - name: Send Discord status notification
         if: always()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          JOB_STATUS: ${{ job.status }}
-          REPO: ${{ github.repository }}
-          WORKFLOW: ${{ github.workflow }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          QUIZ_FORGE_AI_REPORT_PATH: ${{ github.workspace }}/.tmp/quiz-forge-ai-report.json
         run: |
           if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
             echo "DISCORD_WEBHOOK_URL is not set; skipping Discord notification."
             exit 0
           fi
 
-          STATUS_TEXT="SUCCESS"
-          STATUS_EMOJI="✅"
-          if [ "${JOB_STATUS}" != "success" ]; then
-            STATUS_TEXT="FAILURE"
-            STATUS_EMOJI="❌"
-          fi
-
-          MESSAGE="$(printf '%s mindblast quiz-forge daily job: %s\nrepo: %s\nworkflow: %s\nrun: %s' \
-            "${STATUS_EMOJI}" "${STATUS_TEXT}" "${REPO}" "${WORKFLOW}" "${RUN_URL}")"
-
-          if [ -f "${QUIZ_FORGE_AI_REPORT_PATH}" ]; then
-            AI_BLOCK="$(python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          report_path = Path(os.environ["QUIZ_FORGE_AI_REPORT_PATH"])
-          payload = json.loads(report_path.read_text(encoding="utf-8"))
-          reasons = payload.get("fallback_reasons") or []
-          reasons_text = ", ".join(reasons) if reasons else "none"
-          lines = [
-              "ai:",
-              f"  mode: {payload.get('ai_mode', 'unknown')}",
-              f"  provider/model: {payload.get('provider', 'unknown')}/{payload.get('model', 'unknown')}",
-              f"  calls: {payload.get('calls_total', 0)}",
-              f"  tokens in/out: {payload.get('input_tokens_total', 0)}/{payload.get('output_tokens_total', 0)}",
-              f"  run spend usd: {payload.get('run_estimated_cost_usd', 0)}",
-              f"  day spend usd: {payload.get('day_spend_usd', 0)} / {payload.get('day_limit_usd', 0)}",
-              f"  month spend usd: {payload.get('month_spend_usd', 0)} / {payload.get('month_limit_usd', 0)}",
-              f"  fallbacks: {payload.get('fallback_count', 0)} ({reasons_text})",
-          ]
-          quality = payload.get("quality")
-          if isinstance(quality, dict):
-              lint_failures = ", ".join(quality.get("lint_failures") or []) or "none"
-              fallback_paths = ", ".join(quality.get("fallback_paths") or []) or "none"
-              factoid_subtypes = ", ".join(quality.get("factoid_final_subtypes") or []) or "none"
-              lines.extend(
-                  [
-                      "quality:",
-                      f"  lint failures: {quality.get('lint_failure_count', 0)} ({lint_failures})",
-                      f"  fallback paths: {quality.get('fallback_count', 0)} ({fallback_paths})",
-                      f"  factoid subtypes: {factoid_subtypes}",
-                      f"  ai quality rejections: {quality.get('ai_quality_rejection_count', 0)}",
-                  ]
-              )
-          print("\n".join(lines))
-          PY
-            )"
-            MESSAGE="${MESSAGE}"$'\n'"${AI_BLOCK}"
+          if [ -f .tmp/quiz-forge-daily-discord-message.txt ]; then
+            MESSAGE="$(cat .tmp/quiz-forge-daily-discord-message.txt)"
+          else
+            MESSAGE="$(printf '%s\n%s\n%s\n%s\n%s\n%s' \
+              "❌ mindblast quiz-forge daily job: FAILURE" \
+              "repo: ${GITHUB_REPOSITORY}" \
+              "workflow: ${GITHUB_WORKFLOW}" \
+              "run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+              "report:" \
+              "  status: unavailable")"
           fi
 
           PAYLOAD="$(MESSAGE="${MESSAGE}" python3 -c 'import json,os; print(json.dumps({"content": os.environ["MESSAGE"]}))')"
@@ -184,4 +239,20 @@ jobs:
             -H "Content-Type: application/json" \
             --data "${PAYLOAD}"; then
             echo "Failed to send Discord notification."
+          fi
+
+      - name: Fail job if generation or persistence failed
+        if: always()
+        run: |
+          if [ "${{ steps.generate_daily_quiz.outcome }}" != "success" ]; then
+            echo "Daily quiz generation failed."
+            exit 1
+          fi
+          if [ "${{ steps.persist_daily_report.outcome }}" != "success" ]; then
+            echo "Persisting the daily run report failed."
+            exit 1
+          fi
+          if [ "${{ steps.commit_content.outcome }}" != "success" ]; then
+            echo "Committing content repo changes failed."
+            exit 1
           fi
