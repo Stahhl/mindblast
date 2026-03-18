@@ -37,15 +37,21 @@ Enable `quiz-forge` to generate more than one quiz per type per UTC day so conte
 ### Generation Modes
 - `daily` mode:
   - default for scheduled workflow,
-  - generates `edition = 1` per enabled type for the UTC day.
+  - generates the configured daily edition range per enabled type for the UTC day.
 - `extra` mode:
   - used for manual/operational runs,
-  - generates one or more additional editions (`edition > 1`) per type for the same UTC day.
+  - generates one or more additional editions above the configured daily range for the type.
+
+Default scheduled daily targets:
+- `which_came_first`: `1`
+- `history_mcq_4`: `1`
+- `history_factoid_mcq_4`: `3`
 
 ### Edition Semantics
 - `edition` is a positive integer scoped by `(date, quiz_type)`.
-- `edition = 1` is reserved for the default daily run.
-- New extra runs must allocate the next available edition sequentially (no gaps unless historical data already has gaps).
+- `edition = 1` must always be `daily`.
+- Editions inside the configured daily range for the type are `daily`.
+- Extra runs must allocate the next available edition strictly above the configured daily range (no gaps unless historical data already has gaps).
 
 ### UUID and File Naming
 - Output path remains: `quizzes/<uuid>.json`.
@@ -106,19 +112,20 @@ Keep existing purpose but add edition-aware fields:
 - Keep cron default unchanged: one daily generation run.
 - Scheduled run behavior remains:
   - target mode: `daily`
-  - target edition: `1`
+  - target daily editions by type: `which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3`
 
 ### Manual Workflow Expansion
 Add/extend `workflow_dispatch` inputs:
 - `quiz_types` (comma-separated)
 - `mode` (`daily` | `extra`, default `extra` for manual runs)
 - `count` (number of quizzes per selected type, default `1`)
+- `daily_editions_by_type` (comma-separated `quiz_type=count` map)
 - optional `date` override for backfills
 
 Rules:
-- `daily` mode via manual dispatch should still only generate `edition = 1` when missing.
-- `extra` mode generates next available editions.
-- `extra` mode fails closed when `edition = 1` does not exist yet for a date/type.
+- `daily` mode via manual dispatch should ensure the configured daily edition range exists.
+- `extra` mode generates next available editions strictly above the configured daily range.
+- `extra` mode fails closed when the configured daily range does not yet exist for a date/type.
 - Commit/push only when at least one new quiz file is created.
 
 ## Frontend Changes (Phase 2 Alignment)
@@ -151,7 +158,7 @@ Rules:
 ## Rollout Plan
 1. Docs-first contract update (this phase doc + linked contracts).
 2. Generator changes:
-   - mode/count args,
+   - per-type daily target args,
    - edition-aware UUIDs,
    - duplicate guards.
 3. Discovery artifact upgrade:
@@ -160,12 +167,13 @@ Rules:
    - `latest_quiz_by_type`.
 4. Workflow updates:
    - keep cron daily default,
-   - add manual `extra` generation controls.
+   - add manual `extra` generation controls,
+   - record requested daily targets in persisted run reports.
 5. Frontend updates for multi-edition and archive UX.
 6. Verify staging end-to-end and then promote to production.
 
 ## Acceptance Criteria
-- Daily cron still produces one default quiz per type/day (`edition = 1`) when missing.
+- Daily cron produces `which_came_first=1`, `history_mcq_4=1`, and `history_factoid_mcq_4=3`.
 - Manual extra generation can produce additional editions for the same date/type.
 - Index/latest artifacts expose all editions and remain backward-compatible during migration.
 - Frontend can discover, browse, and answer historical quizzes with multiple editions per date.

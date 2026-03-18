@@ -88,6 +88,7 @@ def test_build_daily_run_report_uses_raw_ai_payload_and_renders_discord_text(tmp
         quiz_types=["which_came_first", "history_mcq_4"],
         mode="extra",
         count="2",
+        daily_editions_by_type={"which_came_first": 1, "history_mcq_4": 1, "history_factoid_mcq_4": 3},
         changed_paths=[
             "quizzes/abc.json",
             "quizzes/index/2026-03-18.json",
@@ -101,12 +102,14 @@ def test_build_daily_run_report_uses_raw_ai_payload_and_renders_discord_text(tmp
     assert report_path == "reports/quiz-forge/daily/2026/03/18/2026-03-18T07-12-13Z-run-123.json"
     assert report["repository"] == "Stahhl/mindblast"
     assert report["request"]["quiz_types"] == ["which_came_first", "history_mcq_4"]
+    assert report["request"]["daily_editions_by_type"]["history_factoid_mcq_4"] == 3
     assert report["artifact_outcomes"]["generated_quiz_files"] == ["quizzes/abc.json"]
     assert report["artifact_outcomes"]["content_repo_commit_occurred"] is True
     assert report["artifact_outcomes"]["content_repo_commit_after"] is None
     assert "quality:" in report["discord_message_text"]
     assert "artifacts:" in report["discord_message_text"]
     assert "mode/count: extra/2" in report["discord_message_text"]
+    assert "daily editions: history_factoid_mcq_4=3, history_mcq_4=1, which_came_first=1" in report["discord_message_text"]
 
 
 def test_build_daily_run_report_tolerates_missing_raw_report_on_failure(tmp_path: Path) -> None:
@@ -124,6 +127,7 @@ def test_build_daily_run_report_tolerates_missing_raw_report_on_failure(tmp_path
         quiz_types=["history_factoid_mcq_4"],
         mode="daily",
         count="1",
+        daily_editions_by_type={"history_factoid_mcq_4": 3},
         changed_paths=[],
         content_repo="Stahhl/mindblast-content",
         content_repo_ref="main",
@@ -153,6 +157,7 @@ def test_write_daily_run_report_persists_json(tmp_path: Path) -> None:
         quiz_types=["which_came_first"],
         mode="daily",
         count="1",
+        daily_editions_by_type={"which_came_first": 1},
         changed_paths=["quizzes/example.json"],
         content_repo="Stahhl/mindblast-content",
         content_repo_ref="main",

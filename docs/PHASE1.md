@@ -11,7 +11,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 ## Scope (Phase 1)
 - One repository: `quiz-forge`.
 - One scheduled CI workflow in GitHub Actions.
-- Generate exactly **1** quiz per enabled type per UTC day in default `daily` mode.
+- Generate the configured daily edition target per enabled type per UTC day in default `daily` mode.
 - Enabled types:
   - `which_came_first`
   - `history_mcq_4`
@@ -26,7 +26,7 @@ Build a minimal `quiz-forge` service for `Mindblast` that generates deterministi
 - Non-Wikipedia content sources.
 
 Note:
-- Multiple quizzes per type per day are introduced in Phase 4 (`docs/PHASE4.md`) via `extra` mode.
+- Multiple quizzes per type per day are introduced in Phase 4 (`docs/PHASE4.md`) via per-type daily edition targets plus `extra` mode.
 
 ## Content Source
 - Use Wikipedia via Wikimedia On This Day API:
@@ -39,11 +39,16 @@ Note:
 - Manual dispatch is allowed for operational retries/backfills.
 
 ## Output Format
-- Store one JSON file per enabled quiz type per UTC day:
+- Store one JSON file per generated edition:
   - `quizzes/<uuid>.json`
 - `<uuid>` must be a deterministic UUIDv5 derived from `date + quiz_type + edition`.
-- If a file for a date/type already exists, do not create duplicates.
+- If a file for a date/type/edition already exists, do not create duplicates.
 - Commit only when at least one new file is created.
+
+Current scheduled daily targets:
+- `which_came_first`: `1`
+- `history_mcq_4`: `1`
+- `history_factoid_mcq_4`: `3`
 
 ### JSON Contract (v2)
 Common fields for all types:
@@ -58,7 +63,7 @@ Common fields for all types:
 - `correct_choice_id`: one of the choice ids (legacy compatibility view).
 - `source.name`, `source.url`, `source.retrieved_at`: non-empty strings.
 - `source.events_used`: array of source events (`event_id`, `text`, `year`, `wikipedia_url`).
-- `generation.mode`: `daily` for `edition = 1`.
+- `generation.mode`: `daily` for any edition inside the configured daily range for the quiz type.
 - `generation.edition`: integer `>= 1`.
 - `generation.generated_at`: UTC ISO-8601 timestamp (`Z`).
 - `metadata.version`: `2`.

@@ -9,8 +9,8 @@ Mindblast is a quiz project built to evolve over time.
 
 Phase 1.5 focuses on `quiz-forge` + static discovery:
 - one scheduled GitHub Actions run per day
-- default daily generation: one history quiz per enabled type per UTC day (`edition = 1`)
-- optional manual extra generation: additional same-day editions (`edition > 1`)
+- default daily generation targets: `which_came_first=1`, `history_mcq_4=1`, `history_factoid_mcq_4=3`
+- optional manual extra generation: additional same-day editions above the configured daily range
 - default enabled types: `which_came_first`, `history_mcq_4`, `history_factoid_mcq_4`
 - `history_factoid_mcq_4` AI-native rewrite path is behind `FACTOID_AI_PIPELINE_ENABLED` (disabled by default)
 - quiz payload schema: `metadata.version = 2` with normalized `questions` + `answer_facts` and legacy compatibility fields

@@ -24,6 +24,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - `quiz-forge` runs on GitHub Actions using a daily schedule.
 - It fetches source data from Wikimedia On This Day.
 - It writes one file at `quizzes/<uuid>.json` per generated edition using a deterministic UUIDv5 derived from UTC date + quiz type + edition.
+- Daily edition targets are currently `which_came_first=1`, `history_mcq_4=1`, and `history_factoid_mcq_4=3`.
 - It writes discovery artifacts at `quizzes/index/YYYY-MM-DD.json` and `quizzes/latest.json`.
 - It writes one internal run report per workflow run at `reports/quiz-forge/daily/YYYY/MM/DD/<timestamp>-run-<github_run_id>.json`.
 - The `Mindblast` app consumes these artifacts later after `mindblast` deploy workflows bundle them from `mindblast-content`.
@@ -49,7 +50,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 1. Determine current UTC date.
 2. Determine enabled quiz types.
 3. Build output paths `quizzes/<uuid>.json` from deterministic UUIDv5(date + type + edition).
-4. In default `daily` mode, ensure `edition = 1` exists per type; in `extra` mode, allocate next editions per type.
+4. In default `daily` mode, ensure the configured daily edition range exists per type; in `extra` mode, allocate next editions above that range.
 5. Call Wikimedia On This Day endpoint for current month/day.
 6. Filter events to valid candidates:
    - has year

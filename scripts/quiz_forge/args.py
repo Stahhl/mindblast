@@ -6,6 +6,8 @@ import argparse
 import datetime as dt
 
 from .constants import (
+    DEFAULT_DAILY_EDITIONS_BY_TYPE,
+    DEFAULT_DAILY_EDITIONS_BY_TYPE_STRING,
     DEFAULT_QUIZ_TYPES,
     GENERATION_MODE_DAILY,
     SUPPORTED_GENERATION_MODES,
@@ -61,6 +63,14 @@ def parse_args() -> argparse.Namespace:
         help="How many quizzes to generate per quiz type for this run.",
     )
     parser.add_argument(
+        "--daily-editions-by-type",
+        default=DEFAULT_DAILY_EDITIONS_BY_TYPE_STRING,
+        help=(
+            "Comma-separated per-type daily edition targets used by daily mode and as the base range for extra mode. "
+            f"Default: {DEFAULT_DAILY_EDITIONS_BY_TYPE_STRING}."
+        ),
+    )
+    parser.add_argument(
         "--backfill-human-ids",
         action="store_true",
         help=(
@@ -111,3 +121,27 @@ def parse_generation_count(value: int) -> int:
     if value < 1:
         raise ValueError("--count must be >= 1.")
     return value
+
+
+def parse_daily_editions_by_type(value: str, *, quiz_types: list[str]) -> dict[str, int]:
+    parsed = dict(DEFAULT_DAILY_EDITIONS_BY_TYPE)
+    raw_entries = [item.strip() for item in value.split(",") if item.strip()]
+    if not raw_entries:
+        raise ValueError("--daily-editions-by-type must include at least one type=count entry.")
+
+    for entry in raw_entries:
+        if "=" not in entry:
+            raise ValueError(
+                f"Invalid --daily-editions-by-type entry '{entry}'. Expected quiz_type=count."
+            )
+        quiz_type, raw_count = (part.strip() for part in entry.split("=", 1))
+        if quiz_type not in SUPPORTED_QUIZ_TYPES:
+            supported = ", ".join(SUPPORTED_QUIZ_TYPES)
+            raise ValueError(f"Unsupported quiz type '{quiz_type}' in --daily-editions-by-type. Supported: {supported}")
+        if not raw_count.isdigit() or int(raw_count) < 1:
+            raise ValueError(
+                f"Invalid daily edition target '{raw_count}' for quiz type '{quiz_type}'. Expected integer >= 1."
+            )
+        parsed[quiz_type] = int(raw_count)
+
+    return {quiz_type: parsed.get(quiz_type, 1) for quiz_type in quiz_types}

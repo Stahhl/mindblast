@@ -27,6 +27,11 @@ on:
         required: false
         default: "1"
         type: string
+      daily_editions_by_type:
+        description: "Comma-separated daily edition targets per quiz type."
+        required: false
+        default: "which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3"
+        type: string
 
 permissions:
   contents: read
@@ -44,6 +49,7 @@ jobs:
       QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4,history_factoid_mcq_4' }}
       QUIZ_MODE: ${{ inputs.mode || 'daily' }}
       QUIZ_COUNT: ${{ inputs.count || '1' }}
+      DAILY_EDITIONS_BY_TYPE: ${{ inputs.daily_editions_by_type || 'which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3' }}
       QUIZ_DATE: ${{ inputs.date || '' }}
       AI_MODE: ${{ vars.AI_MODE }}
       AI_PROVIDER: ${{ vars.AI_PROVIDER }}
@@ -102,6 +108,7 @@ jobs:
             --quiz-types "${QUIZ_TYPES}" \
             --mode "${QUIZ_MODE}" \
             --count "${QUIZ_COUNT}" \
+            --daily-editions-by-type "${DAILY_EDITIONS_BY_TYPE}" \
             --output-dir ".content-repo/quizzes" \
             "${EXTRA_ARGS[@]}"
 
@@ -145,6 +152,14 @@ jobs:
               quiz_types=[item.strip() for item in os.environ["QUIZ_TYPES"].split(",") if item.strip()],
               mode=os.environ["QUIZ_MODE"],
               count=os.environ["QUIZ_COUNT"],
+              daily_editions_by_type={
+                  quiz_type.strip(): int(raw_count.strip())
+                  for quiz_type, raw_count in (
+                      entry.split("=", 1)
+                      for entry in os.environ["DAILY_EDITIONS_BY_TYPE"].split(",")
+                      if entry.strip()
+                  )
+              },
               changed_paths=changed_paths,
               content_repo=os.environ["QUIZ_CONTENT_REPO"],
               content_repo_ref=os.environ["QUIZ_CONTENT_REPO_REF"],

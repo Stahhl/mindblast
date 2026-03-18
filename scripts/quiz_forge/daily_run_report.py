@@ -113,6 +113,13 @@ def render_daily_run_discord_message(report: dict[str, Any]) -> str:
         f"  quiz types: {', '.join(request.get('quiz_types') or []) or 'none'}",
         f"  mode/count: {request.get('mode', 'unknown')}/{request.get('count', 'unknown')}",
     ]
+    daily_editions_by_type = request.get("daily_editions_by_type")
+    if isinstance(daily_editions_by_type, dict):
+        summary = ", ".join(
+            f"{quiz_type}={daily_editions_by_type[quiz_type]}"
+            for quiz_type in sorted(daily_editions_by_type)
+        )
+        lines.append(f"  daily editions: {summary or 'none'}")
 
     lines.extend(
         [
@@ -170,6 +177,7 @@ def build_daily_run_report(
     quiz_types: list[str],
     mode: str,
     count: str,
+    daily_editions_by_type: dict[str, int],
     changed_paths: Iterable[str],
     content_repo: str,
     content_repo_ref: str,
@@ -202,6 +210,7 @@ def build_daily_run_report(
             "quiz_types": quiz_types,
             "mode": mode,
             "count": count,
+            "daily_editions_by_type": daily_editions_by_type,
         },
         "date_utc": raw_payload.get("date_utc", target_date),
         "ai_mode": raw_payload.get("ai_mode"),

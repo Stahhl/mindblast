@@ -10,6 +10,7 @@ from typing import Any
 
 from .ai import AIOrchestrator, load_ai_settings
 from .args import (
+    parse_daily_editions_by_type,
     parse_args,
     parse_generation_count,
     parse_generation_mode,
@@ -48,31 +49,35 @@ def _build_generation_plan(
     quiz_types: list[str],
     mode: str,
     count: int,
+    daily_editions_by_type: dict[str, int],
 ) -> list[tuple[str, int, Path]]:
     pending: list[tuple[str, int, Path]] = []
     for quiz_type in quiz_types:
         existing_records = list_quiz_records_for_date_type(output_dir, target_date, quiz_type)
         existing_editions = {record.edition for record in existing_records}
+        daily_target = daily_editions_by_type.get(quiz_type, 1)
         if mode == GENERATION_MODE_DAILY:
-            edition = 1
-            output_path = build_output_path(output_dir, target_date, quiz_type, edition)
-            existing_path = find_existing_quiz_path(output_path, target_date, quiz_type, edition)
-            if existing_path is not None:
-                print(f"Quiz already exists for {quiz_type} edition {edition}: {existing_path}")
-                continue
-            pending.append((quiz_type, edition, output_path))
+            for edition in range(1, daily_target + 1):
+                output_path = build_output_path(output_dir, target_date, quiz_type, edition)
+                existing_path = find_existing_quiz_path(output_path, target_date, quiz_type, edition)
+                if existing_path is not None:
+                    print(f"Quiz already exists for {quiz_type} edition {edition}: {existing_path}")
+                    continue
+                pending.append((quiz_type, edition, output_path))
             continue
 
         if mode != GENERATION_MODE_EXTRA:
             raise ValueError(f"Unsupported generation mode: {mode}")
 
-        if 1 not in existing_editions:
+        missing_daily_editions = [edition for edition in range(1, daily_target + 1) if edition not in existing_editions]
+        if missing_daily_editions:
+            missing_text = ", ".join(str(edition) for edition in missing_daily_editions)
             raise ValueError(
                 f"Cannot generate extra editions for {quiz_type} on {target_date.isoformat()} "
-                "before daily edition 1 exists."
+                f"before daily editions {missing_text} exist."
             )
 
-        next_edition = max(existing_editions) + 1
+        next_edition = max(max(existing_editions), daily_target) + 1
         for edition in range(next_edition, next_edition + count):
             output_path = build_output_path(output_dir, target_date, quiz_type, edition)
             existing_path = find_existing_quiz_path(output_path, target_date, quiz_type, edition)
@@ -199,6 +204,7 @@ def main() -> int:
     quiz_types = parse_quiz_types(args.quiz_types)
     generation_mode = parse_generation_mode(args.mode)
     generation_count = parse_generation_count(args.count)
+    daily_editions_by_type = parse_daily_editions_by_type(args.daily_editions_by_type, quiz_types=quiz_types)
     ai_settings = load_ai_settings(output_dir=args.output_dir)
     ai_orchestrator = AIOrchestrator(settings=ai_settings, target_date=target_date)
     factoid_pipeline_settings = load_factoid_pipeline_settings(ai_settings.model)
@@ -210,6 +216,7 @@ def main() -> int:
         quiz_types=quiz_types,
         mode=generation_mode,
         count=generation_count,
+        daily_editions_by_type=daily_editions_by_type,
     )
     human_id_lookup = load_human_id_lookup(args.output_dir)
     human_id_lookup_changed = False

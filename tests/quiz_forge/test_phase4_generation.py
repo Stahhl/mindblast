@@ -398,6 +398,7 @@ def test_cli_extra_mode_generates_multiple_same_day_editions(monkeypatch, tmp_pa
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: daily_args)
     assert cli.main() == 0
@@ -410,6 +411,7 @@ def test_cli_extra_mode_generates_multiple_same_day_editions(monkeypatch, tmp_pa
         retries=1,
         mode="extra",
         count=2,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: extra_args)
     assert cli.main() == 0
@@ -444,7 +446,92 @@ def test_extra_mode_requires_daily_edition_first(tmp_path) -> None:
             quiz_types=["history_mcq_4"],
             mode="extra",
             count=1,
+            daily_editions_by_type={"history_mcq_4": 1},
         )
+
+
+def test_daily_mode_build_generation_plan_uses_per_type_daily_targets(tmp_path) -> None:
+    from quiz_forge.cli import _build_generation_plan
+
+    pending = _build_generation_plan(
+        output_dir=(tmp_path / "quizzes").as_posix(),
+        target_date=dt.date(2026, 2, 26),
+        quiz_types=["which_came_first", "history_factoid_mcq_4"],
+        mode="daily",
+        count=1,
+        daily_editions_by_type={"which_came_first": 1, "history_factoid_mcq_4": 3},
+    )
+
+    assert [(quiz_type, edition) for quiz_type, edition, _path in pending] == [
+        ("which_came_first", 1),
+        ("history_factoid_mcq_4", 1),
+        ("history_factoid_mcq_4", 2),
+        ("history_factoid_mcq_4", 3),
+    ]
+
+
+def test_extra_mode_requires_full_daily_range_before_extra(tmp_path) -> None:
+    from quiz_forge.cli import _build_generation_plan
+
+    quizzes_dir = tmp_path / "quizzes"
+    target_date = dt.date(2026, 2, 26)
+    write_quiz_file(
+        build_output_path(quizzes_dir.as_posix(), target_date, "history_factoid_mcq_4", 1),
+        _minimal_existing_factoid_payload(
+            target_date=target_date,
+            generated_at="2026-02-26T06:00:00Z",
+            answer_kind="time",
+            prompt_style="when",
+        ),
+    )
+
+    with pytest.raises(ValueError):
+        _build_generation_plan(
+            output_dir=quizzes_dir.as_posix(),
+            target_date=target_date,
+            quiz_types=["history_factoid_mcq_4"],
+            mode="extra",
+            count=1,
+            daily_editions_by_type={"history_factoid_mcq_4": 3},
+        )
+
+
+def test_extra_mode_starts_after_configured_factoid_daily_range(tmp_path) -> None:
+    from quiz_forge.cli import _build_generation_plan
+
+    quizzes_dir = tmp_path / "quizzes"
+    target_date = dt.date(2026, 2, 26)
+    for edition in (1, 2, 3):
+        write_quiz_file(
+            build_output_path(quizzes_dir.as_posix(), target_date, "history_factoid_mcq_4", edition),
+            _minimal_existing_factoid_payload(
+                target_date=target_date,
+                generated_at=f"2026-02-26T06:0{edition}:00Z",
+                answer_kind="time",
+                prompt_style="when",
+            )
+            | {
+                "generation": {
+                    "mode": "daily",
+                    "edition": edition,
+                    "generated_at": f"2026-02-26T06:0{edition}:00Z",
+                }
+            },
+        )
+
+    pending = _build_generation_plan(
+        output_dir=quizzes_dir.as_posix(),
+        target_date=target_date,
+        quiz_types=["history_factoid_mcq_4"],
+        mode="extra",
+        count=2,
+        daily_editions_by_type={"history_factoid_mcq_4": 3},
+    )
+
+    assert [(quiz_type, edition) for quiz_type, edition, _path in pending] == [
+        ("history_factoid_mcq_4", 4),
+        ("history_factoid_mcq_4", 5),
+    ]
 
 
 def test_cli_generates_history_factoid_mcq(monkeypatch, tmp_path) -> None:
@@ -466,6 +553,7 @@ def test_cli_generates_history_factoid_mcq(monkeypatch, tmp_path) -> None:
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -489,6 +577,40 @@ def test_cli_generates_history_factoid_mcq(monkeypatch, tmp_path) -> None:
     assert all(choice["human_id"].startswith("A") for choice in payload["choices"])
 
 
+def test_cli_daily_mode_generates_three_history_factoid_daily_editions(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )
+
+    assert [record.edition for record in records] == [1, 2, 3]
+    assert all(record.payload["generation"]["mode"] == "daily" for record in records)
+
+
 def test_cli_generates_history_factoid_person_mcq_when_person_candidates_exist(monkeypatch, tmp_path) -> None:
     from quiz_forge import cli
 
@@ -508,6 +630,7 @@ def test_cli_generates_history_factoid_person_mcq_when_person_candidates_exist(m
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -552,6 +675,7 @@ def test_cli_generates_history_factoid_place_mcq_when_place_candidates_exist(mon
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -596,6 +720,7 @@ def test_cli_generates_history_factoid_place_mcq_for_embedded_place_patterns(mon
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -652,6 +777,7 @@ def test_cli_prefers_less_recent_factoid_kind_when_both_person_and_place_are_ava
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -686,6 +812,7 @@ def test_cli_reuses_existing_human_ids_on_rerun(monkeypatch, tmp_path) -> None:
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -732,6 +859,7 @@ def test_cli_backfills_human_ids_for_existing_quizzes(monkeypatch, tmp_path) -> 
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
         backfill_human_ids=False,
     )
     monkeypatch.setattr(cli, "parse_args", lambda: daily_args)
@@ -871,6 +999,7 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -937,6 +1066,7 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
@@ -1260,6 +1390,7 @@ def test_cli_discards_ai_time_factoid_update_when_quality_lint_fails(monkeypatch
         retries=1,
         mode="daily",
         count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
