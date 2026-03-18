@@ -7,19 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from .constants import SUPPORTED_QUIZ_TYPES
-from .storage import QuizRecord, list_quiz_records_for_date, load_json_file, write_json_file
+from .storage import QuizRecord, list_quiz_records_for_date, load_json_file, to_public_quiz_path, write_json_file
 
 
 def _utc_timestamp(value: dt.datetime) -> str:
     return value.replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
-
-def _as_repo_relative(path: Path, root: Path) -> str:
-    absolute = path if path.is_absolute() else (root / path)
-    try:
-        return absolute.relative_to(root).as_posix()
-    except ValueError:
-        return path.as_posix()
 
 
 def _parse_timestamp(value: str | None) -> dt.datetime | None:
@@ -40,7 +32,6 @@ def _normalize_generation_mode(raw_mode: str | None, edition: int) -> str:
 
 
 def _build_daily_entries(records: list[QuizRecord]) -> dict[str, list[dict[str, Any]]]:
-    repo_root = Path.cwd().resolve()
     by_type: dict[str, list[QuizRecord]] = {quiz_type: [] for quiz_type in SUPPORTED_QUIZ_TYPES}
     for record in records:
         by_type[record.quiz_type].append(record)
@@ -66,7 +57,7 @@ def _build_daily_entries(records: list[QuizRecord]) -> dict[str, list[dict[str, 
                 {
                     "edition": record.edition,
                     "mode": _normalize_generation_mode(record.mode, record.edition),
-                    "quiz_file": _as_repo_relative(record.path, repo_root),
+                    "quiz_file": to_public_quiz_path(record.path),
                     "generated_at": generated_at,
                 }
             )
@@ -134,7 +125,7 @@ def _build_latest_payload(
 ) -> dict[str, Any]:
     return {
         "date": target_date.isoformat(),
-        "index_file": _as_repo_relative(daily_index_path, Path.cwd().resolve()),
+        "index_file": to_public_quiz_path(daily_index_path),
         "available_types": available_types,
         "latest_quiz_by_type": latest_quiz_by_type,
         "metadata": {

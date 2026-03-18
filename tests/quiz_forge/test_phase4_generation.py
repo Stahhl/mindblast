@@ -12,7 +12,9 @@ from quiz_forge.ai.types import AIJsonTaskResponse, AIUsage
 from quiz_forge.discovery import write_discovery_artifacts
 from quiz_forge.quality import QualityRunStats, lint_quiz_payload
 from quiz_forge.storage import (
+    apply_human_ids_to_quiz,
     build_output_path,
+    load_human_id_lookup,
     load_json_file,
     list_quiz_records_for_date_type,
     write_quiz_file,
@@ -300,6 +302,81 @@ def test_write_discovery_artifacts_supports_multiple_editions(tmp_path) -> None:
     assert latest_payload["latest_quiz_by_type"]["history_mcq_4"] == index_payload["quizzes_by_type"]["history_mcq_4"][-1][
         "quiz_file"
     ]
+
+
+def test_write_discovery_artifacts_normalizes_public_paths_for_external_content_repo(tmp_path) -> None:
+    repo_root = tmp_path / "mindblast"
+    quizzes_dir = repo_root / ".content-repo" / "quizzes"
+    quizzes_dir.mkdir(parents=True)
+    target_date = dt.date(2026, 3, 18)
+
+    history_daily = build_output_path(quizzes_dir.as_posix(), target_date, "history_mcq_4", 1)
+    first_daily = build_output_path(quizzes_dir.as_posix(), target_date, "which_came_first", 1)
+
+    write_quiz_file(
+        history_daily,
+        _minimal_quiz_payload(
+            target_date=target_date,
+            quiz_type="history_mcq_4",
+            edition=1,
+            mode="daily",
+            generated_at="2026-03-18T06:18:00Z",
+        ),
+    )
+    write_quiz_file(
+        first_daily,
+        _minimal_quiz_payload(
+            target_date=target_date,
+            quiz_type="which_came_first",
+            edition=1,
+            mode="daily",
+            generated_at="2026-03-18T06:18:00Z",
+        ),
+    )
+
+    before_cwd = Path.cwd()
+    try:
+        os.chdir(repo_root)
+        changed = write_discovery_artifacts(
+            output_dir=quizzes_dir.as_posix(),
+            target_date=target_date,
+            generated_now=True,
+        )
+    finally:
+        os.chdir(before_cwd)
+
+    assert changed
+    latest_payload = json.loads((quizzes_dir / "latest.json").read_text(encoding="utf-8"))
+    index_payload = json.loads((quizzes_dir / "index" / "2026-03-18.json").read_text(encoding="utf-8"))
+
+    assert latest_payload["index_file"] == "quizzes/index/2026-03-18.json"
+    assert all(path.startswith("quizzes/") for path in latest_payload["latest_quiz_by_type"].values())
+    assert all(entry["quiz_file"].startswith("quizzes/") for entries in index_payload["quizzes_by_type"].values() for entry in entries)
+    assert ".content-repo/" not in json.dumps(latest_payload)
+    assert ".content-repo/" not in json.dumps(index_payload)
+
+
+def test_apply_human_ids_uses_public_quiz_paths_for_external_content_repo() -> None:
+    from quiz_forge.builders import build_history_mcq_4_quiz
+
+    repo_root = Path("/tmp/mindblast-test-root")
+    quiz_path = repo_root / ".content-repo" / "quizzes" / "1234.json"
+    payload = build_history_mcq_4_quiz(
+        dt.date(2026, 3, 18),
+        dt.datetime(2026, 3, 18, 6, 0, tzinfo=dt.timezone.utc),
+        "https://example.com/source",
+        _sample_candidates(),
+        seed=1,
+        edition=1,
+        generation_mode="daily",
+    )
+    lookup = load_human_id_lookup((repo_root / ".content-repo" / "quizzes").as_posix())
+
+    changed = apply_human_ids_to_quiz(quiz=payload, quiz_path=quiz_path, lookup=lookup)
+
+    assert changed is True
+    question = payload["questions"][0]
+    assert lookup["questions"][question["human_id"]]["quiz_file"] == "quizzes/1234.json"
 
 
 def test_cli_extra_mode_generates_multiple_same_day_editions(monkeypatch, tmp_path) -> None:

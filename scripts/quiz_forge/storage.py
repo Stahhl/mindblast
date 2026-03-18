@@ -153,12 +153,12 @@ def _utc_timestamp(value: dt.datetime) -> str:
     return value.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def _as_repo_relative(path: Path, root: Path) -> str:
-    absolute = path if path.is_absolute() else (root / path)
-    try:
-        return absolute.relative_to(root).as_posix()
-    except ValueError:
-        return path.as_posix()
+def to_public_quiz_path(path: Path) -> str:
+    normalized_parts = path.as_posix().split("/")
+    if "quizzes" in normalized_parts:
+        quizzes_index = normalized_parts.index("quizzes")
+        return "/".join(normalized_parts[quizzes_index:])
+    raise ValueError(f"Path does not contain quizzes/ root: {path}")
 
 
 def _extract_human_id_number(human_id: str, prefix: str) -> int | None:
@@ -524,7 +524,7 @@ def apply_human_ids_to_quiz(
 
     question_record = {
         "question_id": question_id,
-        "quiz_file": _as_repo_relative(quiz_path, Path.cwd().resolve()),
+        "quiz_file": to_public_quiz_path(quiz_path),
         "date": quiz.get("date"),
         "quiz_type": quiz.get("type"),
         "edition": edition,
