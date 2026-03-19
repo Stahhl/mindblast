@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import QuizCard from "./QuizCard";
-import type { HistoryMcqQuiz } from "../lib/types";
+import type { GeographyFactoidMcqQuiz, HistoryMcqQuiz } from "../lib/types";
 import { submitQuizFeedback } from "../lib/feedbackApi";
 
 vi.mock("../lib/feedbackApi", () => ({
@@ -116,6 +116,135 @@ function sampleQuiz(): HistoryMcqQuiz {
         facets: { topic: "history" },
         match: {},
         vector_metadata: { text_for_embedding: "Event D", embedding_status: "not_generated" },
+      },
+    ],
+  };
+}
+
+function sampleGeographyQuiz(): GeographyFactoidMcqQuiz {
+  return {
+    date: "2026-03-19",
+    topics: ["geography"],
+    type: "geography_factoid_mcq_4",
+    question: "Which country has the capital Ottawa?",
+    correct_choice_id: "B",
+    source: {
+      name: "Wikidata",
+      url: "https://www.wikidata.org/wiki/Wikidata:Licensing",
+      retrieved_at: "2026-03-19T06:00:00Z",
+      records_used: [
+        {
+          record_id: "fact-a",
+          country_label: "Peru",
+          capital_label: "Lima",
+          country_qid: "Q419",
+          capital_qid: "Q2868",
+          country_url: "https://www.wikidata.org/wiki/Q419",
+          capital_url: "https://www.wikidata.org/wiki/Q2868",
+        },
+        {
+          record_id: "fact-b",
+          country_label: "Canada",
+          capital_label: "Ottawa",
+          country_qid: "Q16",
+          capital_qid: "Q1930",
+          country_url: "https://www.wikidata.org/wiki/Q16",
+          capital_url: "https://www.wikidata.org/wiki/Q1930",
+        },
+        {
+          record_id: "fact-c",
+          country_label: "Japan",
+          capital_label: "Tokyo",
+          country_qid: "Q17",
+          capital_qid: "Q1490",
+          country_url: "https://www.wikidata.org/wiki/Q17",
+          capital_url: "https://www.wikidata.org/wiki/Q1490",
+        },
+        {
+          record_id: "fact-d",
+          country_label: "Portugal",
+          capital_label: "Lisbon",
+          country_qid: "Q45",
+          capital_qid: "Q597",
+          country_url: "https://www.wikidata.org/wiki/Q45",
+          capital_url: "https://www.wikidata.org/wiki/Q597",
+        },
+      ],
+    },
+    metadata: {
+      version: 2,
+      normalized_model: "question_answer_facts_v1",
+    },
+    generation: {
+      mode: "daily",
+      edition: 1,
+      generated_at: "2026-03-19T06:00:00Z",
+    },
+    choices: [
+      { id: "A", label: "Peru", answer_fact_id: "fact-a", human_id: "A1" },
+      { id: "B", label: "Canada", answer_fact_id: "fact-b", human_id: "A2" },
+      { id: "C", label: "Japan", answer_fact_id: "fact-c", human_id: "A3" },
+      { id: "D", label: "Portugal", answer_fact_id: "fact-d", human_id: "A4" },
+    ],
+    questions: [
+      {
+        id: "123e4567-e89b-42d3-a456-426614174100",
+        human_id: "Q99",
+        type: "geography_factoid_mcq_4",
+        prompt: "Which country has the capital Ottawa?",
+        answer_fact_ids: ["fact-a", "fact-b", "fact-c", "fact-d"],
+        correct_answer_fact_id: "fact-b",
+        tags: ["geography", "geography_factoid_mcq_4"],
+        facets: {
+          topic: "geography",
+          difficulty_band: "baseline",
+          question_format: "factoid",
+          answer_kind: "country",
+          prompt_style: "capital_to_country",
+        },
+        selection_rules: { distractor_same_year_allowed: false, capital_label: "Ottawa" },
+      },
+    ],
+    answer_facts: [
+      {
+        id: "fact-a",
+        human_id: "A1",
+        label: "Peru",
+        year: 0,
+        tags: ["geography"],
+        facets: { topic: "geography", entity_type: "country" },
+        match: {},
+        vector_metadata: { text_for_embedding: "Peru -- capital Lima", embedding_status: "not_generated" },
+      },
+      {
+        id: "fact-b",
+        human_id: "A2",
+        label: "Canada",
+        year: 0,
+        tags: ["geography"],
+        facets: { topic: "geography", entity_type: "country" },
+        match: {},
+        vector_metadata: { text_for_embedding: "Canada -- capital Ottawa", embedding_status: "not_generated" },
+      },
+      {
+        id: "fact-c",
+        human_id: "A3",
+        label: "Japan",
+        year: 0,
+        tags: ["geography"],
+        facets: { topic: "geography", entity_type: "country" },
+        match: {},
+        vector_metadata: { text_for_embedding: "Japan -- capital Tokyo", embedding_status: "not_generated" },
+      },
+      {
+        id: "fact-d",
+        human_id: "A4",
+        label: "Portugal",
+        year: 0,
+        tags: ["geography"],
+        facets: { topic: "geography", entity_type: "country" },
+        match: {},
+        vector_metadata: { text_for_embedding: "Portugal -- capital Lisbon", embedding_status: "not_generated" },
       },
     ],
   };
@@ -260,5 +389,25 @@ describe("QuizCard feedback", () => {
     expect(screen.getByRole("button", { name: "Submit feedback" })).toBeDisabled();
     expect(screen.getByText("Sign in to submit feedback.")).toBeInTheDocument();
     expect(submitFeedbackMock).not.toHaveBeenCalled();
+  });
+
+  test("renders geography source records", () => {
+    render(
+      <QuizCard
+        quiz={sampleGeographyQuiz()}
+        quizKey="geography_factoid_mcq_4:1:quizzes/geo123.json"
+        quizFile="quizzes/geo123.json"
+        edition={1}
+        feedbackEnabled={false}
+        feedbackBlockedMessage=""
+        getFeedbackRequestHeaders={() => Promise.resolve({})}
+        selectedChoiceId={undefined}
+        onSelectChoice={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Geography Factoid")).toBeInTheDocument();
+    expect(screen.getByText("Ottawa -> Canada")).toBeInTheDocument();
+    expect(screen.getByText("Lima -> Peru")).toBeInTheDocument();
   });
 });

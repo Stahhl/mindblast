@@ -21,12 +21,14 @@ from .builders import QUIZ_BUILDERS
 from .constants import (
     GENERATION_MODE_DAILY,
     GENERATION_MODE_EXTRA,
+    QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_MCQ_4,
     SUPPORTED_QUIZ_TYPES,
 )
 from .discovery import write_discovery_artifacts
 from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings, propose_ai_factoid_candidate
+from .geography import GEOGRAPHY_SOURCE_URL, load_geography_records
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
 from .quality import QualityRunStats, lint_quiz_payload
@@ -225,14 +227,31 @@ def main() -> int:
     generated: list[tuple[str, int, Path, dict[str, Any]]] = []
     if pending:
         retrieval_time = dt.datetime.now(dt.timezone.utc)
-        source_url = build_api_url(target_date)
-        source_payload = fetch_json(source_url, timeout=args.timeout, retries=args.retries)
-        candidates = extract_candidates(source_payload)
+        history_source_url: str | None = None
+        history_candidates: list[dict[str, Any]] | None = None
+        geography_source_url: str | None = None
+        geography_candidates: list[dict[str, Any]] | None = None
+
+        if any(quiz_type != QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4 for quiz_type, _, _ in pending):
+            history_source_url = build_api_url(target_date)
+            source_payload = fetch_json(history_source_url, timeout=args.timeout, retries=args.retries)
+            history_candidates = extract_candidates(source_payload)
+        if any(quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4 for quiz_type, _, _ in pending):
+            geography_source_url = GEOGRAPHY_SOURCE_URL
+            geography_candidates = load_geography_records()
         reusable_correct_events: list[dict[str, Any]] = []
 
         for quiz_type, edition, output_path in pending:
             builder = QUIZ_BUILDERS[quiz_type]
             seed = build_seed(target_date, quiz_type, edition)
+            if quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4:
+                source_url = geography_source_url
+                candidates = geography_candidates
+            else:
+                source_url = history_source_url
+                candidates = history_candidates
+            if not isinstance(source_url, str) or candidates is None:
+                raise ValueError(f"Missing source inputs for {quiz_type}.")
             ai_ranked_distractor_ids: list[str] | None = None
             if quiz_type == QUIZ_TYPE_HISTORY_MCQ_4 and ai_orchestrator.is_enabled():
                 correct_event, distractor_pool = pick_history_mcq_distractor_pool(

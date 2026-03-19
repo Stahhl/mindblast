@@ -15,7 +15,9 @@ Track potential future quiz formats and product features after Phase 1.
 - `history_mcq_4`: four options, choose the event that matches a target year.
 
 ### Additional Quiz Formats
-- Geography quiz: country/capital/flag/timezone prompts.
+- Geography quiz:
+  - selected next category for Phase 9: capital-to-country factoid MCQ (`geography_factoid_mcq_4`)
+  - later candidates: country-to-capital, flag, and timezone prompts
 - Science myth-or-fact: classify a statement and show explanation.
 - News context quiz: current event with background question.
 - Timeline ordering: place 3 to 5 events in chronological order.
@@ -47,5 +49,6 @@ Track potential future quiz formats and product features after Phase 1.
 3. Ship Phase 2 static frontend app using discovery artifacts.
 4. Add Phase 3 AI-assisted distractor reranking with strict budget/fallback controls.
 5. Add ratings and lightweight analytics.
-6. Add categories and difficulty controls.
-7. Add leaderboard/achievement/streak systems.
+6. Add the first non-history category via Phase 9 geography factoids.
+7. Broaden categories and difficulty controls beyond the initial geography rollout.
+8. Add leaderboard/achievement/streak systems.

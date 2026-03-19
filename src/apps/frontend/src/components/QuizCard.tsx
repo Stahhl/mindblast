@@ -33,6 +33,9 @@ function formatQuizType(type: QuizType): string {
   if (type === "history_factoid_mcq_4") {
     return "History Factoid";
   }
+  if (type === "geography_factoid_mcq_4") {
+    return "Geography Factoid";
+  }
   return type;
 }
 
@@ -310,10 +313,19 @@ export default function QuizCard({
         <summary className="source-summary">Show sources ({quiz.source.name})</summary>
         <section className="source-block">
           <ul>
-            {quiz.source.events_used.map((event) => (
+            {quiz.source.events_used?.map((event) => (
               <li key={`${event.year}-${event.wikipedia_url}`}>
                 <a href={event.wikipedia_url} target="_blank" rel="noreferrer">
                   {event.year}: {event.text}
+                </a>
+              </li>
+            ))}
+            {quiz.source.records_used?.map((record) => (
+              <li key={record.record_id}>
+                <a href={record.country_url} target="_blank" rel="noreferrer">
+                  {record.capital_label}
+                  {" -> "}
+                  {record.country_label}
                 </a>
               </li>
             ))}

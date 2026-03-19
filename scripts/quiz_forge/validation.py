@@ -10,6 +10,7 @@ from .constants import (
     SUPPORTED_GENERATION_MODES,
     NORMALIZED_MODEL_VERSION,
     QUIZ_SCHEMA_VERSION,
+    QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_MCQ_4,
     QUIZ_TYPE_WHICH_CAME_FIRST,
@@ -18,16 +19,84 @@ from .constants import (
 )
 
 
+def _expected_topics(quiz_type: str) -> list[str]:
+    if quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4:
+        return ["geography"]
+    return ["history"]
+
+
+def _validate_history_source(source: dict[str, Any]) -> None:
+    events_used = source.get("events_used")
+    if not isinstance(events_used, list) or len(events_used) < 2:
+        raise ValueError("source.events_used must contain at least 2 entries.")
+
+    for event in events_used:
+        if not isinstance(event, dict):
+            raise ValueError("source.events_used entries must be objects.")
+        event_id = event.get("event_id")
+        text = event.get("text")
+        year = event.get("year")
+        wikipedia_url = event.get("wikipedia_url")
+        if not isinstance(event_id, str) or not event_id.strip():
+            raise ValueError("source.events_used.event_id must be a non-empty string.")
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("source.events_used.text must be a non-empty string.")
+        if not isinstance(year, int):
+            raise ValueError("source.events_used.year must be an integer.")
+        if not isinstance(wikipedia_url, str) or not wikipedia_url.strip():
+            raise ValueError("source.events_used.wikipedia_url must be a non-empty string.")
+
+
+def _validate_geography_source(source: dict[str, Any]) -> None:
+    records_used = source.get("records_used")
+    if not isinstance(records_used, list) or len(records_used) != 4:
+        raise ValueError("source.records_used must contain exactly 4 entries.")
+
+    for record in records_used:
+        if not isinstance(record, dict):
+            raise ValueError("source.records_used entries must be objects.")
+        for key in (
+            "record_id",
+            "country_label",
+            "capital_label",
+            "country_qid",
+            "capital_qid",
+            "country_url",
+            "capital_url",
+        ):
+            value = record.get(key)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"source.records_used.{key} must be a non-empty string.")
+
+
+def _source_reference_ids(quiz_type: str, source: dict[str, Any]) -> list[str]:
+    if quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4:
+        records_used = source.get("records_used")
+        if not isinstance(records_used, list):
+            raise ValueError("source.records_used must be a list.")
+        record_ids = [record.get("record_id") for record in records_used if isinstance(record, dict)]
+        if any(not isinstance(record_id, str) or not record_id.strip() for record_id in record_ids):
+            raise ValueError("source.records_used.record_id must be a non-empty string.")
+        return record_ids
+
+    events_used = source.get("events_used")
+    if not isinstance(events_used, list):
+        raise ValueError("source.events_used must be a list.")
+    event_ids = [event.get("event_id") for event in events_used if isinstance(event, dict)]
+    if any(not isinstance(event_id, str) or not event_id.strip() for event_id in event_ids):
+        raise ValueError("source.events_used.event_id must be a non-empty string.")
+    return event_ids
+
+
 def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[str, list[dict[str, Any]]]:
     if quiz.get("date") != target_date.isoformat():
         raise ValueError("Invalid date field.")
 
-    if quiz.get("topics") != ["history"]:
-        raise ValueError("topics must equal ['history'] in Phase 1.")
-
     quiz_type = quiz.get("type")
     if quiz_type not in SUPPORTED_QUIZ_TYPES:
         raise ValueError(f"type must be one of {SUPPORTED_QUIZ_TYPES}.")
+    if quiz.get("topics") != _expected_topics(quiz_type):
+        raise ValueError(f"topics must equal {_expected_topics(quiz_type)} for {quiz_type}.")
 
     question = quiz.get("question")
     if not isinstance(question, str) or not question.strip():
@@ -74,25 +143,10 @@ def validate_common_fields(quiz: dict[str, Any], target_date: dt.date) -> tuple[
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"source.{key} must be a non-empty string.")
 
-    events_used = source.get("events_used")
-    if not isinstance(events_used, list) or len(events_used) < 2:
-        raise ValueError("source.events_used must contain at least 2 entries.")
-
-    for event in events_used:
-        if not isinstance(event, dict):
-            raise ValueError("source.events_used entries must be objects.")
-        event_id = event.get("event_id")
-        text = event.get("text")
-        year = event.get("year")
-        wikipedia_url = event.get("wikipedia_url")
-        if not isinstance(event_id, str) or not event_id.strip():
-            raise ValueError("source.events_used.event_id must be a non-empty string.")
-        if not isinstance(text, str) or not text.strip():
-            raise ValueError("source.events_used.text must be a non-empty string.")
-        if not isinstance(year, int):
-            raise ValueError("source.events_used.year must be an integer.")
-        if not isinstance(wikipedia_url, str) or not wikipedia_url.strip():
-            raise ValueError("source.events_used.wikipedia_url must be a non-empty string.")
+    if quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4:
+        _validate_geography_source(source)
+    else:
+        _validate_history_source(source)
 
     metadata = quiz.get("metadata")
     if not isinstance(metadata, dict) or metadata.get("version") != QUIZ_SCHEMA_VERSION:
@@ -195,12 +249,11 @@ def _validate_questions(
     legacy_choices: list[dict[str, Any]],
 ) -> None:
     source = quiz.get("source")
-    source_events = source.get("events_used") if isinstance(source, dict) else None
-    if not isinstance(source_events, list):
-        raise ValueError("source.events_used must be a list.")
-    source_event_ids = [event.get("event_id") for event in source_events if isinstance(event, dict)]
-    if any(not isinstance(event_id, str) or event_id not in facts_by_id for event_id in source_event_ids):
-        raise ValueError("source.events_used.event_id must reference existing answer_facts.")
+    if not isinstance(source, dict):
+        raise ValueError("source must be an object.")
+    source_reference_ids = _source_reference_ids(quiz_type, source)
+    if any(reference_id not in facts_by_id for reference_id in source_reference_ids):
+        raise ValueError("source reference ids must reference existing answer_facts.")
 
     questions = quiz.get("questions")
     if not isinstance(questions, list) or len(questions) != 1:
@@ -237,8 +290,8 @@ def _validate_questions(
         raise ValueError("questions[0].correct_answer_fact_id must be in answer_fact_ids.")
     if any(answer_fact_id not in facts_by_id for answer_fact_id in answer_fact_ids):
         raise ValueError("questions[0].answer_fact_ids must reference existing answer_facts.")
-    if set(source_event_ids) != set(answer_fact_ids):
-        raise ValueError("questions[0].answer_fact_ids must match source.events_used.event_id set.")
+    if source_reference_ids != answer_fact_ids:
+        raise ValueError("questions[0].answer_fact_ids must match source record order.")
 
     if prompt != quiz.get("question"):
         raise ValueError("questions[0].prompt must match legacy question field.")
@@ -372,6 +425,58 @@ def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dic
             raise ValueError("history_factoid_mcq_4 answer_facts entity_type must align with answer_kind.")
 
 
+def validate_geography_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dict[str, Any]) -> None:
+    if len(choices) != 4:
+        raise ValueError("geography_factoid_mcq_4 choices must contain exactly 4 entries.")
+
+    labels: list[str] = []
+    for choice in choices:
+        if "year" in choice:
+            raise ValueError("geography_factoid_mcq_4 choices must not include year.")
+        label = choice.get("label")
+        if not isinstance(label, str) or not label.strip():
+            raise ValueError("geography_factoid_mcq_4 choices must have labels.")
+        labels.append(label.strip().casefold())
+    if len(set(labels)) != len(labels):
+        raise ValueError("geography_factoid_mcq_4 choices must have unique country labels.")
+
+    question = quiz.get("question")
+    if not isinstance(question, str) or not question.startswith("Which country has the capital ") or not question.endswith("?"):
+        raise ValueError("geography_factoid_mcq_4 question text is invalid.")
+
+    questions = quiz.get("questions")
+    if not isinstance(questions, list) or not questions or not isinstance(questions[0], dict):
+        raise ValueError("geography_factoid_mcq_4 questions[0] must be present.")
+    facets = questions[0].get("facets")
+    if not isinstance(facets, dict):
+        raise ValueError("geography_factoid_mcq_4 questions[0].facets must be an object.")
+    if facets.get("question_format") != "factoid":
+        raise ValueError("geography_factoid_mcq_4 facets.question_format must be 'factoid'.")
+    if facets.get("answer_kind") != "country":
+        raise ValueError("geography_factoid_mcq_4 facets.answer_kind must be 'country'.")
+    if facets.get("prompt_style") != "capital_to_country":
+        raise ValueError("geography_factoid_mcq_4 facets.prompt_style must be 'capital_to_country'.")
+
+    source = quiz.get("source")
+    if not isinstance(source, dict):
+        raise ValueError("geography_factoid_mcq_4 source must be an object.")
+    records_used = source.get("records_used")
+    if not isinstance(records_used, list) or len(records_used) != 4:
+        raise ValueError("geography_factoid_mcq_4 source.records_used must contain exactly 4 entries.")
+
+    answer_facts = quiz.get("answer_facts")
+    if not isinstance(answer_facts, list) or len(answer_facts) != 4:
+        raise ValueError("geography_factoid_mcq_4 answer_facts must contain exactly 4 entries.")
+    for fact in answer_facts:
+        if not isinstance(fact, dict):
+            raise ValueError("geography_factoid_mcq_4 answer_facts entries must be objects.")
+        fact_facets = fact.get("facets")
+        if not isinstance(fact_facets, dict):
+            raise ValueError("geography_factoid_mcq_4 answer_facts facets must be objects.")
+        if fact_facets.get("entity_type") != "country":
+            raise ValueError("geography_factoid_mcq_4 answer_facts entity_type must be 'country'.")
+
+
 def validate_quiz(quiz: dict[str, Any], target_date: dt.date) -> None:
     quiz_type, choices = validate_common_fields(quiz, target_date)
     facts_by_id = _validate_answer_facts(quiz)
@@ -387,6 +492,10 @@ def validate_quiz(quiz: dict[str, Any], target_date: dt.date) -> None:
 
     if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
         validate_history_factoid_mcq_4_quiz(choices, quiz)
+        return
+
+    if quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4:
+        validate_geography_factoid_mcq_4_quiz(choices, quiz)
         return
 
     raise ValueError(f"Unsupported quiz type for validation: {quiz_type}")

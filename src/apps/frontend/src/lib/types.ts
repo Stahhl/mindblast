@@ -1,4 +1,8 @@
-export type QuizType = "which_came_first" | "history_mcq_4" | "history_factoid_mcq_4";
+export type QuizType =
+  | "which_came_first"
+  | "history_mcq_4"
+  | "history_factoid_mcq_4"
+  | "geography_factoid_mcq_4";
 
 export interface IndexQuizEdition {
   edition: number;
@@ -36,11 +40,22 @@ export interface QuizSourceEvent {
   wikipedia_url: string;
 }
 
+export interface QuizSourceRecord {
+  record_id: string;
+  country_label: string;
+  capital_label: string;
+  country_qid: string;
+  capital_qid: string;
+  country_url: string;
+  capital_url: string;
+}
+
 export interface QuizSource {
   name: string;
   url: string;
   retrieved_at: string;
-  events_used: QuizSourceEvent[];
+  events_used?: QuizSourceEvent[];
+  records_used?: QuizSourceRecord[];
 }
 
 interface QuizBase {
@@ -119,7 +134,16 @@ export interface HistoryFactoidMcqQuiz extends QuizBase {
   choices: HistoryMcqChoice[];
 }
 
-export type QuizPayload = WhichCameFirstQuiz | HistoryMcqQuiz | HistoryFactoidMcqQuiz;
+export interface GeographyFactoidMcqQuiz extends QuizBase {
+  type: "geography_factoid_mcq_4";
+  choices: HistoryMcqChoice[];
+}
+
+export type QuizPayload =
+  | WhichCameFirstQuiz
+  | HistoryMcqQuiz
+  | HistoryFactoidMcqQuiz
+  | GeographyFactoidMcqQuiz;
 
 export interface LoadedQuiz {
   key: string;

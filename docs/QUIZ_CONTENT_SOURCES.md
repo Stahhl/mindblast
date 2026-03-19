@@ -1,6 +1,6 @@
 # Quiz Content Source Scan (Commercial Safety Pass)
 
-Last reviewed: 2026-02-23 (UTC)
+Last reviewed: 2026-03-19 (UTC)
 
 Policy anchor: `docs/CONTENT_COMPLIANCE_POLICY.md`
 
@@ -40,12 +40,42 @@ This document focuses on licensing and terms risk, not content quality.
    - Treat **BoardGameGeek** as contract-only for commercial app usage and never for model training unless policy changes in writing.
 4. Paid expansion path: **The Trivia API commercial plan** or **TriviaDatabase app/full-use license** once we need larger volume/variety.
 
+## Phase 9 Selected Source Direction
+
+Selected next category:
+- `geography_factoid_mcq_4` (capital-to-country only in v1)
+
+Selected source posture:
+- **Wikidata-derived structured geography facts**
+
+Terms / license:
+- Terms URL: https://www.wikidata.org/wiki/Wikidata:Licensing
+- Review date: 2026-03-19 (UTC)
+- License signal: CC0 / public-domain dedication
+
+Operational obligations for Phase 9:
+- preserve source query URL or dataset reference in quiz metadata
+- preserve stable country/capital entity identifiers
+- keep source attribution explicit in payloads
+- reject ambiguous/disputed capital-country pairs in v1
+- do not mix synthetic distractors into sourced geography payloads
+
+Risk rating:
+- `Green`
+
+Why this was selected:
+- structured facts are a better fit for deterministic geography generation than free-form text sources
+- CC0 posture is the lowest-friction option in the current source scan
+- country/capital records support short-answer factoid prompts cleanly
+
 ## Practical Use Guidance
 
 - Best low-risk path for training data today: **CC0-only corpus (Wikidata-derived)**.
 - Best low-risk path for direct question delivery:
   - CC0/contracted sources first,
   - CC BY-SA sources only if we implement attribution and downstream compliance.
+- Best near-term category expansion path:
+  - geography factoids from Wikidata-derived country/capital records
 - AI-generated content is not a source:
   - never attach fabricated citations to generated items,
   - keep generated items explicitly labeled as synthetic when/if introduced.

@@ -2,7 +2,8 @@
 
 ## Purpose
 `quiz-forge` is the backend generator that creates daily quiz payloads and internal run reports, then commits them to the private content repository `Stahhl/mindblast-content`.
-In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `history_mcq_4`).
+Today it produces history quizzes per enabled type (`which_came_first`, `history_mcq_4`, `history_factoid_mcq_4`).
+Phase 9 is planned to add the first non-history type: `geography_factoid_mcq_4`.
 
 ## Naming
 - Project name: `Mindblast`.
@@ -22,7 +23,8 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 
 ## System Context
 - `quiz-forge` runs on GitHub Actions using a daily schedule.
-- It fetches source data from Wikimedia On This Day.
+- It currently fetches history source data from Wikimedia On This Day.
+- Planned Phase 9 geography expansion uses approved structured geography facts rather than the On This Day feed.
 - It writes one file at `quizzes/<uuid>.json` per generated edition using a deterministic UUIDv5 derived from UTC date + quiz type + edition.
 - Daily edition targets are currently `which_came_first=1`, `history_mcq_4=1`, and `history_factoid_mcq_4=3`.
 - It writes discovery artifacts at `quizzes/index/YYYY-MM-DD.json` and `quizzes/latest.json`.
@@ -60,6 +62,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
    - payloads include normalized `questions` + `answer_facts` plus compatibility fields.
    - previously selected correct answer-facts are eligible distractors for subsequent quiz types when valid.
    - in Phase 3 for `history_mcq_4`, optionally make one AI rerank call for distractor ordering and fallback deterministically on any failure.
+   - in planned Phase 9 geography generation, use an approved structured geography source path with per-type topic validation.
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
 10. Write/update discovery artifacts for static client lookup.
@@ -71,11 +74,16 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - `quiz-forge` script must enforce all validation rules before commit.
 - Current schema version is `metadata.version = 2`.
 
+Planned extension:
+- category expansion requires per-type topic validation rather than a global history-only topic assumption
+- Phase 9 is the first planned contract that uses `topics = ["geography"]`
+
 ## Guardrails
 
 ### Cost Guardrails
 - Phase 1 uses Wikimedia data only and no paid AI calls.
 - Expected daily infra cost: $0.
+- Planned Phase 9 geography work should keep the same low-cost posture by preferring approved free structured facts.
 - If paid AI is introduced later, add:
   - hard daily budget env var (`AI_MAX_DAILY_USD`, Phase 3 default `1.00`)
   - hard monthly budget env var (`AI_MAX_MONTHLY_USD`, Phase 3 default `5.00`)
@@ -92,6 +100,7 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 - If input data quality is insufficient, fail job instead of writing weak output.
 - Do not fabricate source attributions for generated/synthetic content.
 - If synthetic content is introduced later, it must be explicitly labeled and excluded from sourced event attribution.
+- For future category expansion, reject ambiguous or disputed facts rather than weakening the prompt/answer contract.
 
 ### Reliability Guardrails
 - Single-run concurrency group in GitHub Actions (avoid duplicate runs).
@@ -158,8 +167,9 @@ In Phase 1, it produces one history quiz per enabled type (`which_came_first`, `
 3. Ship Phase 2 frontend app that consumes static discovery + quiz files.
 4. Add Phase 3 AI-assisted distractor reranking with budget-limited provider abstraction.
 5. Add ratings feedback signal from the `Mindblast` app.
-6. Add category expansion and difficulty levels.
-7. Add leaderboards, achievements, and streak logic.
+6. Add the first non-history category with Phase 9 geography factoids.
+7. Add broader category expansion and difficulty levels.
+8. Add leaderboards, achievements, and streak logic.
 
 ## Open Decisions
 - Keep pure rule-based generation or add optional LLM refinement later.

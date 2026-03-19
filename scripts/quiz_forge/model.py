@@ -29,6 +29,10 @@ def build_answer_fact_id(event: dict[str, Any]) -> str:
     return str(uuid.uuid5(ANSWER_FACT_NAMESPACE, key))
 
 
+def build_answer_fact_id_from_key(key: str) -> str:
+    return str(uuid.uuid5(ANSWER_FACT_NAMESPACE, key))
+
+
 def build_factoid_answer_fact_id(
     source_event: dict[str, Any],
     *,
@@ -103,6 +107,7 @@ def build_question_object(
     answer_fact_ids: list[str],
     correct_answer_fact_id: str,
     target_year: int | None = None,
+    topic: str = "history",
     extra_facets: dict[str, Any] | None = None,
     extra_selection_rules: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -115,7 +120,7 @@ def build_question_object(
         selection_rules.update(extra_selection_rules)
 
     facets: dict[str, Any] = {
-        "topic": "history",
+        "topic": topic,
         "difficulty_band": "baseline",
     }
     if extra_facets:
@@ -127,7 +132,7 @@ def build_question_object(
         "prompt": prompt,
         "answer_fact_ids": answer_fact_ids,
         "correct_answer_fact_id": correct_answer_fact_id,
-        "tags": ["history", quiz_type],
+        "tags": [topic, quiz_type],
         "facets": facets,
         "selection_rules": selection_rules,
     }

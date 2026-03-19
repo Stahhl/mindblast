@@ -1,7 +1,7 @@
 export interface SubmitQuizFeedbackRequest {
   quiz_file: string;
   date: string;
-  quiz_type: "which_came_first" | "history_mcq_4" | "history_factoid_mcq_4";
+  quiz_type: "which_came_first" | "history_mcq_4" | "history_factoid_mcq_4" | "geography_factoid_mcq_4";
   edition: number;
   question_id: string;
   question_human_id: string;

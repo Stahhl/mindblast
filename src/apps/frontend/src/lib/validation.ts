@@ -1,6 +1,11 @@
 import type { IndexPayload, LatestPayload, QuizPayload, QuizSource, QuizType } from "./types";
 
-const KNOWN_TYPES = new Set<QuizType>(["which_came_first", "history_mcq_4", "history_factoid_mcq_4"]);
+const KNOWN_TYPES = new Set<QuizType>([
+  "which_came_first",
+  "history_mcq_4",
+  "history_factoid_mcq_4",
+  "geography_factoid_mcq_4",
+]);
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -24,7 +29,7 @@ function isHumanId(value: unknown, prefix: "Q" | "A"): value is string {
   return /^\d+$/.test(suffix) && Number.parseInt(suffix, 10) >= 1;
 }
 
-function validateSource(source: unknown, expectedLength: number): asserts source is QuizSource {
+function validateEventSource(source: unknown, expectedLength: number): asserts source is QuizSource {
   assert(source && typeof source === "object", "quiz.source must be an object");
 
   const sourceValue = source as Record<string, unknown>;
@@ -48,6 +53,40 @@ function validateSource(source: unknown, expectedLength: number): asserts source
       isNonEmptyString(eventValue.wikipedia_url),
       `quiz.source.events_used[${idx}].wikipedia_url must be a non-empty string`
     );
+  });
+}
+
+function validateRecordSource(source: unknown, expectedLength: number): asserts source is QuizSource {
+  assert(source && typeof source === "object", "quiz.source must be an object");
+
+  const sourceValue = source as Record<string, unknown>;
+  assert(isNonEmptyString(sourceValue.name), "quiz.source.name must be a non-empty string");
+  assert(isNonEmptyString(sourceValue.url), "quiz.source.url must be a non-empty string");
+  assert(isNonEmptyString(sourceValue.retrieved_at), "quiz.source.retrieved_at must be a non-empty string");
+
+  assert(Array.isArray(sourceValue.records_used), "quiz.source.records_used must be an array");
+  assert(
+    sourceValue.records_used.length === expectedLength,
+    `quiz.source.records_used must contain exactly ${expectedLength} entries`
+  );
+
+  sourceValue.records_used.forEach((record, idx) => {
+    assert(record && typeof record === "object", `quiz.source.records_used[${idx}] must be an object`);
+    const recordValue = record as Record<string, unknown>;
+    [
+      "record_id",
+      "country_label",
+      "capital_label",
+      "country_qid",
+      "capital_qid",
+      "country_url",
+      "capital_url",
+    ].forEach((key) => {
+      assert(
+        isNonEmptyString(recordValue[key]),
+        `quiz.source.records_used[${idx}].${key} must be a non-empty string`
+      );
+    });
   });
 }
 
@@ -243,7 +282,7 @@ function validateWhichCameFirst(quiz: QuizPayload): void {
   });
 
   assert(years[0] !== years[1], "which_came_first choice years must be distinct");
-  validateSource(quiz.source, 2);
+  validateEventSource(quiz.source, 2);
 }
 
 function validateHistoryMcq4(quiz: QuizPayload): void {
@@ -255,7 +294,7 @@ function validateHistoryMcq4(quiz: QuizPayload): void {
     assert(choiceWithYear.year === undefined, `history_mcq_4 choice ${idx + 1} must not include year`);
   });
 
-  validateSource(quiz.source, 4);
+  validateEventSource(quiz.source, 4);
 }
 
 function validateHistoryFactoidMcq4(quiz: QuizPayload): void {
@@ -268,7 +307,23 @@ function validateHistoryFactoidMcq4(quiz: QuizPayload): void {
   });
 
   assert(quiz.question.trim().endsWith("?"), "history_factoid_mcq_4 question must end with '?'");
-  validateSource(quiz.source, 4);
+  validateEventSource(quiz.source, 4);
+}
+
+function validateGeographyFactoidMcq4(quiz: QuizPayload): void {
+  assert(quiz.type === "geography_factoid_mcq_4", "quiz.type mismatch for geography_factoid_mcq_4 validation");
+  assert(quiz.choices.length === 4, "geography_factoid_mcq_4 must have exactly 4 choices");
+
+  quiz.choices.forEach((choice, idx) => {
+    const choiceWithYear = choice as { year?: unknown };
+    assert(choiceWithYear.year === undefined, `geography_factoid_mcq_4 choice ${idx + 1} must not include year`);
+  });
+
+  assert(
+    quiz.question.startsWith("Which country has the capital ") && quiz.question.trim().endsWith("?"),
+    "geography_factoid_mcq_4 question must match the capital-to-country format"
+  );
+  validateRecordSource(quiz.source, 4);
 }
 
 export function validateLatestPayload(payload: unknown): LatestPayload {
@@ -392,6 +447,8 @@ export function validateQuizPayload(payload: unknown): QuizPayload {
     validateWhichCameFirst(quiz);
   } else if (quiz.type === "history_mcq_4") {
     validateHistoryMcq4(quiz);
+  } else if (quiz.type === "geography_factoid_mcq_4") {
+    validateGeographyFactoidMcq4(quiz);
   } else {
     validateHistoryFactoidMcq4(quiz);
   }

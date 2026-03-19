@@ -1,0 +1,130 @@
+[
+  {
+    "country_label": "Austria",
+    "capital_label": "Vienna",
+    "country_qid": "Q40",
+    "capital_qid": "Q1741",
+    "country_url": "https://www.wikidata.org/wiki/Q40",
+    "capital_url": "https://www.wikidata.org/wiki/Q1741"
+  },
+  {
+    "country_label": "Canada",
+    "capital_label": "Ottawa",
+    "country_qid": "Q16",
+    "capital_qid": "Q1930",
+    "country_url": "https://www.wikidata.org/wiki/Q16",
+    "capital_url": "https://www.wikidata.org/wiki/Q1930"
+  },
+  {
+    "country_label": "Chile",
+    "capital_label": "Santiago",
+    "country_qid": "Q298",
+    "capital_qid": "Q2887",
+    "country_url": "https://www.wikidata.org/wiki/Q298",
+    "capital_url": "https://www.wikidata.org/wiki/Q2887"
+  },
+  {
+    "country_label": "Estonia",
+    "capital_label": "Tallinn",
+    "country_qid": "Q191",
+    "capital_qid": "Q1770",
+    "country_url": "https://www.wikidata.org/wiki/Q191",
+    "capital_url": "https://www.wikidata.org/wiki/Q1770"
+  },
+  {
+    "country_label": "Ghana",
+    "capital_label": "Accra",
+    "country_qid": "Q117",
+    "capital_qid": "Q3761",
+    "country_url": "https://www.wikidata.org/wiki/Q117",
+    "capital_url": "https://www.wikidata.org/wiki/Q3761"
+  },
+  {
+    "country_label": "Iceland",
+    "capital_label": "Reykjavik",
+    "country_qid": "Q189",
+    "capital_qid": "Q1764",
+    "country_url": "https://www.wikidata.org/wiki/Q189",
+    "capital_url": "https://www.wikidata.org/wiki/Q1764"
+  },
+  {
+    "country_label": "Japan",
+    "capital_label": "Tokyo",
+    "country_qid": "Q17",
+    "capital_qid": "Q1490",
+    "country_url": "https://www.wikidata.org/wiki/Q17",
+    "capital_url": "https://www.wikidata.org/wiki/Q1490"
+  },
+  {
+    "country_label": "Kenya",
+    "capital_label": "Nairobi",
+    "country_qid": "Q114",
+    "capital_qid": "Q3870",
+    "country_url": "https://www.wikidata.org/wiki/Q114",
+    "capital_url": "https://www.wikidata.org/wiki/Q3870"
+  },
+  {
+    "country_label": "Latvia",
+    "capital_label": "Riga",
+    "country_qid": "Q211",
+    "capital_qid": "Q1773",
+    "country_url": "https://www.wikidata.org/wiki/Q211",
+    "capital_url": "https://www.wikidata.org/wiki/Q1773"
+  },
+  {
+    "country_label": "Lithuania",
+    "capital_label": "Vilnius",
+    "country_qid": "Q37",
+    "capital_qid": "Q216",
+    "country_url": "https://www.wikidata.org/wiki/Q37",
+    "capital_url": "https://www.wikidata.org/wiki/Q216"
+  },
+  {
+    "country_label": "Nepal",
+    "capital_label": "Kathmandu",
+    "country_qid": "Q837",
+    "capital_qid": "Q3037",
+    "country_url": "https://www.wikidata.org/wiki/Q837",
+    "capital_url": "https://www.wikidata.org/wiki/Q3037"
+  },
+  {
+    "country_label": "Peru",
+    "capital_label": "Lima",
+    "country_qid": "Q419",
+    "capital_qid": "Q2868",
+    "country_url": "https://www.wikidata.org/wiki/Q419",
+    "capital_url": "https://www.wikidata.org/wiki/Q2868"
+  },
+  {
+    "country_label": "Poland",
+    "capital_label": "Warsaw",
+    "country_qid": "Q36",
+    "capital_qid": "Q270",
+    "country_url": "https://www.wikidata.org/wiki/Q36",
+    "capital_url": "https://www.wikidata.org/wiki/Q270"
+  },
+  {
+    "country_label": "Portugal",
+    "capital_label": "Lisbon",
+    "country_qid": "Q45",
+    "capital_qid": "Q597",
+    "country_url": "https://www.wikidata.org/wiki/Q45",
+    "capital_url": "https://www.wikidata.org/wiki/Q597"
+  },
+  {
+    "country_label": "Senegal",
+    "capital_label": "Dakar",
+    "country_qid": "Q1041",
+    "capital_qid": "Q3718",
+    "country_url": "https://www.wikidata.org/wiki/Q1041",
+    "capital_url": "https://www.wikidata.org/wiki/Q3718"
+  },
+  {
+    "country_label": "Uruguay",
+    "capital_label": "Montevideo",
+    "country_qid": "Q77",
+    "capital_qid": "Q1335",
+    "country_url": "https://www.wikidata.org/wiki/Q77",
+    "capital_url": "https://www.wikidata.org/wiki/Q1335"
+  }
+]

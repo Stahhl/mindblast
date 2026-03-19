@@ -9,15 +9,18 @@ from typing import Any
 from .constants import (
     NORMALIZED_MODEL_VERSION,
     QUIZ_SCHEMA_VERSION,
+    QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
     QUIZ_TYPE_HISTORY_MCQ_4,
     QUIZ_TYPE_WHICH_CAME_FIRST,
     SUPPORTED_GENERATION_MODES,
     WHICH_CAME_FIRST_QUESTION,
 )
+from .geography import GEOGRAPHY_SOURCE_NAME, geography_option_sort_key, pick_geography_factoid_records
 from .model import (
     build_answer_fact,
     build_answer_fact_id,
+    build_answer_fact_id_from_key,
     build_factoid_answer_fact_id,
     build_question_id,
     build_question_object,
@@ -175,6 +178,66 @@ def build_source(
         "url": source_url,
         "retrieved_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "events_used": [normalize_source_event(event) for event in events],
+    }
+
+
+def _build_geography_answer_fact(record: dict[str, Any], *, role: str) -> dict[str, Any]:
+    fact_id = build_answer_fact_id_from_key(
+        "geography|country|"
+        f"{record['country_qid']}|{record['capital_qid']}|{record['country_label']}|{record['capital_label']}"
+    )
+    return {
+        "id": fact_id,
+        "label": record["country_label"],
+        "year": 0,
+        "tags": [
+            "geography",
+            QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4,
+            f"role:{role}",
+            "entity:country",
+        ],
+        "facets": {
+            "topic": "geography",
+            "source": "wikidata",
+            "entity_type": "country",
+        },
+        "match": {
+            "distractor_profile": {
+                "entity_type": "country",
+                "capital_label": record["capital_label"],
+            }
+        },
+        "vector_metadata": {
+            "text_for_embedding": f"{record['country_label']} -- capital {record['capital_label']}",
+            "embedding_status": "not_generated",
+        },
+    }
+
+
+def _build_geography_source(
+    retrieval_time: dt.datetime,
+    source_url: str,
+    options: list[dict[str, Any]],
+    answer_fact_ids: list[str],
+) -> dict[str, Any]:
+    records_used = []
+    for option, answer_fact_id in zip(options, answer_fact_ids):
+        records_used.append(
+            {
+                "record_id": answer_fact_id,
+                "country_label": option["country_label"],
+                "capital_label": option["capital_label"],
+                "country_qid": option["country_qid"],
+                "capital_qid": option["capital_qid"],
+                "country_url": option["country_url"],
+                "capital_url": option["capital_url"],
+            }
+        )
+    return {
+        "name": GEOGRAPHY_SOURCE_NAME,
+        "url": source_url,
+        "retrieved_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "records_used": records_used,
     }
 
 
@@ -577,8 +640,100 @@ def build_history_factoid_mcq_4_quiz(
     raise ValueError("Could not build lint-clean history_factoid_mcq_4 quiz.")
 
 
+def build_geography_factoid_mcq_4_quiz(
+    target_date: dt.date,
+    retrieval_time: dt.datetime,
+    source_url: str,
+    candidates: list[dict[str, Any]],
+    seed: int,
+    edition: int,
+    generation_mode: str,
+    preferred_distractor_events: list[dict[str, Any]] | None = None,
+    ai_ranked_distractor_ids: list[str] | None = None,
+    quality_stats: QualityRunStats | None = None,
+) -> dict[str, Any]:
+    del preferred_distractor_events
+    del ai_ranked_distractor_ids
+    del quality_stats
+    if generation_mode not in SUPPORTED_GENERATION_MODES:
+        raise ValueError(f"Unsupported generation mode: {generation_mode}")
+
+    correct, distractors = pick_geography_factoid_records(candidates, seed)
+    options = [correct, *distractors]
+    options.sort(key=lambda item: geography_option_sort_key(seed, item))
+
+    choice_ids = ("A", "B", "C", "D")
+    choices: list[dict[str, Any]] = []
+    answer_facts: list[dict[str, Any]] = []
+    correct_choice_id: str | None = None
+    correct_answer_fact_id: str | None = None
+
+    for choice_id, option in zip(choice_ids, options):
+        role = "correct" if option is correct else "distractor"
+        fact = _build_geography_answer_fact(option, role=role)
+        answer_facts.append(fact)
+        choices.append(
+            {
+                "id": choice_id,
+                "label": option["country_label"],
+                "answer_fact_id": fact["id"],
+            }
+        )
+        if option is correct:
+            correct_choice_id = choice_id
+            correct_answer_fact_id = fact["id"]
+
+    if correct_choice_id is None or correct_answer_fact_id is None:
+        raise ValueError("Could not determine correct choice id for geography_factoid_mcq_4.")
+
+    question_text = f"Which country has the capital {correct['capital_label']}?"
+    question_object = build_question_object(
+        question_id=build_question_id(target_date, QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4, edition),
+        prompt=question_text,
+        quiz_type=QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4,
+        answer_fact_ids=[fact["id"] for fact in answer_facts],
+        correct_answer_fact_id=correct_answer_fact_id,
+        topic="geography",
+        extra_facets={
+            "question_format": "factoid",
+            "answer_kind": "country",
+            "prompt_style": "capital_to_country",
+        },
+        extra_selection_rules={
+            "capital_label": correct["capital_label"],
+        },
+    )
+
+    return {
+        "date": target_date.isoformat(),
+        "topics": ["geography"],
+        "type": QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4,
+        "questions": [question_object],
+        "answer_facts": answer_facts,
+        "question": question_text,
+        "choices": choices,
+        "correct_choice_id": correct_choice_id,
+        "source": _build_geography_source(
+            retrieval_time,
+            source_url,
+            options,
+            [fact["id"] for fact in answer_facts],
+        ),
+        "generation": {
+            "mode": generation_mode,
+            "edition": edition,
+            "generated_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        },
+        "metadata": {
+            "version": QUIZ_SCHEMA_VERSION,
+            "normalized_model": NORMALIZED_MODEL_VERSION,
+        },
+    }
+
+
 QUIZ_BUILDERS = {
     QUIZ_TYPE_WHICH_CAME_FIRST: build_which_came_first_quiz,
     QUIZ_TYPE_HISTORY_MCQ_4: build_history_mcq_4_quiz,
     QUIZ_TYPE_HISTORY_FACTOID_MCQ_4: build_history_factoid_mcq_4_quiz,
+    QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4: build_geography_factoid_mcq_4_quiz,
 }

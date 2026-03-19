@@ -10,6 +10,7 @@ const SUPPORTED_TYPES = new Set<QuizType>([
   "which_came_first",
   "history_mcq_4",
   "history_factoid_mcq_4",
+  "geography_factoid_mcq_4",
 ]);
 const ALLOWED_FIELDS = new Set([
   "quiz_file",

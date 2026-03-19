@@ -1,4 +1,8 @@
-export type QuizType = "which_came_first" | "history_mcq_4" | "history_factoid_mcq_4";
+export type QuizType =
+  | "which_came_first"
+  | "history_mcq_4"
+  | "history_factoid_mcq_4"
+  | "geography_factoid_mcq_4";
 
 export interface SubmitFeedbackPayload {
   quiz_file: string;
