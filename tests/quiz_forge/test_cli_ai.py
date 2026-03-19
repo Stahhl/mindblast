@@ -30,7 +30,8 @@ def _patch_cli_args(monkeypatch, tmp_path: Path) -> None:
         retries=1,
         mode="daily",
         count=1,
-        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1",
+        backfill_human_ids=False,
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
 

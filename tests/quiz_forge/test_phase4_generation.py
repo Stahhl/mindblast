@@ -398,7 +398,7 @@ def test_cli_extra_mode_generates_multiple_same_day_editions(monkeypatch, tmp_pa
         retries=1,
         mode="daily",
         count=1,
-        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: daily_args)
     assert cli.main() == 0
@@ -411,7 +411,7 @@ def test_cli_extra_mode_generates_multiple_same_day_editions(monkeypatch, tmp_pa
         retries=1,
         mode="extra",
         count=2,
-        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: extra_args)
     assert cli.main() == 0
@@ -596,7 +596,7 @@ def test_cli_daily_mode_generates_three_history_factoid_daily_editions(monkeypat
         retries=1,
         mode="daily",
         count=1,
-        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3",
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1",
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0

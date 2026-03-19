@@ -12,7 +12,7 @@ on:
       quiz_types:
         description: "Comma-separated quiz types."
         required: false
-        default: "which_came_first,history_mcq_4,history_factoid_mcq_4"
+        default: "which_came_first,history_mcq_4,history_factoid_mcq_4,geography_factoid_mcq_4"
         type: string
       mode:
         description: "Generation mode."
@@ -30,7 +30,7 @@ on:
       daily_editions_by_type:
         description: "Comma-separated daily edition targets per quiz type."
         required: false
-        default: "which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3"
+        default: "which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1"
         type: string
 
 permissions:
@@ -46,10 +46,10 @@ jobs:
     env:
       QUIZ_CONTENT_REPO: ${{ vars.QUIZ_CONTENT_REPO }}
       QUIZ_CONTENT_REPO_REF: main
-      QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4,history_factoid_mcq_4' }}
+      QUIZ_TYPES: ${{ inputs.quiz_types || 'which_came_first,history_mcq_4,history_factoid_mcq_4,geography_factoid_mcq_4' }}
       QUIZ_MODE: ${{ inputs.mode || 'daily' }}
       QUIZ_COUNT: ${{ inputs.count || '1' }}
-      DAILY_EDITIONS_BY_TYPE: ${{ inputs.daily_editions_by_type || 'which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3' }}
+      DAILY_EDITIONS_BY_TYPE: ${{ inputs.daily_editions_by_type || 'which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1' }}
       QUIZ_DATE: ${{ inputs.date || '' }}
       AI_MODE: ${{ vars.AI_MODE }}
       AI_PROVIDER: ${{ vars.AI_PROVIDER }}

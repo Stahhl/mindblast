@@ -46,6 +46,7 @@ Default scheduled daily targets:
 - `which_came_first`: `1`
 - `history_mcq_4`: `1`
 - `history_factoid_mcq_4`: `3`
+- `geography_factoid_mcq_4`: `1`
 
 ### Edition Semantics
 - `edition` is a positive integer scoped by `(date, quiz_type)`.
@@ -112,7 +113,7 @@ Keep existing purpose but add edition-aware fields:
 - Keep cron default unchanged: one daily generation run.
 - Scheduled run behavior remains:
   - target mode: `daily`
-  - target daily editions by type: `which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3`
+  - target daily editions by type: `which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=3,geography_factoid_mcq_4=1`
 
 ### Manual Workflow Expansion
 Add/extend `workflow_dispatch` inputs:
@@ -173,7 +174,7 @@ Rules:
 6. Verify staging end-to-end and then promote to production.
 
 ## Acceptance Criteria
-- Daily cron produces `which_came_first=1`, `history_mcq_4=1`, and `history_factoid_mcq_4=3`.
+- Daily cron produces `which_came_first=1`, `history_mcq_4=1`, `history_factoid_mcq_4=3`, and `geography_factoid_mcq_4=1`.
 - Manual extra generation can produce additional editions for the same date/type.
 - Index/latest artifacts expose all editions and remain backward-compatible during migration.
 - Frontend can discover, browse, and answer historical quizzes with multiple editions per date.

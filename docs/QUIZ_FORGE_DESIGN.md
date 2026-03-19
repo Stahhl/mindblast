@@ -26,7 +26,7 @@ Phase 9 is planned to add the first non-history type: `geography_factoid_mcq_4`.
 - It currently fetches history source data from Wikimedia On This Day.
 - Planned Phase 9 geography expansion uses approved structured geography facts rather than the On This Day feed.
 - It writes one file at `quizzes/<uuid>.json` per generated edition using a deterministic UUIDv5 derived from UTC date + quiz type + edition.
-- Daily edition targets are currently `which_came_first=1`, `history_mcq_4=1`, and `history_factoid_mcq_4=3`.
+- Daily edition targets are currently `which_came_first=1`, `history_mcq_4=1`, `history_factoid_mcq_4=3`, and `geography_factoid_mcq_4=1`.
 - It writes discovery artifacts at `quizzes/index/YYYY-MM-DD.json` and `quizzes/latest.json`.
 - It writes one internal run report per workflow run at `reports/quiz-forge/daily/YYYY/MM/DD/<timestamp>-run-<github_run_id>.json`.
 - The `Mindblast` app consumes these artifacts later after `mindblast` deploy workflows bundle them from `mindblast-content`.

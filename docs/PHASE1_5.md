@@ -13,7 +13,7 @@ Add a lightweight discovery/index layer so clients can find daily quiz files wit
 - Add deterministic index artifacts after successful daily generation.
 - Keep everything file-based in git storage, with generated artifacts written under `quizzes/` in the private content repository `Stahhl/mindblast-content` (no always-on backend API).
 - Persist one internal debugging/operations JSON report per daily workflow run under `reports/quiz-forge/daily/` in the same content repository.
-- Current scheduled daily policy targets `which_came_first=1`, `history_mcq_4=1`, and `history_factoid_mcq_4=3`.
+- Current scheduled daily policy targets `which_came_first=1`, `history_mcq_4=1`, `history_factoid_mcq_4=3`, and `geography_factoid_mcq_4=1`.
 
 ## Out of Scope
 - User authentication.
