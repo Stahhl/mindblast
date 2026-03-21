@@ -113,9 +113,9 @@ export function loadFeedbackRuntimeConfig(): FeedbackRuntimeConfig {
       commentsEnabled: envBool("FEEDBACK_COMMENTS_ENABLED", true),
     },
     rateLimits: {
-      clientHourly: envInt("FEEDBACK_RATE_LIMIT_CLIENT_HOURLY", 5),
-      clientDaily: envInt("FEEDBACK_RATE_LIMIT_CLIENT_DAILY", 20),
-      ipHourly: envInt("FEEDBACK_RATE_LIMIT_IP_HOURLY", 60),
+      clientHourly: envInt("FEEDBACK_RATE_LIMIT_CLIENT_HOURLY", 12),
+      clientDaily: envInt("FEEDBACK_RATE_LIMIT_CLIENT_DAILY", 60),
+      ipHourly: envInt("FEEDBACK_RATE_LIMIT_IP_HOURLY", 120),
       globalHourly: envInt("FEEDBACK_RATE_LIMIT_GLOBAL_HOURLY", 5000),
     },
     security: {

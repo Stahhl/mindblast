@@ -9,6 +9,19 @@ afterEach(() => {
 });
 
 describe("feedback runtime config", () => {
+  test("uses the updated default rate limits", () => {
+    delete process.env.FEEDBACK_RATE_LIMIT_CLIENT_HOURLY;
+    delete process.env.FEEDBACK_RATE_LIMIT_CLIENT_DAILY;
+    delete process.env.FEEDBACK_RATE_LIMIT_IP_HOURLY;
+    delete process.env.FEEDBACK_RATE_LIMIT_GLOBAL_HOURLY;
+
+    const config = loadFeedbackRuntimeConfig();
+    expect(config.rateLimits.clientHourly).toBe(12);
+    expect(config.rateLimits.clientDaily).toBe(60);
+    expect(config.rateLimits.ipHourly).toBe(120);
+    expect(config.rateLimits.globalHourly).toBe(5000);
+  });
+
   test("auto App Check is enabled in production environments including staging project ids", () => {
     process.env.NODE_ENV = "production";
     process.env.GCLOUD_PROJECT = "mindblast-staging";

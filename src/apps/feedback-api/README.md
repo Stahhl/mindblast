@@ -34,9 +34,9 @@ Function source path in `firebase.json`:
 - `FEEDBACK_REQUIRE_ORIGIN` (default: `true` in production, else `false`)
 - `FEEDBACK_ALLOWED_ORIGINS` (comma-separated; defaults include `mindblast.app` + `staging.mindblast.app`)
 - `FEEDBACK_MAX_REQUEST_BYTES` (default: `8192`)
-- `FEEDBACK_RATE_LIMIT_CLIENT_HOURLY` (default: `5`)
-- `FEEDBACK_RATE_LIMIT_CLIENT_DAILY` (default: `20`)
-- `FEEDBACK_RATE_LIMIT_IP_HOURLY` (default: `60`)
+- `FEEDBACK_RATE_LIMIT_CLIENT_HOURLY` (default: `12`)
+- `FEEDBACK_RATE_LIMIT_CLIENT_DAILY` (default: `60`)
+- `FEEDBACK_RATE_LIMIT_IP_HOURLY` (default: `120`)
 - `FEEDBACK_RATE_LIMIT_GLOBAL_HOURLY` (default: `5000`)
 
 Request requirements for `POST /api/quiz-feedback`:
