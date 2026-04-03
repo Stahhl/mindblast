@@ -226,6 +226,8 @@ class QualityRunStats:
     fallback_paths: dict[str, int] = field(default_factory=dict)
     factoid_final_subtypes: dict[str, int] = field(default_factory=dict)
     ai_quality_rejection_count: int = 0
+    typed_candidate_rejections: dict[str, int] = field(default_factory=dict)
+    ai_distractor_rejection_lints: dict[str, int] = field(default_factory=dict)
 
     def add_issues(self, issues: tuple[str, ...]) -> None:
         for issue in issues:
@@ -240,6 +242,13 @@ class QualityRunStats:
     def add_ai_quality_rejection(self) -> None:
         self.ai_quality_rejection_count += 1
 
+    def add_typed_candidate_rejection(self, reason: str) -> None:
+        self.typed_candidate_rejections[reason] = self.typed_candidate_rejections.get(reason, 0) + 1
+
+    def add_ai_distractor_rejection_lints(self, issues: tuple[str, ...]) -> None:
+        for issue in issues:
+            self.ai_distractor_rejection_lints[issue] = self.ai_distractor_rejection_lints.get(issue, 0) + 1
+
     def to_report_payload(self) -> dict[str, Any]:
         return {
             "lint_failure_count": sum(self.lint_failures.values()),
@@ -250,4 +259,10 @@ class QualityRunStats:
                 f"{code}:{count}" for code, count in sorted(self.factoid_final_subtypes.items())
             ],
             "ai_quality_rejection_count": self.ai_quality_rejection_count,
+            "typed_candidate_rejections": [
+                f"{code}:{count}" for code, count in sorted(self.typed_candidate_rejections.items())
+            ],
+            "ai_distractor_rejection_lints": [
+                f"{code}:{count}" for code, count in sorted(self.ai_distractor_rejection_lints.items())
+            ],
         }

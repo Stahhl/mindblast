@@ -18,6 +18,7 @@ Define a production-safe AI workflow for generating `history_factoid_mcq_4` cont
 - Add an AI-native multi-step generation workflow for history factoid quizzes.
 - Support per-step model selection (strong model where needed, cheaper model elsewhere).
 - Add verification gates before publishing generated distractors/questions.
+- Keep typed `person`/`place` factoid flows grounded in deterministic candidate pools; AI may review, normalize, and select only from supplied candidates.
 - Persist approved question assets in a reusable question bank.
 - Daily run must publish at least 1 valid factoid quiz when sufficient approved content exists.
 
@@ -80,6 +81,7 @@ Output contract per candidate:
 Rules:
 - Candidate must be answerable from source.
 - Answer must be short-form (entity/date style, not long sentence).
+- For typed factoids, AI must not invent answers. It may only approve/normalize candidates extracted from the supplied source-event candidate pool.
 
 ### Stage 2: Candidate Ranking + Quality Gate (Light Model + Rules)
 Goal:
@@ -94,6 +96,7 @@ Checks:
 Outcome:
 - Candidate gets `quality_score_1`.
 - Candidates below threshold are discarded.
+- Typed candidate review must reject vague fragments, wrong entity forms, mixed-type labels, and answers that are not grounded in source text.
 
 ### Stage 3: Distractor Generation (Strong Model + Typed Constraints)
 Goal:
@@ -104,6 +107,7 @@ Constraints:
 - no duplicates
 - no answer leakage
 - strongly match `answer_kind`
+- distractor IDs must come only from the grounded typed candidate pool supplied to the model
 
 Weighting policy:
 - `answer_kind = person`: distractors must be real people.
@@ -121,6 +125,7 @@ Required checks before publish:
 Fail policy:
 - If verification fails, discard AI distractor set.
 - Retry once with adjusted constraints; if still invalid, fallback to deterministic distractor selector.
+- Deterministic linting remains the final publish gate even if the AI distractor set is schema-valid.
 
 ### Stage 5: Final Ranking/Judging
 Goal:

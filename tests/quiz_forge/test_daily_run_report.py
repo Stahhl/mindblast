@@ -67,6 +67,8 @@ def test_build_daily_run_report_uses_raw_ai_payload_and_renders_discord_text(tmp
                     "fallback_paths": ["history_mcq_4:alternate_correct_event"],
                     "factoid_final_subtypes": ["time"],
                     "ai_quality_rejection_count": 1,
+                    "typed_candidate_rejections": ["factoid_typed_candidate_review_no_supported_candidates:1"],
+                    "ai_distractor_rejection_lints": ["mixed_entity_types:1"],
                 },
             }
         )
@@ -113,6 +115,8 @@ def test_build_daily_run_report_uses_raw_ai_payload_and_renders_discord_text(tmp
     assert report["artifact_outcomes"]["content_repo_commit_occurred"] is True
     assert report["artifact_outcomes"]["content_repo_commit_after"] is None
     assert "quality:" in report["discord_message_text"]
+    assert "typed candidate rejections: factoid_typed_candidate_review_no_supported_candidates:1" in report["discord_message_text"]
+    assert "ai distractor rejection lints: mixed_entity_types:1" in report["discord_message_text"]
     assert "artifacts:" in report["discord_message_text"]
     assert "mode/count: extra/2" in report["discord_message_text"]
     assert (

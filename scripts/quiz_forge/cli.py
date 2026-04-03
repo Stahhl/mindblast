@@ -281,14 +281,31 @@ def main() -> int:
                     print(f"AI rerank fallback for {quiz_type}: {ai_attempt.fallback_reason}")
 
             ai_selected_factoid_candidate: dict[str, Any] | None = None
+            ai_selected_factoid_distractors: list[dict[str, Any]] | None = None
             ai_selected_factoid_reason: str | None = None
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4 and factoid_pipeline_settings.enabled:
-                ai_selected_factoid_candidate, ai_selected_factoid_reason = propose_ai_factoid_candidate(
+                (
+                    ai_selected_factoid_candidate,
+                    ai_selected_factoid_distractors,
+                    ai_selected_factoid_reason,
+                ) = propose_ai_factoid_candidate(
                     candidates=candidates,
                     seed=seed,
+                    preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
                     settings=factoid_pipeline_settings,
                     ai_orchestrator=ai_orchestrator,
                 )
+                if ai_selected_factoid_reason is not None and ai_selected_factoid_candidate is None:
+                    quality_stats.add_typed_candidate_rejection(ai_selected_factoid_reason)
+                elif (
+                    ai_selected_factoid_candidate is not None
+                    and ai_selected_factoid_distractors is None
+                    and ai_selected_factoid_reason is not None
+                ):
+                    if ai_selected_factoid_reason == "factoid_typed_distractor_select_invalid_ids":
+                        quality_stats.add_fallback_path("history_factoid_mcq_4:ai_distractor_invalid")
+                    else:
+                        quality_stats.add_fallback_path("history_factoid_mcq_4:ai_distractor_fallback")
 
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
                 quiz = builder(
@@ -303,6 +320,7 @@ def main() -> int:
                     ai_ranked_distractor_ids=ai_ranked_distractor_ids,
                     preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
                     ai_selected_factoid_candidate=ai_selected_factoid_candidate,
+                    ai_selected_factoid_distractors=ai_selected_factoid_distractors,
                     quality_stats=quality_stats,
                 )
             elif quiz_type == QUIZ_TYPE_HISTORY_MCQ_4:
@@ -337,6 +355,13 @@ def main() -> int:
                             "AI factoid candidate applied for history_factoid_mcq_4: "
                             f"answer_kind={ai_selected_factoid_candidate['answer_kind']}"
                         )
+                        if ai_selected_factoid_distractors is not None:
+                            print("AI typed distractor selection applied for history_factoid_mcq_4.")
+                        elif ai_selected_factoid_reason is not None:
+                            print(
+                                "AI typed distractor selection fallback for history_factoid_mcq_4: "
+                                f"{ai_selected_factoid_reason}"
+                            )
                     elif ai_selected_factoid_reason is not None:
                         print(f"AI factoid candidate fallback for history_factoid_mcq_4: {ai_selected_factoid_reason}")
 

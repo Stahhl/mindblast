@@ -205,6 +205,7 @@ _NON_PERSON_KEYWORDS = {
     "Bombing",
     "Center",
     "Centre",
+    "Civil",
     "Company",
     "Congress",
     "Court",
@@ -236,6 +237,17 @@ _NON_PERSON_KEYWORDS = {
     "Theatre",
     "Theater",
     "Supertanker",
+}
+_NON_PERSON_LEADING_TOKENS = {
+    "after",
+    "at",
+    "before",
+    "during",
+    "for",
+    "from",
+    "in",
+    "near",
+    "on",
 }
 _SUBJECT_RE = re.compile(
     r"^(?P<subject>[A-Z][\w'.-]+(?:\s+(?:[A-Z][\w'.-]+|[ivxlcdmIVXLCDM]+|Jr\.|Sr\.|St\.|[a-z]{1,4})){1,6})\s+(?P<rest>.+)$"
@@ -337,6 +349,8 @@ def _looks_like_person_name(subject: str) -> bool:
         return False
 
     first = non_title_tokens[0]
+    if first.casefold() in _NON_PERSON_LEADING_TOKENS:
+        return False
     if first in _NON_PERSON_KEYWORDS or any(keyword in subject for keyword in _NON_PERSON_KEYWORDS):
         return False
     if any(token.rstrip(".,") in _PLACE_HINT_TOKENS for token in non_title_tokens):
@@ -541,12 +555,7 @@ def _factoid_candidate_id(candidate: dict[str, Any]) -> str:
     )
 
 
-def _pick_factoid_candidates_of_kind(
-    extracted_candidates: list[dict[str, Any]],
-    seed: int,
-    *,
-    correct_index_offset: int = 0,
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _unique_factoid_candidates(extracted_candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ordered = sorted(extracted_candidates, key=_factoid_candidate_sort_key)
     unique_ordered: list[dict[str, Any]] = []
     seen_candidate_ids: set[str] = set()
@@ -556,8 +565,32 @@ def _pick_factoid_candidates_of_kind(
             continue
         unique_ordered.append(candidate)
         seen_candidate_ids.add(candidate_id)
+    return unique_ordered
 
-    ordered = unique_ordered
+
+def extract_history_factoid_typed_candidates(candidates: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    return {
+        "person": [
+            candidate
+            for event in candidates
+            if (candidate := _extract_person_factoid_candidate(event)) is not None
+        ],
+        "place": [
+            candidate
+            for event in candidates
+            if (candidate := _extract_place_factoid_candidate(event)) is not None
+        ],
+    }
+
+
+def _pick_factoid_candidates_of_kind(
+    extracted_candidates: list[dict[str, Any]],
+    seed: int,
+    *,
+    correct_index_offset: int = 0,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    ordered = _unique_factoid_candidates(extracted_candidates)
+
     if not ordered:
         raise ValueError("No eligible factoid candidates found.")
 
@@ -587,6 +620,56 @@ def _pick_factoid_candidates_of_kind(
     return correct, distractors
 
 
+def build_history_factoid_distractor_pool_for_candidate(
+    extracted_candidates: list[dict[str, Any]],
+    *,
+    correct_candidate: dict[str, Any],
+) -> list[dict[str, Any]]:
+    source_event = correct_candidate.get("source_event")
+    if not isinstance(source_event, dict):
+        raise ValueError("Typed factoid correct candidate is missing source_event.")
+    source_event_key = _source_event_key(source_event)
+    correct_candidate_id = _factoid_candidate_id(correct_candidate)
+    correct_answer_label = str(correct_candidate.get("answer_label", "")).casefold()
+    distractor_pool = [
+        candidate
+        for candidate in _unique_factoid_candidates(extracted_candidates)
+        if isinstance(candidate.get("source_event"), dict)
+        and _source_event_key(candidate["source_event"]) != source_event_key
+        and candidate.get("answer_label", "").casefold() != correct_answer_label
+        and _factoid_candidate_id(candidate) != correct_candidate_id
+    ]
+    return distractor_pool
+
+
+def select_history_factoid_distractors_from_pool(
+    distractor_pool: list[dict[str, Any]],
+    *,
+    selected_candidate_ids: list[str],
+) -> list[dict[str, Any]]:
+    if len(selected_candidate_ids) != 3:
+        raise ValueError("AI distractor selection must contain exactly 3 candidate ids.")
+    if len(set(selected_candidate_ids)) != 3:
+        raise ValueError("AI distractor selection must contain unique candidate ids.")
+
+    by_candidate_id = {
+        _factoid_candidate_id(candidate): candidate
+        for candidate in _unique_factoid_candidates(distractor_pool)
+    }
+    selected: list[dict[str, Any]] = []
+    seen_labels: set[str] = set()
+    for candidate_id in selected_candidate_ids:
+        candidate = by_candidate_id.get(candidate_id)
+        if candidate is None:
+            raise ValueError("AI distractor selection referenced unknown candidate id.")
+        answer_label = str(candidate.get("answer_label", "")).casefold()
+        if answer_label in seen_labels:
+            raise ValueError("AI distractor selection produced duplicate labels.")
+        selected.append(candidate)
+        seen_labels.add(answer_label)
+    return selected
+
+
 def build_history_factoid_distractors_for_candidate(
     candidates: list[dict[str, Any]],
     *,
@@ -597,26 +680,11 @@ def build_history_factoid_distractors_for_candidate(
     if answer_kind not in {"person", "place"}:
         raise ValueError("Typed factoid distractor builder only supports person/place candidates.")
 
-    extractor = _extract_person_factoid_candidate if answer_kind == "person" else _extract_place_factoid_candidate
-    extracted_candidates = [
-        candidate
-        for event in candidates
-        if (candidate := extractor(event)) is not None
-    ]
-    source_event = correct_candidate.get("source_event")
-    if not isinstance(source_event, dict):
-        raise ValueError("Typed factoid correct candidate is missing source_event.")
-    source_event_key = _source_event_key(source_event)
-    correct_candidate_id = _factoid_candidate_id(correct_candidate)
-    correct_answer_label = str(correct_candidate.get("answer_label", "")).casefold()
-    distractor_pool = [
-        candidate
-        for candidate in extracted_candidates
-        if isinstance(candidate.get("source_event"), dict)
-        and _source_event_key(candidate["source_event"]) != source_event_key
-        and candidate.get("answer_label", "").casefold() != correct_answer_label
-        and _factoid_candidate_id(candidate) != correct_candidate_id
-    ]
+    extracted_candidates = extract_history_factoid_typed_candidates(candidates)[answer_kind]
+    distractor_pool = build_history_factoid_distractor_pool_for_candidate(
+        extracted_candidates,
+        correct_candidate=correct_candidate,
+    )
     if len({candidate["answer_label"].casefold() for candidate in distractor_pool}) < 3:
         raise ValueError(f"Not enough valid {answer_kind} distractors for history_factoid_mcq_4.")
 
@@ -634,18 +702,7 @@ def pick_history_factoid_typed_candidates(
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     del preferred_distractor_events
 
-    by_kind = {
-        "person": [
-            candidate
-            for event in candidates
-            if (candidate := _extract_person_factoid_candidate(event)) is not None
-        ],
-        "place": [
-            candidate
-            for event in candidates
-            if (candidate := _extract_place_factoid_candidate(event)) is not None
-        ],
-    }
+    by_kind = extract_history_factoid_typed_candidates(candidates)
     eligible_kinds = [
         answer_kind
         for answer_kind in ("person", "place")
@@ -671,18 +728,7 @@ def iter_history_factoid_typed_candidate_sets(
     *,
     preferred_answer_kind: str | None = None,
 ) -> list[tuple[dict[str, Any], list[dict[str, Any]], str]]:
-    by_kind = {
-        "person": [
-            candidate
-            for event in candidates
-            if (candidate := _extract_person_factoid_candidate(event)) is not None
-        ],
-        "place": [
-            candidate
-            for event in candidates
-            if (candidate := _extract_place_factoid_candidate(event)) is not None
-        ],
-    }
+    by_kind = extract_history_factoid_typed_candidates(candidates)
     eligible_kinds = [
         answer_kind
         for answer_kind in ("person", "place")

@@ -4,10 +4,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import os
+import re
 from typing import Any
 
 from .constants import AI_MODE_ON, AI_MODE_SHADOW
 from .ai.orchestrator import AIOrchestrator
+from .model import build_factoid_answer_fact_id
+from .selection import (
+    build_history_factoid_distractor_pool_for_candidate,
+    extract_history_factoid_typed_candidates,
+    looks_like_person_label,
+    looks_like_place_label,
+    select_history_factoid_distractors_from_pool,
+)
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -50,12 +59,16 @@ class FactoidPipelineSettings:
 
 def load_factoid_pipeline_settings(default_model: str) -> FactoidPipelineSettings:
     model_fallback = os.getenv("AI_MODEL", default_model).strip() or default_model
+    strong_model_fallback = os.getenv("FACTOID_AI_STRONG_MODEL", "gpt-5.2").strip() or "gpt-5.2"
+    light_model_fallback = os.getenv("FACTOID_AI_LIGHT_MODEL", model_fallback).strip() or model_fallback
     return FactoidPipelineSettings(
         enabled=_env_bool("FACTOID_AI_PIPELINE_ENABLED", False),
-        model_qgen=(os.getenv("FACTOID_AI_MODEL_QA_GEN", model_fallback).strip() or model_fallback),
-        model_ranker=(os.getenv("FACTOID_AI_MODEL_RANKER", model_fallback).strip() or model_fallback),
-        model_distractors=(os.getenv("FACTOID_AI_MODEL_DISTRACTOR_GEN", model_fallback).strip() or model_fallback),
-        model_judge=(os.getenv("FACTOID_AI_MODEL_JUDGE", model_fallback).strip() or model_fallback),
+        model_qgen=(os.getenv("FACTOID_AI_MODEL_QA_GEN", strong_model_fallback).strip() or strong_model_fallback),
+        model_ranker=(os.getenv("FACTOID_AI_MODEL_RANKER", light_model_fallback).strip() or light_model_fallback),
+        model_distractors=(
+            os.getenv("FACTOID_AI_MODEL_DISTRACTOR_GEN", strong_model_fallback).strip() or strong_model_fallback
+        ),
+        model_judge=(os.getenv("FACTOID_AI_MODEL_JUDGE", light_model_fallback).strip() or light_model_fallback),
         max_stage_tokens=_env_int("FACTOID_AI_MAX_STAGE_TOKENS", 700),
         min_question_score=_env_float("FACTOID_AI_MIN_QUESTION_SCORE", 0.6),
         min_final_score=_env_float("FACTOID_AI_MIN_FINAL_SCORE", 0.7),
@@ -81,6 +94,284 @@ def _typed_factoid_pairs() -> dict[str, str]:
         "place": "where",
         "time": "when",
     }
+
+
+_ALNUM_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+
+def _candidate_id(candidate: dict[str, Any]) -> str:
+    return build_factoid_answer_fact_id(
+        candidate["source_event"],
+        answer_label=str(candidate["answer_label"]),
+        entity_type=str(candidate["answer_kind"]),
+    )
+
+
+def _tokenize(value: str) -> set[str]:
+    return {token for token in _ALNUM_TOKEN_RE.findall(value.casefold()) if token}
+
+
+def _label_matches_answer_kind(answer_kind: str, label: str) -> bool:
+    if answer_kind == "person":
+        return looks_like_person_label(label)
+    if answer_kind == "place":
+        return looks_like_place_label(label)
+    if answer_kind == "time":
+        return any(char.isdigit() for char in label)
+    return False
+
+
+def _normalized_label_is_grounded(
+    *,
+    normalized_label: str,
+    original_label: str,
+    source_text: str,
+) -> bool:
+    normalized_tokens = _tokenize(normalized_label)
+    if not normalized_tokens:
+        return False
+    source_tokens = _tokenize(source_text)
+    if not normalized_tokens.issubset(source_tokens):
+        return False
+    original_tokens = _tokenize(original_label)
+    return bool(normalized_tokens & original_tokens)
+
+
+def _reviewed_candidate_sort_key(candidate: dict[str, Any]) -> tuple[int, str, int, str]:
+    answer_kind_priority = {"person": 0, "place": 1, "time": 2}
+    source_event = candidate["source_event"]
+    return (
+        answer_kind_priority.get(str(candidate["answer_kind"]), 9),
+        str(candidate["answer_label"]).casefold(),
+        int(source_event["year"]),
+        str(source_event["text"]),
+    )
+
+
+def _reviewed_typed_candidates(
+    *,
+    candidates: list[dict[str, Any]],
+    settings: FactoidPipelineSettings,
+    ai_orchestrator: AIOrchestrator,
+) -> tuple[list[dict[str, Any]], str | None]:
+    extracted_by_kind = extract_history_factoid_typed_candidates(candidates)
+    extracted_candidates = [
+        candidate
+        for answer_kind in ("person", "place")
+        for candidate in extracted_by_kind[answer_kind]
+    ]
+    if not extracted_candidates:
+        return [], "factoid_typed_candidate_none_extracted"
+
+    candidate_payload = [
+        {
+            "candidate_id": _candidate_id(candidate),
+            "answer_kind": candidate["answer_kind"],
+            "prompt_style": candidate["prompt_style"],
+            "answer_label": candidate["answer_label"],
+            "question_text": candidate["question_text"],
+            "source_year": candidate["source_event"]["year"],
+            "source_text": candidate["source_event"]["text"],
+            "source_url": candidate["source_event"]["wikipedia_url"],
+        }
+        for candidate in sorted(extracted_candidates, key=_reviewed_candidate_sort_key)
+    ]
+    response, reason = ai_orchestrator.run_json_task(
+        task_name="factoid_typed_candidate_review",
+        system_prompt=(
+            "Review grounded history factoid candidates. "
+            "Return JSON only with candidate_reviews. "
+            "Approve only candidates whose answer_label is a short standalone entity matching answer_kind. "
+            "For person questions, approve only real people. "
+            "For place questions, approve only places/locations. "
+            "Reject fragments, event titles, wars, organizations, time phrases, vague labels, or mixed-type answers. "
+            "Do not invent new facts or new candidate ids."
+        ),
+        user_payload={
+            "task": "factoid_typed_candidate_review",
+            "candidates": candidate_payload,
+            "constraints": {
+                "allowed_answer_kinds": ["person", "place"],
+                "allowed_prompt_styles": ["who", "where"],
+                "must_preserve_candidate_ids": True,
+                "grounded_only": True,
+            },
+        },
+        model=settings.model_qgen,
+        max_output_tokens=settings.max_stage_tokens,
+        response_schema={
+            "name": "factoid_typed_candidate_review",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["candidate_reviews"],
+                "properties": {
+                    "candidate_reviews": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": [
+                                "candidate_id",
+                                "answer_kind",
+                                "normalized_answer_label",
+                                "prompt_style",
+                                "supported",
+                                "rejection_reason",
+                            ],
+                            "properties": {
+                                "candidate_id": {"type": "string"},
+                                "answer_kind": {"type": "string", "enum": ["person", "place"]},
+                                "normalized_answer_label": {"type": "string"},
+                                "prompt_style": {"type": "string", "enum": ["who", "where"]},
+                                "supported": {"type": "boolean"},
+                                "rejection_reason": {"type": "string"},
+                            },
+                        },
+                    }
+                },
+            },
+        },
+    )
+    if response is None:
+        return [], reason or "factoid_typed_candidate_review_failed"
+
+    raw_reviews = response.get("candidate_reviews")
+    if not isinstance(raw_reviews, list) or not raw_reviews:
+        return [], "factoid_typed_candidate_review_empty"
+
+    by_candidate_id = {
+        _candidate_id(candidate): candidate
+        for candidate in extracted_candidates
+    }
+    reviewed: list[dict[str, Any]] = []
+    for item in raw_reviews:
+        if not isinstance(item, dict):
+            continue
+        candidate_id = _normalize_text(item.get("candidate_id"))
+        answer_kind = item.get("answer_kind")
+        prompt_style = item.get("prompt_style")
+        normalized_answer_label = _normalize_text(item.get("normalized_answer_label"))
+        supported = item.get("supported")
+        if not isinstance(candidate_id, str) or candidate_id not in by_candidate_id:
+            continue
+        original = by_candidate_id[candidate_id]
+        if answer_kind != original["answer_kind"] or prompt_style != original["prompt_style"]:
+            continue
+        if supported is not True:
+            continue
+        if normalized_answer_label is None:
+            continue
+        source_text = _normalize_text(original["source_event"].get("text"))
+        if source_text is None:
+            continue
+        if not _label_matches_answer_kind(answer_kind, normalized_answer_label):
+            continue
+        if not _normalized_label_is_grounded(
+            normalized_label=normalized_answer_label,
+            original_label=str(original["answer_label"]),
+            source_text=source_text,
+        ):
+            continue
+        reviewed_candidate = dict(original)
+        reviewed_candidate["answer_label"] = normalized_answer_label
+        reviewed.append(reviewed_candidate)
+
+    if not reviewed:
+        return [], "factoid_typed_candidate_review_no_supported_candidates"
+
+    return reviewed, None
+
+
+def _select_ai_typed_distractors(
+    *,
+    correct_candidate: dict[str, Any],
+    reviewed_candidates: list[dict[str, Any]],
+    settings: FactoidPipelineSettings,
+    ai_orchestrator: AIOrchestrator,
+) -> tuple[list[dict[str, Any]] | None, str | None]:
+    answer_kind = str(correct_candidate.get("answer_kind"))
+    distractor_pool = build_history_factoid_distractor_pool_for_candidate(
+        reviewed_candidates,
+        correct_candidate=correct_candidate,
+    )
+    if len({candidate["answer_label"].casefold() for candidate in distractor_pool}) < 3:
+        return None, "factoid_typed_distractor_pool_too_small"
+
+    response, reason = ai_orchestrator.run_json_task(
+        task_name="factoid_typed_distractor_select",
+        system_prompt=(
+            "Select grounded distractors for a history factoid multiple-choice quiz. "
+            "Return JSON only with selected_distractor_ids and optional reason_codes. "
+            "Use only provided candidate ids. "
+            "All selected distractors must match answer_kind exactly. "
+            "Never mix people, places, events, wars, organizations, or time expressions in one answer set. "
+            "Prefer short standalone entity labels and avoid vague fragments."
+        ),
+        user_payload={
+            "task": "factoid_typed_distractor_select",
+            "answer_kind": answer_kind,
+            "question_prompt": correct_candidate["question_text"],
+            "correct_candidate": {
+                "candidate_id": _candidate_id(correct_candidate),
+                "answer_label": correct_candidate["answer_label"],
+            },
+            "distractor_candidates": [
+                {
+                    "candidate_id": _candidate_id(candidate),
+                    "answer_label": candidate["answer_label"],
+                    "source_year": candidate["source_event"]["year"],
+                    "source_text": candidate["source_event"]["text"],
+                }
+                for candidate in sorted(distractor_pool, key=_reviewed_candidate_sort_key)
+            ],
+            "constraints": {
+                "return_exactly": 3,
+                "ids_must_come_from_candidates": True,
+                "grounded_only": True,
+                "same_entity_type_only": True,
+            },
+        },
+        model=settings.model_distractors,
+        max_output_tokens=260,
+        response_schema={
+            "name": "factoid_typed_distractor_select",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["selected_distractor_ids", "reason_codes"],
+                "properties": {
+                    "selected_distractor_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                    "reason_codes": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                },
+            },
+        },
+    )
+    if response is None:
+        return None, reason or "factoid_typed_distractor_select_failed"
+
+    selected_candidate_ids = response.get("selected_distractor_ids")
+    if not isinstance(selected_candidate_ids, list) or not all(isinstance(item, str) for item in selected_candidate_ids):
+        return None, "factoid_typed_distractor_select_invalid_ids"
+
+    try:
+        return (
+            select_history_factoid_distractors_from_pool(
+                distractor_pool,
+                selected_candidate_ids=list(selected_candidate_ids),
+            ),
+            None,
+        )
+    except ValueError:
+        return None, "factoid_typed_distractor_select_invalid_ids"
 
 
 def _validate_ai_factoid_candidate(candidate: Any, *, source_event: dict[str, Any]) -> dict[str, Any] | None:
@@ -128,83 +419,54 @@ def propose_ai_factoid_candidate(
     *,
     candidates: list[dict[str, Any]],
     seed: int,
+    preferred_answer_kind: str | None,
     settings: FactoidPipelineSettings,
     ai_orchestrator: AIOrchestrator,
-) -> tuple[dict[str, Any] | None, str | None]:
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]] | None, str | None]:
     if not settings.enabled:
-        return None, "factoid_pipeline_disabled"
+        return None, None, "factoid_pipeline_disabled"
     if not ai_orchestrator.is_enabled():
-        return None, "factoid_pipeline_ai_disabled"
+        return None, None, "factoid_pipeline_ai_disabled"
     if len(candidates) < 4:
-        return None, "factoid_ai_candidate_not_enough_source_events"
+        return None, None, "factoid_ai_candidate_not_enough_source_events"
 
-    ordered_events = sorted(candidates, key=lambda item: (item["year"], item["text"], item["wikipedia_url"]))
-    source_event = ordered_events[seed % len(ordered_events)]
-    source_text = _normalize_text(source_event.get("text"))
-    article_url = _normalize_text(source_event.get("wikipedia_url"))
-    source_year = source_event.get("year")
-    if source_text is None or article_url is None or not isinstance(source_year, int):
-        return None, "factoid_ai_candidate_missing_source_context"
-
-    qgen_payload = {
-        "task": "factoid_typed_candidate_generation",
-        "article_url": article_url,
-        "event_text": source_text,
-        "event_year": source_year,
-        "constraints": {
-            "num_candidates": 4,
-            "allowed_answer_kinds": ["person", "place", "time"],
-            "allowed_prompt_styles": ["who", "where", "when"],
-            "question_must_end_with_question_mark": True,
-            "max_question_length": 220,
-            "max_answer_length": 80,
-        },
-    }
-    qgen_response, qgen_reason = ai_orchestrator.run_json_task(
-        task_name="factoid_typed_qgen",
-        system_prompt=(
-            "Generate concise history factoid candidates from one sourced event. "
-            "Return JSON only with candidates array. "
-            "Each candidate must include question, correct_answer, answer_kind, prompt_style, and score (0..1). "
-            "Allowed answer kinds are person, place, and time. "
-            "Prompt style must align exactly: person->who, place->where, time->when. "
-            "Do not invent facts not clearly supported by the event text."
-        ),
-        user_payload=qgen_payload,
-        model=settings.model_qgen,
-        max_output_tokens=settings.max_stage_tokens,
+    reviewed_candidates, review_reason = _reviewed_typed_candidates(
+        candidates=candidates,
+        settings=settings,
+        ai_orchestrator=ai_orchestrator,
     )
-    if qgen_response is None:
-        return None, qgen_reason or "factoid_typed_qgen_failed"
-    raw_candidates = qgen_response.get("candidates")
-    if not isinstance(raw_candidates, list) or not raw_candidates:
-        return None, "factoid_typed_qgen_empty"
+    if not reviewed_candidates:
+        return None, None, review_reason or "factoid_typed_candidate_review_failed"
 
-    valid_candidates = [
-        candidate
-        for item in raw_candidates
-        if (candidate := _validate_ai_factoid_candidate(item, source_event=source_event)) is not None
+    by_kind = {"person": [], "place": []}
+    for candidate in reviewed_candidates:
+        answer_kind = str(candidate["answer_kind"])
+        if answer_kind in by_kind:
+            by_kind[answer_kind].append(candidate)
+
+    eligible_kinds = [
+        answer_kind
+        for answer_kind in ("person", "place")
+        if len({_candidate_id(candidate) for candidate in by_kind[answer_kind]}) >= 4
     ]
-    if not valid_candidates:
-        return None, "factoid_typed_qgen_no_valid_candidates"
+    if not eligible_kinds:
+        return None, None, "factoid_typed_candidate_review_not_enough_grounded_candidates"
 
-    typed_candidates = [candidate for candidate in valid_candidates if candidate["answer_kind"] in {"person", "place"}]
-    if not typed_candidates:
-        return None, "factoid_typed_qgen_only_time_candidates"
+    if preferred_answer_kind in eligible_kinds:
+        selected_kind = preferred_answer_kind
+    else:
+        selected_kind = eligible_kinds[seed % len(eligible_kinds)]
 
-    typed_candidates.sort(
-        key=lambda item: (
-            -item["quality_score"],
-            {"person": 0, "place": 1, "time": 2}[item["answer_kind"]],
-            item["question_text"],
-            item["answer_label"],
-        )
+    ordered_candidates = sorted(by_kind[selected_kind], key=_reviewed_candidate_sort_key)
+    correct_candidate = ordered_candidates[seed % len(ordered_candidates)]
+
+    selected_distractors, distractor_reason = _select_ai_typed_distractors(
+        correct_candidate=correct_candidate,
+        reviewed_candidates=ordered_candidates,
+        settings=settings,
+        ai_orchestrator=ai_orchestrator,
     )
-    selected = typed_candidates[0]
-    if selected["quality_score"] < settings.min_question_score:
-        return None, "factoid_typed_qgen_below_threshold"
-
-    return selected, None
+    return correct_candidate, selected_distractors, distractor_reason
 
 
 def _extract_correct_and_choices(quiz: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:

@@ -950,19 +950,7 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task == "factoid_typed_candidate_generation":
-            payload = {
-                "candidates": [
-                    {
-                        "question": "When was this event officially recognized?",
-                        "correct_answer": "1901",
-                        "answer_kind": "time",
-                        "prompt_style": "when",
-                        "score": 0.95,
-                    }
-                ]
-            }
-        elif task == "factoid_question_generation":
+        if task == "factoid_question_generation":
             payload = {"candidates": [{"question": "When was this event officially recognized?", "score": 0.95}]}
         elif task == "factoid_question_rank":
             payload = {"best_index": 0, "best_score": 0.95}
@@ -1003,7 +991,7 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
-    assert run_json_mock.call_count == 5
+    assert run_json_mock.call_count == 4
 
     records = list_quiz_records_for_date_type(
         output_dir=output_dir,
@@ -1034,22 +1022,38 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task != "factoid_typed_candidate_generation":
+        if task == "factoid_typed_candidate_review":
+            payload = {
+                "candidate_reviews": [
+                    {
+                        "candidate_id": candidate["candidate_id"],
+                        "answer_kind": candidate["answer_kind"],
+                        "normalized_answer_label": candidate["answer_label"],
+                        "prompt_style": candidate["prompt_style"],
+                        "supported": True,
+                        "rejection_reason": "",
+                    }
+                    for candidate in user_payload["candidates"]
+                ]
+            }
+            model = "gpt-5.2"
+        elif task == "factoid_typed_distractor_select":
+            correct_candidate_id = user_payload["correct_candidate"]["candidate_id"]
+            payload = {
+                "selected_distractor_ids": [
+                    candidate["candidate_id"]
+                    for candidate in user_payload["distractor_candidates"]
+                    if candidate["candidate_id"] != correct_candidate_id
+                ][:3],
+                "reason_codes": [],
+            }
+            model = "gpt-5.2"
+        else:
             raise AssertionError(f"Unexpected task: {task}")
         return AIJsonTaskResponse(
-            payload={
-                "candidates": [
-                    {
-                        "question": "Who walks on the Moon during Apollo 11?",
-                        "correct_answer": "Neil Armstrong",
-                        "answer_kind": "person",
-                        "prompt_style": "who",
-                        "score": 0.97,
-                    }
-                ]
-            },
+            payload=payload,
             provider="openai",
-            model="gpt-5-mini",
+            model=model,
             usage=AIUsage(input_tokens=20, output_tokens=10, estimated_cost_usd=0.0),
         )
 
@@ -1070,7 +1074,7 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
-    assert run_json_mock.call_count == 1
+    assert run_json_mock.call_count == 2
 
     records = list_quiz_records_for_date_type(
         output_dir=output_dir,
@@ -1078,10 +1082,168 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
         quiz_type="history_factoid_mcq_4",
     )
     payload = records[0].payload
-    assert payload["question"] == "Who walks on the Moon during Apollo 11?"
     assert payload["questions"][0]["facets"]["answer_kind"] == "person"
     assert payload["questions"][0]["facets"]["prompt_style"] == "who"
-    assert any(choice["label"] == "Neil Armstrong" for choice in payload["choices"])
+    assert lint_quiz_payload(payload) == ()
+    assert len(payload["choices"]) == 4
+    expected_labels = {
+        "Neil Armstrong",
+        "Napoleon Bonaparte",
+        "Martin Luther King Jr.",
+        "Amelia Earhart",
+        "Julius Caesar",
+    }
+    assert {choice["label"] for choice in payload["choices"]}.issubset(expected_labels)
+
+
+def test_cli_falls_back_when_ai_typed_distractor_selection_is_invalid(monkeypatch, tmp_path, mocker) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+    report_path = tmp_path / "ai-report.json"
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setenv("AI_MODE", "on")
+    monkeypatch.setenv("AI_PROVIDER", "openai")
+    monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
+    monkeypatch.setenv("AI_MAX_CALLS_PER_RUN", "8")
+    monkeypatch.setenv("FACTOID_AI_PIPELINE_ENABLED", "true")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", report_path.as_posix())
+
+    def fake_run_json_task(*args, **kwargs) -> AIJsonTaskResponse:  # noqa: ANN002,ANN003
+        del args
+        user_payload = kwargs["user_payload"]
+        task = user_payload.get("task")
+        if task == "factoid_typed_candidate_review":
+            payload = {
+                "candidate_reviews": [
+                    {
+                        "candidate_id": candidate["candidate_id"],
+                        "answer_kind": candidate["answer_kind"],
+                        "normalized_answer_label": candidate["answer_label"],
+                        "prompt_style": candidate["prompt_style"],
+                        "supported": True,
+                        "rejection_reason": "",
+                    }
+                    for candidate in user_payload["candidates"]
+                ]
+            }
+        elif task == "factoid_typed_distractor_select":
+            payload = {
+                "selected_distractor_ids": ["not-a-real-candidate-id", "still-invalid", "also-invalid"],
+                "reason_codes": ["bad_ids"],
+            }
+        else:
+            raise AssertionError(f"Unexpected task: {task}")
+        return AIJsonTaskResponse(
+            payload=payload,
+            provider="openai",
+            model="gpt-5.2",
+            usage=AIUsage(input_tokens=20, output_tokens=10, estimated_cost_usd=0.0),
+        )
+
+    mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=fake_run_json_task,
+    )
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    payload = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )[0].payload
+    assert lint_quiz_payload(payload) == ()
+
+    report_payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert "history_factoid_mcq_4:ai_distractor_invalid:1" in report_payload["quality"]["fallback_paths"]
+
+
+def test_cli_counts_ai_typed_candidate_review_rejections(monkeypatch, tmp_path, mocker) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+    report_path = tmp_path / "ai-report.json"
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setenv("AI_MODE", "on")
+    monkeypatch.setenv("AI_PROVIDER", "openai")
+    monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
+    monkeypatch.setenv("AI_MAX_CALLS_PER_RUN", "8")
+    monkeypatch.setenv("FACTOID_AI_PIPELINE_ENABLED", "true")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", report_path.as_posix())
+
+    def fake_run_json_task(*args, **kwargs) -> AIJsonTaskResponse:  # noqa: ANN002,ANN003
+        del args
+        user_payload = kwargs["user_payload"]
+        task = user_payload.get("task")
+        if task != "factoid_typed_candidate_review":
+            raise AssertionError(f"Unexpected task: {task}")
+        return AIJsonTaskResponse(
+            payload={
+                "candidate_reviews": [
+                    {
+                        "candidate_id": candidate["candidate_id"],
+                        "answer_kind": candidate["answer_kind"],
+                        "normalized_answer_label": candidate["answer_label"],
+                        "prompt_style": candidate["prompt_style"],
+                        "supported": False,
+                        "rejection_reason": "not_publishable",
+                    }
+                    for candidate in user_payload["candidates"]
+                ]
+            },
+            provider="openai",
+            model="gpt-5.2",
+            usage=AIUsage(input_tokens=20, output_tokens=10, estimated_cost_usd=0.0),
+        )
+
+    mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=fake_run_json_task,
+    )
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    payload = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_factoid_mcq_4",
+    )[0].payload
+    assert lint_quiz_payload(payload) == ()
+
+    report_payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert (
+        "factoid_typed_candidate_review_no_supported_candidates:1"
+        in report_payload["quality"]["typed_candidate_rejections"]
+    )
 
 
 def test_ai_factoid_distractors_exclude_same_source_event_value_copies() -> None:
@@ -1371,7 +1533,7 @@ def test_cli_discards_ai_time_factoid_update_when_quality_lint_fails(monkeypatch
         min_final_score = 0.5
 
     monkeypatch.setattr(cli, "load_factoid_pipeline_settings", lambda _model: _Settings())
-    monkeypatch.setattr(cli, "propose_ai_factoid_candidate", lambda **_kwargs: (None, "not_used"))
+    monkeypatch.setattr(cli, "propose_ai_factoid_candidate", lambda **_kwargs: (None, None, "not_used"))
 
     def _bad_ai_update(*, quiz, **_kwargs):
         updated = json.loads(json.dumps(quiz))

@@ -541,6 +541,7 @@ def build_history_factoid_mcq_4_quiz(
     ai_ranked_distractor_ids: list[str] | None = None,
     preferred_answer_kind: str | None = None,
     ai_selected_factoid_candidate: dict[str, Any] | None = None,
+    ai_selected_factoid_distractors: list[dict[str, Any]] | None = None,
     quality_stats: QualityRunStats | None = None,
 ) -> dict[str, Any]:
     del ai_ranked_distractor_ids
@@ -549,10 +550,14 @@ def build_history_factoid_mcq_4_quiz(
 
     if ai_selected_factoid_candidate is not None:
         try:
-            distractors = build_history_factoid_distractors_for_candidate(
-                candidates,
-                seed=seed,
-                correct_candidate=ai_selected_factoid_candidate,
+            distractors = (
+                ai_selected_factoid_distractors
+                if ai_selected_factoid_distractors is not None
+                else build_history_factoid_distractors_for_candidate(
+                    candidates,
+                    seed=seed,
+                    correct_candidate=ai_selected_factoid_candidate,
+                )
             )
             payload = _build_history_factoid_typed_quiz(
                 target_date=target_date,
@@ -571,12 +576,19 @@ def build_history_factoid_mcq_4_quiz(
                 return payload
             if quality_stats is not None:
                 quality_stats.add_issues(issues)
-                quality_stats.add_fallback_path("history_factoid_mcq_4:ai_candidate_rejected")
+                if ai_selected_factoid_distractors is not None:
+                    quality_stats.add_ai_distractor_rejection_lints(issues)
+                    quality_stats.add_fallback_path("history_factoid_mcq_4:ai_distractor_rejected")
+                else:
+                    quality_stats.add_fallback_path("history_factoid_mcq_4:ai_candidate_rejected")
         except ValueError:
             # AI-selected factoids are opportunistic. If they cannot produce four
             # unique answer facts, fall back to the deterministic typed/time flow.
             if quality_stats is not None:
-                quality_stats.add_fallback_path("history_factoid_mcq_4:ai_candidate_invalid")
+                if ai_selected_factoid_distractors is not None:
+                    quality_stats.add_fallback_path("history_factoid_mcq_4:ai_distractor_invalid")
+                else:
+                    quality_stats.add_fallback_path("history_factoid_mcq_4:ai_candidate_invalid")
 
     try:
         typed_candidate_sets = iter_history_factoid_typed_candidate_sets(

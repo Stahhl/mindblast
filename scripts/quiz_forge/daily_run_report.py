@@ -17,6 +17,8 @@ _EMPTY_QUALITY_PAYLOAD: dict[str, Any] = {
     "fallback_paths": [],
     "factoid_final_subtypes": [],
     "ai_quality_rejection_count": 0,
+    "typed_candidate_rejections": [],
+    "ai_distractor_rejection_lints": [],
 }
 
 _EMPTY_AI_PAYLOAD: dict[str, Any] = {
@@ -143,6 +145,8 @@ def render_daily_run_discord_message(report: dict[str, Any]) -> str:
                 f"  lint failures: {quality.get('lint_failure_count', 0)} ({', '.join(quality.get('lint_failures') or []) or 'none'})",
                 f"  fallback paths: {quality.get('fallback_count', 0)} ({', '.join(quality.get('fallback_paths') or []) or 'none'})",
                 f"  factoid subtypes: {', '.join(quality.get('factoid_final_subtypes') or []) or 'none'}",
+                f"  typed candidate rejections: {', '.join(quality.get('typed_candidate_rejections') or []) or 'none'}",
+                f"  ai distractor rejection lints: {', '.join(quality.get('ai_distractor_rejection_lints') or []) or 'none'}",
                 f"  ai quality rejections: {quality.get('ai_quality_rejection_count', 0)}",
             ]
         )

@@ -29,6 +29,46 @@ def test_lint_history_factoid_person_flags_mixed_entity_types() -> None:
     assert ISSUE_WEAK_DISTRACTOR_PLAUSIBILITY in issues
 
 
+def test_lint_history_factoid_person_flags_weekly_report_style_fragment_labels() -> None:
+    payload = {
+        "type": "history_factoid_mcq_4",
+        "question": "Who was involved in this event?",
+        "questions": [{"facets": {"answer_kind": "person", "prompt_style": "who"}}],
+        "choices": [
+            {"id": "A", "label": "Norman Thagard"},
+            {"id": "B", "label": "During the Algerian Civil"},
+            {"id": "C", "label": "American Civil"},
+            {"id": "D", "label": "In New York"},
+        ],
+        "correct_choice_id": "A",
+    }
+
+    issues = lint_quiz_payload(payload)
+
+    assert ISSUE_MIXED_ENTITY_TYPES in issues
+    assert ISSUE_WEAK_DISTRACTOR_PLAUSIBILITY in issues
+
+
+def test_lint_history_factoid_person_flags_non_person_objects() -> None:
+    payload = {
+        "type": "history_factoid_mcq_4",
+        "question": "Who was central to this event?",
+        "questions": [{"facets": {"answer_kind": "person", "prompt_style": "who"}}],
+        "choices": [
+            {"id": "A", "label": "Neil Armstrong"},
+            {"id": "B", "label": "An EF4 tornado"},
+            {"id": "C", "label": "The South African"},
+            {"id": "D", "label": "Pelican Island National Wildlife"},
+        ],
+        "correct_choice_id": "A",
+    }
+
+    issues = lint_quiz_payload(payload)
+
+    assert ISSUE_MIXED_ENTITY_TYPES in issues
+    assert ISSUE_WEAK_DISTRACTOR_PLAUSIBILITY in issues
+
+
 def test_lint_history_factoid_place_flags_prompt_location_leak() -> None:
     payload = {
         "type": "history_factoid_mcq_4",
