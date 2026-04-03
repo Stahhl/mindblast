@@ -13,7 +13,7 @@ from ..constants import AI_MODE_OFF, AI_MODE_ON, AI_MODE_SHADOW, AI_PROVIDER_NOO
 from .ledger import get_spend_totals, load_ledger, record_usage, save_ledger
 from .providers import build_provider
 from .tasks.rerank_distractors import build_rerank_payload, estimate_input_tokens, validate_ranked_ids
-from .types import AIAttempt, AIRunStats, AISettings, AIUsage
+from .types import AIAttempt, AIProviderDiagnostics, AIProviderResponseError, AIRunStats, AISettings, AIUsage
 
 
 def _estimate_cost_usd(*, input_tokens: int, output_tokens: int, settings: AISettings) -> float:
@@ -32,6 +32,9 @@ def _normalize_error_text(message: str) -> str:
 
 
 def _provider_error_label(exc: Exception) -> str:
+    if isinstance(exc, AIProviderResponseError):
+        return exc.failure_label
+
     message = _normalize_error_text(str(exc))
     lowered = message.lower()
 
@@ -59,6 +62,16 @@ def _provider_error_label(exc: Exception) -> str:
     return compact[:64]
 
 
+def _provider_error_summary(exc: Exception) -> str | None:
+    if isinstance(exc, AIProviderResponseError):
+        return _normalize_error_text(exc.summary)
+    message = _normalize_error_text(str(exc))
+    parse_match = re.search(r"parse failure \[[a-z0-9_]+\]:\s*(.+)$", message, flags=re.IGNORECASE)
+    if parse_match is not None:
+        return parse_match.group(1).strip()
+    return None
+
+
 class AIOrchestrator:
     def __init__(self, *, settings: AISettings, target_date: dt.date) -> None:
         self.settings = settings
@@ -67,6 +80,7 @@ class AIOrchestrator:
         self.ledger_path = Path(settings.ledger_path)
         self.ledger = load_ledger(self.ledger_path)
         self.ledger_dirty = False
+        self.last_json_task_failure_diagnostics: AIProviderDiagnostics | None = None
 
         day_spend, month_spend = get_spend_totals(self.ledger, target_date)
         self.stats = AIRunStats(
@@ -211,6 +225,8 @@ class AIOrchestrator:
         max_output_tokens: int | None = None,
         response_schema: dict[str, Any] | None = None,
     ) -> tuple[dict[str, Any] | None, str | None]:
+        self.last_json_task_failure_diagnostics = None
+
         if self.settings.mode == AI_MODE_OFF:
             return self._json_fallback(self._task_reason(task_name, "ai_mode_off"))
 
@@ -240,19 +256,46 @@ class AIOrchestrator:
         if estimated_input_tokens > self.settings.max_input_tokens:
             return self._json_fallback(self._task_reason(task_name, "input_token_limit_precheck"))
 
-        self.stats.calls_total += 1
-        try:
-            response = self.provider.run_json_task(
-                system_prompt=system_prompt,
-                user_payload=user_payload,
-                settings=self.settings,
-                model=effective_model,
-                max_output_tokens=effective_max_output,
-                response_schema=response_schema,
-            )
-        except Exception as exc:  # noqa: BLE001 - keep fallback behavior resilient
-            reason = self._task_reason(task_name, f"provider_error:{type(exc).__name__}:{_provider_error_label(exc)}")
-            return self._json_fallback(reason)
+        retry_count = 0
+        while True:
+            self.stats.calls_total += 1
+            try:
+                response = self.provider.run_json_task(
+                    system_prompt=system_prompt,
+                    user_payload=user_payload,
+                    settings=self.settings,
+                    model=effective_model,
+                    max_output_tokens=effective_max_output,
+                    response_schema=response_schema,
+                )
+            except Exception as exc:  # noqa: BLE001 - keep fallback behavior resilient
+                failure_label = _provider_error_label(exc)
+                retryable = (
+                    task_name == "weekly_feedback_review"
+                    and failure_label == "empty_content"
+                    and retry_count == 0
+                    and self.stats.calls_total < self.settings.max_calls_per_run
+                )
+                if retryable:
+                    retry_count += 1
+                    continue
+
+                error_summary = _provider_error_summary(exc)
+                if error_summary:
+                    provider = exc.provider if isinstance(exc, AIProviderResponseError) else self.settings.provider
+                    model = exc.model if isinstance(exc, AIProviderResponseError) else effective_model
+                    self.last_json_task_failure_diagnostics = AIProviderDiagnostics(
+                        provider=provider,
+                        model=model,
+                        failure_label=failure_label,
+                        last_error_summary=error_summary,
+                        retry_attempted=retry_count > 0,
+                        retry_count=retry_count,
+                    )
+
+                reason = self._task_reason(task_name, f"provider_error:{type(exc).__name__}:{failure_label}")
+                return self._json_fallback(reason)
+            break
 
         usage = AIUsage(
             input_tokens=response.usage.input_tokens,

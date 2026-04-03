@@ -145,9 +145,93 @@ def test_orchestrator_run_json_task_uses_specific_parse_failure_label(tmp_path, 
 
     assert payload is None
     assert reason == "weekly_feedback_review:provider_error:RuntimeError:json_decode_error"
+    assert orchestrator.last_json_task_failure_diagnostics is not None
+    assert orchestrator.last_json_task_failure_diagnostics.failure_label == "json_decode_error"
 
     report = json.loads(Path(settings.report_path).read_text(encoding="utf-8"))
     assert "weekly_feedback_review:provider_error:RuntimeError:json_decode_error:1" in report["fallback_reasons"]
+
+
+def test_orchestrator_run_json_task_retries_weekly_empty_content_once(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    settings.max_calls_per_run = 3
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+    provider_mock = mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=[
+            RuntimeError("OpenAI response parse failure [empty_content]: keys=['content'], content_type=list"),
+            AIJsonTaskResponse(
+                payload={"result": "ok"},
+                provider="openai",
+                model="gpt-5.2",
+                usage=AIUsage(input_tokens=44, output_tokens=12, estimated_cost_usd=0.0),
+            ),
+        ],
+    )
+
+    payload, reason = orchestrator.run_json_task(
+        task_name="weekly_feedback_review",
+        system_prompt="Return JSON.",
+        user_payload={"task": "test"},
+        model="gpt-5.2",
+    )
+
+    assert reason is None
+    assert payload == {"result": "ok"}
+    assert provider_mock.call_count == 2
+    assert orchestrator.stats.calls_total == 2
+    assert orchestrator.last_json_task_failure_diagnostics is None
+
+
+def test_orchestrator_run_json_task_persists_retry_diagnostics_after_second_failure(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    settings.max_calls_per_run = 3
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+    provider_mock = mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=[
+            RuntimeError("OpenAI response parse failure [empty_content]: keys=['content'], content_type=list"),
+            RuntimeError("OpenAI response parse failure [missing_message]: choices[0].message missing"),
+        ],
+    )
+
+    payload, reason = orchestrator.run_json_task(
+        task_name="weekly_feedback_review",
+        system_prompt="Return JSON.",
+        user_payload={"task": "test"},
+        model="gpt-5.2",
+    )
+
+    assert payload is None
+    assert reason == "weekly_feedback_review:provider_error:RuntimeError:missing_message"
+    assert provider_mock.call_count == 2
+    assert orchestrator.stats.calls_total == 2
+    assert orchestrator.last_json_task_failure_diagnostics is not None
+    assert orchestrator.last_json_task_failure_diagnostics.failure_label == "missing_message"
+    assert orchestrator.last_json_task_failure_diagnostics.retry_attempted is True
+    assert orchestrator.last_json_task_failure_diagnostics.retry_count == 1
+
+
+def test_orchestrator_run_json_task_does_not_retry_non_weekly_empty_content(tmp_path, mocker) -> None:
+    settings = _settings(tmp_path, mode="on")
+    settings.max_calls_per_run = 3
+    orchestrator = AIOrchestrator(settings=settings, target_date=dt.date(2026, 2, 25))
+    provider_mock = mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=RuntimeError("OpenAI response parse failure [empty_content]: keys=['content'], content_type=list"),
+    )
+
+    payload, reason = orchestrator.run_json_task(
+        task_name="factoid_generation",
+        system_prompt="Return JSON.",
+        user_payload={"task": "test"},
+        model="gpt-5.2",
+    )
+
+    assert payload is None
+    assert reason == "factoid_generation:provider_error:RuntimeError:empty_content"
+    assert provider_mock.call_count == 1
+    assert orchestrator.stats.calls_total == 1
 
 
 def test_orchestrator_run_json_task_records_usage(tmp_path, mocker) -> None:

@@ -9,6 +9,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from quiz_forge.ai.types import AIProviderDiagnostics
+
 from .types import WeeklyFeedbackAggregate
 
 
@@ -25,6 +27,7 @@ def build_weekly_report_payload(
     generated_at: str,
     llm_summary: dict[str, Any] | None,
     ai_unavailable_reason: str | None = None,
+    ai_diagnostics: AIProviderDiagnostics | None = None,
 ) -> dict[str, Any]:
     questions = [
         {
@@ -45,7 +48,7 @@ def build_weekly_report_payload(
         }
         for summary in aggregate.question_summaries
     ]
-    return {
+    payload = {
         "metadata": {
             "version": 1,
             "generated_at": generated_at,
@@ -65,6 +68,9 @@ def build_weekly_report_payload(
         "llm_summary": llm_summary,
         "ai_unavailable_reason": ai_unavailable_reason,
     }
+    if ai_diagnostics is not None:
+        payload["ai_diagnostics"] = ai_diagnostics.to_report_payload()
+    return payload
 
 
 def render_weekly_report_markdown(
@@ -73,6 +79,7 @@ def render_weekly_report_markdown(
     generated_at: str,
     llm_summary: dict[str, Any] | None,
     ai_unavailable_reason: str | None = None,
+    ai_diagnostics: AIProviderDiagnostics | None = None,
 ) -> str:
     lines = [
         "# Weekly Feedback Review",
@@ -91,9 +98,19 @@ def render_weekly_report_markdown(
                 "## AI Summary",
                 "",
                 f"AI summary unavailable: `{ai_unavailable_reason or 'not_requested'}`",
-                "",
             ]
         )
+        if ai_diagnostics is not None:
+            lines.append(
+                "Diagnostics: "
+                f"`provider={ai_diagnostics.provider}` "
+                f"`model={ai_diagnostics.model}` "
+                f"`failure={ai_diagnostics.failure_label}` "
+                f"`retry_attempted={str(ai_diagnostics.retry_attempted).lower()}` "
+                f"`retry_count={ai_diagnostics.retry_count}` "
+                f"`summary={ai_diagnostics.last_error_summary}`"
+            )
+        lines.append("")
     else:
         lines.extend(
             [

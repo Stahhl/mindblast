@@ -190,7 +190,7 @@ Production workflow prerequisites:
 Recommended repository variables:
 - `FEEDBACK_REPORT_AI_MODE`: `on`
 - `FEEDBACK_REPORT_AI_PROVIDER`: `openai`
-- `FEEDBACK_REPORT_AI_MODEL`: `gpt-5-mini`
+- `FEEDBACK_REPORT_AI_MODEL`: `gpt-5.2`
 - `FEEDBACK_REPORT_AI_MAX_CALLS_PER_RUN`: `3`
 - `FEEDBACK_REPORT_AI_MAX_INPUT_TOKENS`: `12000`
 - `FEEDBACK_REPORT_AI_MAX_OUTPUT_TOKENS`: `800`

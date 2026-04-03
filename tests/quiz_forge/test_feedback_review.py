@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from quiz_forge.ai.types import AIProviderDiagnostics
+
 from feedback_review.aggregation import aggregate_feedback_submissions
 from feedback_review.cli import main as weekly_feedback_review_main
 from feedback_review.firestore_reader import FirestoreFeedbackReader, parse_feedback_submission
@@ -287,12 +289,76 @@ def test_rendering_includes_ai_unavailable_fallback(tmp_path: Path) -> None:
     assert payload["aggregates"]["issue_counts"] == {}
     assert payload["questions"][0]["issue_tags"] == []
     assert payload["ai_unavailable_reason"] == "ai_disabled"
+    assert "ai_diagnostics" not in payload
+
+
+def test_rendering_includes_ai_diagnostics_when_available(tmp_path: Path) -> None:
+    _write_quiz_payload(tmp_path, "quizzes/q1.json")
+    aggregate = aggregate_feedback_submissions(
+        submissions=[
+            FeedbackSubmission(
+                feedback_id="f1",
+                quiz_file="quizzes/q1.json",
+                date="2026-03-10",
+                quiz_type="history_mcq_4",
+                edition=2,
+                question_id="question-1",
+                question_human_id="Q77",
+                rating=2,
+                comment="Could be clearer",
+                feedback_date_utc="2026-03-12",
+                created_at="2026-03-12T08:00:00Z",
+                updated_at="2026-03-12T08:00:00Z",
+            )
+        ],
+        content_repo_root=tmp_path.as_posix(),
+        window=build_previous_completed_days_window(dt.date(2026, 3, 16)),
+    )
+
+    diagnostics = AIProviderDiagnostics(
+        provider="openai",
+        model="gpt-5.2",
+        failure_label="empty_content",
+        last_error_summary="keys=['content'], content_type=list",
+        retry_attempted=True,
+        retry_count=1,
+    )
+    markdown = render_weekly_report_markdown(
+        aggregate=aggregate,
+        generated_at="2026-03-16T07:00:00Z",
+        llm_summary=None,
+        ai_unavailable_reason="weekly_feedback_review:provider_error:RuntimeError:empty_content",
+        ai_diagnostics=diagnostics,
+    )
+    payload = build_weekly_report_payload(
+        aggregate=aggregate,
+        generated_at="2026-03-16T07:00:00Z",
+        llm_summary=None,
+        ai_unavailable_reason="weekly_feedback_review:provider_error:RuntimeError:empty_content",
+        ai_diagnostics=diagnostics,
+    )
+
+    assert "Diagnostics:" in markdown
+    assert payload["ai_diagnostics"] == {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "failure_label": "empty_content",
+        "retry_attempted": True,
+        "retry_count": 1,
+        "last_error_summary": "keys=['content'], content_type=list",
+    }
 
 
 class _FakeSummaryOrchestrator:
-    def __init__(self, response: dict[str, object] | None, reason: str | None = None) -> None:
+    def __init__(
+        self,
+        response: dict[str, object] | None,
+        reason: str | None = None,
+        diagnostics: AIProviderDiagnostics | None = None,
+    ) -> None:
         self._response = response
         self._reason = reason
+        self.last_json_task_failure_diagnostics = diagnostics
         self.last_kwargs: dict[str, object] | None = None
 
     def is_enabled(self) -> bool:
@@ -335,13 +401,14 @@ def test_summarize_weekly_feedback_validates_payload(tmp_path: Path) -> None:
             "action_items": [{"title": "Review Q77", "detail": "Tighten the prompt wording.", "priority": "high"}],
         }
     )
-    summary, reason = summarize_weekly_feedback(
+    summary, reason, diagnostics = summarize_weekly_feedback(
         aggregate=aggregate,
         ai_orchestrator=orchestrator,
     )
 
     assert reason is None
     assert summary is not None
+    assert diagnostics is None
     assert summary["questions_to_review"][0]["question_human_id"] == "Q77"
     assert orchestrator.last_kwargs is not None
     response_schema = orchestrator.last_kwargs.get("response_schema")
@@ -373,7 +440,7 @@ def test_summarize_weekly_feedback_falls_back_on_invalid_payload(tmp_path: Path)
         window=build_previous_completed_days_window(dt.date(2026, 3, 16)),
     )
 
-    summary, reason = summarize_weekly_feedback(
+    summary, reason, diagnostics = summarize_weekly_feedback(
         aggregate=aggregate,
         ai_orchestrator=_FakeSummaryOrchestrator(
             {
@@ -388,7 +455,53 @@ def test_summarize_weekly_feedback_falls_back_on_invalid_payload(tmp_path: Path)
 
     assert summary is None
     assert reason is not None
+    assert diagnostics is None
     assert reason.startswith("summary_payload_invalid:")
+
+
+def test_summarize_weekly_feedback_returns_provider_diagnostics_on_failure(tmp_path: Path) -> None:
+    _write_quiz_payload(tmp_path, "quizzes/q1.json")
+    aggregate = aggregate_feedback_submissions(
+        submissions=[
+            FeedbackSubmission(
+                feedback_id="f1",
+                quiz_file="quizzes/q1.json",
+                date="2026-03-10",
+                quiz_type="history_mcq_4",
+                edition=2,
+                question_id="question-1",
+                question_human_id="Q77",
+                rating=4,
+                comment="Good",
+                feedback_date_utc="2026-03-12",
+                created_at="2026-03-12T08:00:00Z",
+                updated_at="2026-03-12T08:00:00Z",
+            )
+        ],
+        content_repo_root=tmp_path.as_posix(),
+        window=build_previous_completed_days_window(dt.date(2026, 3, 16)),
+    )
+
+    summary, reason, diagnostics = summarize_weekly_feedback(
+        aggregate=aggregate,
+        ai_orchestrator=_FakeSummaryOrchestrator(
+            None,
+            "weekly_feedback_review:provider_error:RuntimeError:empty_content",
+            diagnostics=AIProviderDiagnostics(
+                provider="openai",
+                model="gpt-5.2",
+                failure_label="empty_content",
+                last_error_summary="keys=['content'], content_type=list",
+                retry_attempted=True,
+                retry_count=1,
+            ),
+        ),
+    )
+
+    assert summary is None
+    assert reason == "weekly_feedback_review:provider_error:RuntimeError:empty_content"
+    assert diagnostics is not None
+    assert diagnostics.failure_label == "empty_content"
 
 
 def test_weekly_feedback_cli_writes_markdown_and_json_reports(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

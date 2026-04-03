@@ -112,11 +112,12 @@ def main() -> int:
 
     llm_summary: dict[str, Any] | None = None
     ai_unavailable_reason: str | None = None
+    ai_diagnostics = None
     ai_orchestrator: AIOrchestrator | None = None
     if not args.disable_ai:
         ai_settings = load_ai_settings(output_dir=_resolve_ai_state_dir().as_posix())
         ai_orchestrator = AIOrchestrator(settings=ai_settings, target_date=run_date)
-        llm_summary, ai_unavailable_reason = summarize_weekly_feedback(
+        llm_summary, ai_unavailable_reason, ai_diagnostics = summarize_weekly_feedback(
             aggregate=aggregate,
             ai_orchestrator=ai_orchestrator,
         )
@@ -128,12 +129,14 @@ def main() -> int:
         generated_at=generated_at,
         llm_summary=llm_summary,
         ai_unavailable_reason=ai_unavailable_reason,
+        ai_diagnostics=ai_diagnostics,
     )
     json_payload = build_weekly_report_payload(
         aggregate=aggregate,
         generated_at=generated_at,
         llm_summary=llm_summary,
         ai_unavailable_reason=ai_unavailable_reason,
+        ai_diagnostics=ai_diagnostics,
     )
     markdown_path, json_path = _write_report_outputs(
         content_repo_root=content_repo_root,

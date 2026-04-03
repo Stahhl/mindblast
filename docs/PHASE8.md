@@ -160,7 +160,7 @@ The LLM output must be structured with these fields:
 ## Provider and Budget Posture
 - Provider abstraction: reuse the existing provider abstraction.
 - Intended first provider: `OpenAI`.
-- Intended first model: `gpt-5-mini`.
+- Intended first model: `gpt-5.2`.
 - Use provider-enforced structured outputs with a strict response schema for weekly summary generation when supported by the chosen provider.
 - Do not rely on prompt-only `return JSON` instructions as the primary contract for weekly summary output.
 

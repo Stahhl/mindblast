@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from quiz_forge.ai import AIOrchestrator
+from quiz_forge.ai.types import AIProviderDiagnostics
 
 from .types import WeeklyFeedbackAggregate
 
@@ -129,9 +130,9 @@ def summarize_weekly_feedback(
     *,
     aggregate: WeeklyFeedbackAggregate,
     ai_orchestrator: AIOrchestrator,
-) -> tuple[dict[str, Any] | None, str | None]:
+) -> tuple[dict[str, Any] | None, str | None, AIProviderDiagnostics | None]:
     if not ai_orchestrator.is_enabled():
-        return None, "ai_disabled"
+        return None, "ai_disabled", None
 
     question_summaries = [
         {
@@ -175,8 +176,8 @@ def summarize_weekly_feedback(
         response_schema=_weekly_feedback_response_schema(),
     )
     if response is None:
-        return None, reason
+        return None, reason, ai_orchestrator.last_json_task_failure_diagnostics
     try:
-        return _validate_summary_payload(response), None
+        return _validate_summary_payload(response), None, None
     except ValueError as exc:
-        return None, f"summary_payload_invalid:{exc}"
+        return None, f"summary_payload_invalid:{exc}", None

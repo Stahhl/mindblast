@@ -7,7 +7,13 @@ import os
 from typing import Any
 from urllib import error, request
 
-from ..types import AIJsonTaskResponse, AIRerankResponse, AISettings, AIUsage
+from ..types import (
+    AIJsonTaskResponse,
+    AIRerankResponse,
+    AIProviderResponseError,
+    AISettings,
+    AIUsage,
+)
 from .openai_contract import (
     OPENAI_CHAT_COMPLETIONS_ENDPOINT,
     build_chat_request_body,
@@ -62,12 +68,21 @@ class OpenAIProvider:
             return body
         return stripped
 
-    def _message_content_to_text(self, message: dict[str, Any]) -> str:
+    def _raise_parse_error(self, *, model: str, failure_label: str, summary: str) -> None:
+        raise AIProviderResponseError(
+            provider="openai",
+            model=model,
+            failure_label=failure_label,
+            summary=summary,
+        )
+
+    def _message_content_to_text(self, message: dict[str, Any], *, model: str) -> str:
         refusal = message.get("refusal")
         if isinstance(refusal, str) and refusal.strip():
-            raise RuntimeError(
-                "OpenAI response parse failure [refusal]: "
-                f"{self._message_shape_summary(message)}"
+            self._raise_parse_error(
+                model=model,
+                failure_label="refusal",
+                summary=self._message_shape_summary(message),
             )
 
         for field_name in ("content", "content_parts"):
@@ -84,16 +99,18 @@ class OpenAIProvider:
                     if item_type == "text" and isinstance(item.get("text"), str) and item["text"].strip():
                         text_chunks.append(item["text"].strip())
                     if item_type == "refusal" and isinstance(item.get("refusal"), str) and item["refusal"].strip():
-                        raise RuntimeError(
-                            "OpenAI response parse failure [refusal]: "
-                            f"{self._message_shape_summary(message)}"
+                        self._raise_parse_error(
+                            model=model,
+                            failure_label="refusal",
+                            summary=self._message_shape_summary(message),
                         )
                 if text_chunks:
                     return self._strip_code_fences("\n".join(text_chunks))
 
-        raise RuntimeError(
-            "OpenAI response parse failure [empty_content]: "
-            f"{self._message_shape_summary(message)}"
+        self._raise_parse_error(
+            model=model,
+            failure_label="empty_content",
+            summary=self._message_shape_summary(message),
         )
 
     def _require_api_key(self) -> str:
@@ -136,7 +153,7 @@ class OpenAIProvider:
 
         return payload_json
 
-    def _extract_content_json(self, payload_json: dict[str, Any]) -> dict[str, Any]:
+    def _extract_content_json(self, payload_json: dict[str, Any], *, model: str) -> dict[str, Any]:
         try:
             message = (
                 payload_json["choices"][0]["message"]
@@ -144,24 +161,34 @@ class OpenAIProvider:
                 else None
             )
             if not isinstance(message, dict):
-                raise RuntimeError("OpenAI response parse failure [missing_message]: choices[0].message missing.")
+                self._raise_parse_error(
+                    model=model,
+                    failure_label="missing_message",
+                    summary="choices[0].message missing",
+                )
 
-            content_text = self._message_content_to_text(message)
+            content_text = self._message_content_to_text(message, model=model)
             content_json = json.loads(content_text)
-        except RuntimeError:
+        except AIProviderResponseError:
             raise
         except json.JSONDecodeError as exc:
-            raise RuntimeError(
-                "OpenAI response parse failure [json_decode_error]: "
-                f"{exc}; {self._message_shape_summary(message)}"
-            ) from exc
+            self._raise_parse_error(
+                model=model,
+                failure_label="json_decode_error",
+                summary=f"{exc}; {self._message_shape_summary(message)}",
+            )
         except (KeyError, TypeError) as exc:
-            raise RuntimeError(f"OpenAI response parse failure [shape_error]: {exc}") from exc
+            self._raise_parse_error(
+                model=model,
+                failure_label="shape_error",
+                summary=str(exc),
+            )
 
         if not isinstance(content_json, dict):
-            raise RuntimeError(
-                "OpenAI response parse failure [non_object_json]: "
-                f"{type(content_json).__name__}"
+            self._raise_parse_error(
+                model=model,
+                failure_label="non_object_json",
+                summary=type(content_json).__name__,
             )
         return content_json
 
@@ -204,7 +231,7 @@ class OpenAIProvider:
             body=body,
             timeout_ms=settings.timeout_ms,
         )
-        ranked_json = self._extract_content_json(payload_json)
+        ranked_json = self._extract_content_json(payload_json, model=settings.model)
 
         ranked_ids = extract_ranked_ids(ranked_json)
         reason_codes = ranked_json.get("reason_codes", [])
@@ -241,7 +268,7 @@ class OpenAIProvider:
             body=body,
             timeout_ms=settings.timeout_ms,
         )
-        content_json = self._extract_content_json(payload_json)
+        content_json = self._extract_content_json(payload_json, model=model)
 
         return AIJsonTaskResponse(
             payload=content_json,

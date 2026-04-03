@@ -47,6 +47,57 @@ class AIJsonTaskResponse:
     usage: AIUsage
 
 
+@dataclass(frozen=True)
+class AIProviderDiagnostics:
+    provider: str
+    model: str
+    failure_label: str
+    last_error_summary: str
+    retry_attempted: bool = False
+    retry_count: int = 0
+
+    def to_report_payload(self) -> dict[str, Any]:
+        return {
+            "provider": self.provider,
+            "model": self.model,
+            "failure_label": self.failure_label,
+            "retry_attempted": self.retry_attempted,
+            "retry_count": self.retry_count,
+            "last_error_summary": self.last_error_summary,
+        }
+
+
+class AIProviderResponseError(RuntimeError):
+    def __init__(
+        self,
+        *,
+        provider: str,
+        model: str,
+        failure_label: str,
+        summary: str,
+    ) -> None:
+        self.provider = provider
+        self.model = model
+        self.failure_label = failure_label
+        self.summary = summary
+        super().__init__(f"{provider} response parse failure [{failure_label}]: {summary}")
+
+    def to_diagnostics(
+        self,
+        *,
+        retry_attempted: bool = False,
+        retry_count: int = 0,
+    ) -> AIProviderDiagnostics:
+        return AIProviderDiagnostics(
+            provider=self.provider,
+            model=self.model,
+            failure_label=self.failure_label,
+            last_error_summary=self.summary,
+            retry_attempted=retry_attempted,
+            retry_count=retry_count,
+        )
+
+
 @dataclass
 class AIAttempt:
     mode: str
