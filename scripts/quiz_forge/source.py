@@ -7,8 +7,11 @@ import json
 import time
 from typing import Any
 from urllib import error, request
+from urllib.parse import quote, unquote, urlparse
 
 from .constants import API_URL_TEMPLATE
+
+WIKIPEDIA_SUMMARY_API_TEMPLATE = "https://en.wikipedia.org/api/rest_v1/page/summary/{title}"
 
 
 def build_api_url(target_date: dt.date) -> str:
@@ -53,6 +56,26 @@ def first_wikipedia_url(event: dict[str, Any]) -> str | None:
             return page_url.strip()
 
     return None
+
+
+def build_wikipedia_summary_url(page_url: str) -> str | None:
+    parsed = urlparse(page_url.strip())
+    if not parsed.scheme or not parsed.netloc:
+        return None
+    path = parsed.path.strip("/")
+    if not path.startswith("wiki/"):
+        return None
+    title = path[len("wiki/") :]
+    if not title:
+        return None
+    return WIKIPEDIA_SUMMARY_API_TEMPLATE.format(title=quote(unquote(title), safe="()"))
+
+
+def fetch_wikipedia_page_summary(page_url: str, *, timeout: int, retries: int) -> dict[str, Any]:
+    summary_url = build_wikipedia_summary_url(page_url)
+    if not isinstance(summary_url, str):
+        raise ValueError(f"Unsupported Wikipedia page URL: {page_url}")
+    return fetch_json(summary_url, timeout=timeout, retries=retries)
 
 
 def extract_candidates(payload: dict[str, Any]) -> list[dict[str, Any]]:

@@ -18,9 +18,9 @@ Define a production-safe AI workflow for generating `history_factoid_mcq_4` cont
 - Add an AI-native multi-step generation workflow for history factoid quizzes.
 - Support per-step model selection (strong model where needed, cheaper model elsewhere).
 - Add verification gates before publishing generated distractors/questions.
-- Keep typed `person`/`place` factoid flows grounded in deterministic candidate pools; AI may review, normalize, and select only from supplied candidates.
-- Persist approved question assets in a reusable question bank.
-- Daily run must publish at least 1 valid factoid quiz when sufficient approved content exists.
+- Use fetched Wikipedia page context as the grounding source for candidate generation.
+- Keep published answer choices sourced-only; no synthetic distractors.
+- Daily run may fall back to the deterministic builder whenever the AI-native path is not publishable.
 
 ## Out of Scope
 - Non-history categories.
@@ -56,14 +56,15 @@ Operational notes:
 
 ### Stage 0: Source Ingest
 Inputs:
-- Curated source URL list (initially Wikipedia pages with clear attribution trail).
+- Deterministically selected linked Wikipedia pages from the daily On This Day candidate pool.
 
 Outputs:
 - Normalized source document package:
-  - URL
-  - title
-  - extracted spans/sentences
-  - detected entities
+  - `event_id`
+  - event text/year
+  - page URL
+  - page title
+  - page extract
   - retrieval timestamp
 
 ### Stage 1: Candidate Q/A Generation (Strong Model)
@@ -73,15 +74,19 @@ Goal:
 Output contract per candidate:
 - `question`
 - `correct_answer`
-- `answer_kind` (`person` | `place` | `time`)
-- `prompt_style` (`who` | `where` | `when`)
-- `supporting_span` (verbatim or pointer to exact source text)
-- `source_url`
+- `answer_kind` (`person` | `place` | `organization` | `work` | `object` | `time`)
+- `answer_subtype`
+- `prompt_style` (`who` | `where` | `when` | `what` | `which`)
+- `evidence_text` (verbatim source span)
+- `page_context_id`
+- `score`
 
 Rules:
 - Candidate must be answerable from source.
 - Answer must be short-form (entity/date style, not long sentence).
-- For typed factoids, AI must not invent answers. It may only approve/normalize candidates extracted from the supplied source-event candidate pool.
+- `correct_answer` must appear in the page title or page extract.
+- `evidence_text` must appear verbatim in the page extract.
+- The question prompt must not contain the correct answer.
 
 ### Stage 2: Candidate Ranking + Quality Gate (Light Model + Rules)
 Goal:
@@ -107,7 +112,8 @@ Constraints:
 - no duplicates
 - no answer leakage
 - strongly match `answer_kind`
-- distractor IDs must come only from the grounded typed candidate pool supplied to the model
+- distractor IDs must come only from the grounded accepted candidate pool supplied to the model
+- distractors must also match `answer_subtype`
 
 Weighting policy:
 - `answer_kind = person`: distractors must be real people.
@@ -174,6 +180,11 @@ Required fields:
 - Additive metadata allowed:
   - `metadata.pipeline_version`
   - `metadata.generation_method = "ai_native_factoid_v1"`
+- Additive source provenance allowed:
+  - `source.page_sources[*].answer_fact_id`
+  - `source.page_sources[*].page_url`
+  - `source.page_sources[*].page_title`
+  - `source.page_sources[*].retrieved_at`
 
 ## Model Strategy
 - Stage 1 and Stage 3: stronger model tier allowed.

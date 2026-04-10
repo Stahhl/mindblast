@@ -19,6 +19,8 @@ _EMPTY_QUALITY_PAYLOAD: dict[str, Any] = {
     "ai_quality_rejection_count": 0,
     "typed_candidate_rejections": [],
     "ai_distractor_rejection_lints": [],
+    "ai_stage_failures": [],
+    "page_context_fetch_count": 0,
 }
 
 _EMPTY_AI_PAYLOAD: dict[str, Any] = {
@@ -147,6 +149,8 @@ def render_daily_run_discord_message(report: dict[str, Any]) -> str:
                 f"  factoid subtypes: {', '.join(quality.get('factoid_final_subtypes') or []) or 'none'}",
                 f"  typed candidate rejections: {', '.join(quality.get('typed_candidate_rejections') or []) or 'none'}",
                 f"  ai distractor rejection lints: {', '.join(quality.get('ai_distractor_rejection_lints') or []) or 'none'}",
+                f"  ai stage failures: {', '.join(quality.get('ai_stage_failures') or []) or 'none'}",
+                f"  page contexts fetched: {quality.get('page_context_fetch_count', 0)}",
                 f"  ai quality rejections: {quality.get('ai_quality_rejection_count', 0)}",
             ]
         )

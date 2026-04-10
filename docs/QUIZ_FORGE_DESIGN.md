@@ -62,7 +62,7 @@ Phase 9 is planned to add the first non-history type: `geography_factoid_mcq_4`.
    - payloads include normalized `questions` + `answer_facts` plus compatibility fields.
    - previously selected correct answer-facts are eligible distractors for subsequent quiz types when valid.
    - in Phase 3 for `history_mcq_4`, optionally make one AI rerank call for distractor ordering and fallback deterministically on any failure.
-   - for `history_factoid_mcq_4`, the AI-assisted typed path may review/normalize deterministic `person`/`place` candidates and select distractors only from the supplied grounded same-kind pool; deterministic lints still decide publishability.
+  - for `history_factoid_mcq_4`, the AI-native page-grounded path may fetch linked Wikipedia page extracts, generate grounded candidates, select same-kind same-subtype distractors from accepted page-backed candidates, and publish only after local validation plus final judging.
    - in planned Phase 9 geography generation, use an approved structured geography source path with per-type topic validation.
 8. Run shared + type-specific contract validation.
 9. Write JSON files to disk.
@@ -102,7 +102,8 @@ Planned extension:
 - Do not fabricate source attributions for generated/synthetic content.
 - If synthetic content is introduced later, it must be explicitly labeled and excluded from sourced event attribution.
 - For future category expansion, reject ambiguous or disputed facts rather than weakening the prompt/answer contract.
-- For `history_factoid_mcq_4`, mixed entity-type answer sets should be treated as publish blockers, not soft warnings.
+- For `history_factoid_mcq_4`, mixed entity-type or mixed subtype answer sets should be treated as publish blockers, not soft warnings.
+- AI-native factoid answers and evidence must be locally grounded in fetched page context before publish.
 
 ### Reliability Guardrails
 - Single-run concurrency group in GitHub Actions (avoid duplicate runs).
@@ -113,6 +114,7 @@ Planned extension:
 - When an AI/provider API supports strict structured outputs or explicit response schemas, use them instead of prompt-only JSON instructions.
 - Treat provider-side schema enforcement as the first guard and local validation/parsing as the second guard.
 - Provider fallback/error labels should preserve schema/runtime failure details (for example `empty_content`, `json_decode_error`, `refusal`) so CI reports are actionable.
+- AI-native factoid reporting should include page-context fetch counts and stage-specific failures such as `page_context_fetch_failed`, `candidate_ungrounded`, `insufficient_same_subtype_pool`, and `final_judge_rejected`.
 
 ### Security Guardrails
 - Minimal GitHub permissions in workflow:

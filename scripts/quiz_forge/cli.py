@@ -27,7 +27,7 @@ from .constants import (
     SUPPORTED_QUIZ_TYPES,
 )
 from .discovery import write_discovery_artifacts
-from .factoid_pipeline import apply_factoid_ai_pipeline, load_factoid_pipeline_settings, propose_ai_factoid_candidate
+from .factoid_pipeline import generate_ai_native_factoid_quiz, load_factoid_pipeline_settings
 from .geography import GEOGRAPHY_SOURCE_URL, load_geography_records
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
@@ -147,7 +147,7 @@ def _extract_factoid_answer_kind(payload: dict[str, Any]) -> str | None:
     if not isinstance(facets, dict):
         return None
     answer_kind = facets.get("answer_kind")
-    if answer_kind in {"person", "place", "time"}:
+    if answer_kind in {"person", "place", "organization", "work", "object", "time"}:
         return answer_kind
     return None
 
@@ -280,49 +280,58 @@ def main() -> int:
                 elif ai_attempt.fallback_reason:
                     print(f"AI rerank fallback for {quiz_type}: {ai_attempt.fallback_reason}")
 
-            ai_selected_factoid_candidate: dict[str, Any] | None = None
-            ai_selected_factoid_distractors: list[dict[str, Any]] | None = None
-            ai_selected_factoid_reason: str | None = None
-            if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4 and factoid_pipeline_settings.enabled:
-                (
-                    ai_selected_factoid_candidate,
-                    ai_selected_factoid_distractors,
-                    ai_selected_factoid_reason,
-                ) = propose_ai_factoid_candidate(
-                    candidates=candidates,
-                    seed=seed,
-                    preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
-                    settings=factoid_pipeline_settings,
-                    ai_orchestrator=ai_orchestrator,
-                )
-                if ai_selected_factoid_reason is not None and ai_selected_factoid_candidate is None:
-                    quality_stats.add_typed_candidate_rejection(ai_selected_factoid_reason)
-                elif (
-                    ai_selected_factoid_candidate is not None
-                    and ai_selected_factoid_distractors is None
-                    and ai_selected_factoid_reason is not None
-                ):
-                    if ai_selected_factoid_reason == "factoid_typed_distractor_select_invalid_ids":
-                        quality_stats.add_fallback_path("history_factoid_mcq_4:ai_distractor_invalid")
-                    else:
-                        quality_stats.add_fallback_path("history_factoid_mcq_4:ai_distractor_fallback")
-
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
-                quiz = builder(
-                    target_date,
-                    retrieval_time,
-                    source_url,
-                    candidates,
-                    seed,
-                    edition,
-                    generation_mode,
-                    preferred_distractor_events=reusable_correct_events,
-                    ai_ranked_distractor_ids=ai_ranked_distractor_ids,
-                    preferred_answer_kind=_preferred_factoid_answer_kind(recent_factoid_answer_kinds),
-                    ai_selected_factoid_candidate=ai_selected_factoid_candidate,
-                    ai_selected_factoid_distractors=ai_selected_factoid_distractors,
-                    quality_stats=quality_stats,
-                )
+                preferred_answer_kind = _preferred_factoid_answer_kind(recent_factoid_answer_kinds)
+                ai_native_quiz: dict[str, Any] | None = None
+                ai_native_reason: str | None = None
+                if factoid_pipeline_settings.enabled:
+                    ai_native_quiz, ai_native_reason = generate_ai_native_factoid_quiz(
+                        target_date=target_date,
+                        retrieval_time=retrieval_time,
+                        source_url=source_url,
+                        candidates=candidates,
+                        seed=seed,
+                        edition=edition,
+                        generation_mode=generation_mode,
+                        preferred_answer_kind=preferred_answer_kind,
+                        settings=factoid_pipeline_settings,
+                        ai_orchestrator=ai_orchestrator,
+                        timeout=args.timeout,
+                        retries=args.retries,
+                        quality_stats=quality_stats,
+                    )
+                    if ai_native_quiz is not None:
+                        factoid_issues = lint_quiz_payload(ai_native_quiz)
+                        if factoid_issues:
+                            quality_stats.add_issues(factoid_issues)
+                            quality_stats.add_fallback_path("history_factoid_mcq_4:ai_native_rejected")
+                            quality_stats.add_ai_quality_rejection()
+                            print(
+                                "AI-native factoid quiz rejected by quality lint for history_factoid_mcq_4: "
+                                + ", ".join(factoid_issues)
+                            )
+                            ai_native_quiz = None
+                            ai_native_reason = "quality_lint_rejected"
+                if ai_native_quiz is not None:
+                    quiz = ai_native_quiz
+                    print("AI-native page-grounded factoid quiz applied for history_factoid_mcq_4.")
+                else:
+                    if factoid_pipeline_settings.enabled and ai_native_reason is not None:
+                        quality_stats.add_fallback_path("history_factoid_mcq_4:ai_native_fallback")
+                        print(f"AI-native factoid fallback for history_factoid_mcq_4: {ai_native_reason}")
+                    quiz = builder(
+                        target_date,
+                        retrieval_time,
+                        source_url,
+                        candidates,
+                        seed,
+                        edition,
+                        generation_mode,
+                        preferred_distractor_events=reusable_correct_events,
+                        ai_ranked_distractor_ids=ai_ranked_distractor_ids,
+                        preferred_answer_kind=preferred_answer_kind,
+                        quality_stats=quality_stats,
+                    )
             elif quiz_type == QUIZ_TYPE_HISTORY_MCQ_4:
                 quiz = builder(
                     target_date,
@@ -349,51 +358,6 @@ def main() -> int:
                     ai_ranked_distractor_ids=ai_ranked_distractor_ids,
                 )
             if quiz_type == QUIZ_TYPE_HISTORY_FACTOID_MCQ_4:
-                if factoid_pipeline_settings.enabled:
-                    if ai_selected_factoid_candidate is not None:
-                        print(
-                            "AI factoid candidate applied for history_factoid_mcq_4: "
-                            f"answer_kind={ai_selected_factoid_candidate['answer_kind']}"
-                        )
-                        if ai_selected_factoid_distractors is not None:
-                            print("AI typed distractor selection applied for history_factoid_mcq_4.")
-                        elif ai_selected_factoid_reason is not None:
-                            print(
-                                "AI typed distractor selection fallback for history_factoid_mcq_4: "
-                                f"{ai_selected_factoid_reason}"
-                            )
-                    elif ai_selected_factoid_reason is not None:
-                        print(f"AI factoid candidate fallback for history_factoid_mcq_4: {ai_selected_factoid_reason}")
-
-                factoid_facets = quiz.get("questions", [{}])[0].get("facets") if isinstance(quiz.get("questions"), list) and quiz.get("questions") else None
-                uses_time_builder = isinstance(factoid_facets, dict) and factoid_facets.get("answer_kind") == "time"
-                factoid_reason: str | None = None
-                base_factoid_quiz = copy.deepcopy(quiz)
-                if uses_time_builder:
-                    quiz, factoid_reason = apply_factoid_ai_pipeline(
-                        quiz=quiz,
-                        settings=factoid_pipeline_settings,
-                        ai_orchestrator=ai_orchestrator,
-                    )
-                    if factoid_reason is None:
-                        factoid_issues = lint_quiz_payload(quiz)
-                        if factoid_issues:
-                            quality_stats.add_issues(factoid_issues)
-                            quality_stats.add_fallback_path("history_factoid_mcq_4:ai_pipeline_rejected")
-                            quality_stats.add_ai_quality_rejection()
-                            print(
-                                "AI factoid pipeline rejected by quality lint for history_factoid_mcq_4: "
-                                + ", ".join(factoid_issues)
-                            )
-                            quiz = base_factoid_quiz
-                            factoid_reason = "quality_lint_rejected"
-                if factoid_pipeline_settings.enabled and uses_time_builder:
-                    if factoid_reason is None:
-                        print("AI factoid pipeline applied for history_factoid_mcq_4.")
-                    elif factoid_reason == "shadow_mode":
-                        print("AI factoid pipeline shadow run completed for history_factoid_mcq_4.")
-                    else:
-                        print(f"AI factoid pipeline fallback for history_factoid_mcq_4: {factoid_reason}")
                 answer_kind = _extract_factoid_answer_kind(quiz)
                 if answer_kind is not None:
                     recent_factoid_answer_kinds.append(answer_kind)

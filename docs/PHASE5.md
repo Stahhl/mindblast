@@ -41,11 +41,22 @@ Add a second history MCQ format where questions are more specific and answers ar
 
 ### Question Style
 - More elaborate prompt, shorter answer labels.
-- Phase 5 initial support:
-  - `when` (time/date/year as short time answer)
-- Planned expansion:
-  - `who` (person)
-  - `where` (place)
+- Supported answer kinds:
+  - `person`
+  - `place`
+  - `organization`
+  - `work`
+  - `object`
+  - `time`
+- Supported prompt styles:
+  - `who`
+  - `where`
+  - `when`
+  - `what`
+  - `which`
+- AI-native generation is page-grounded:
+  - answers must be supported by fetched Wikipedia page context
+  - distractors must come from other grounded page-backed candidates of the same `answer_kind` and `answer_subtype`
 
 Examples:
 - `Who assassinated Julius Caesar?`
@@ -72,32 +83,36 @@ No new top-level schema version is required. Use current v2 schema with additive
 
 `questions[0]` required additions for this type:
 - `facets.question_format = "factoid"`
-- Phase 5 initial values:
-  - `facets.answer_kind = "time"`
-  - `facets.prompt_style = "when"`
-- Planned expansion values:
-  - `facets.answer_kind` in `person|place|time`
-  - `facets.prompt_style` in `who|where|when`
+- `facets.answer_kind` in `person|place|organization|work|object|time`
+- `facets.answer_subtype` as a short non-empty string such as `band`, `song`, `album`, `instrument`, or `city`
+- `facets.prompt_style` in `who|where|when|what|which`
 
 `answer_facts[*]` recommended additions:
 - `facets.entity_type` aligned with `questions[0].facets.answer_kind`
+- `facets.entity_subtype` aligned with `questions[0].facets.answer_subtype`
 - existing `vector_metadata` stays required for future embedding workflows
 
 ## Source and Attribution
 - Source attribution requirements remain identical to Phase 1:
   - `source.name`, `source.url`, `source.retrieved_at`
   - `source.events_used` must be real attributable events/facts.
+- AI-native page-grounded factoids may add:
+  - `source.page_sources[*].answer_fact_id`
+  - `source.page_sources[*].page_url`
+  - `source.page_sources[*].page_title`
+  - `source.page_sources[*].retrieved_at`
 - No fabricated source links.
 - If source text is long, answer labels may be normalized/shortened, but must preserve factual identity.
 
 ## Generation Strategy
 
 High-level builder behavior:
-1. Select a factoid target (person/place/time) from source candidates.
-2. Generate prompt based on style (`who`/`where`/`when`).
-3. Select 3 distractors of same `answer_kind` when possible.
-4. Validate distinctness and factual consistency.
-5. Build normalized payload and run standard validation.
+1. Deterministically select a bounded set of linked Wikipedia pages from the daily On This Day pool.
+2. Fetch normalized page context (`title` + grounded extract) for those pages.
+3. Generate 1-3 grounded factoid candidates per page with answer kind, subtype, prompt style, answer, and evidence span.
+4. Reject any candidate whose answer or evidence is not locally grounded in the fetched page context.
+5. Select 3 distractors from other accepted candidates with the same `answer_kind` and `answer_subtype`.
+6. Judge the final assembled quiz, then build normalized payload and run standard validation.
 
 Failure policy:
 - Fail closed when short-answer extraction quality is insufficient.
@@ -114,9 +129,11 @@ Failure policy:
 - `choices[*].year` is forbidden.
 - `question` must end with `?`.
 - `questions[0].facets.question_format == "factoid"`.
-- Phase 5 initial values:
-  - `questions[0].facets.answer_kind == "time"`.
-  - `questions[0].facets.prompt_style == "when"`.
+- `questions[0].facets.answer_kind` must be one of the supported factoid answer kinds.
+- `questions[0].facets.answer_subtype` must be present and non-empty.
+- `questions[0].facets.prompt_style` must be one of the supported prompt styles and align with `answer_kind`.
+- `answer_facts[*].facets.entity_type` must align with `questions[0].facets.answer_kind`.
+- `answer_facts[*].facets.entity_subtype` must align with `questions[0].facets.answer_subtype`.
 - Exactly one correct choice.
 
 ## Rollout Plan

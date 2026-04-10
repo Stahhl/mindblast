@@ -188,8 +188,7 @@ def _detect_history_factoid_issues(payload: dict[str, Any]) -> list[str]:
 
     if answer_kind == "time" and correct_answer_label and _prompt_contains_label(prompt, correct_answer_label):
         issues.append(ISSUE_PROMPT_LEAK_YEAR)
-
-    if answer_kind in {"person", "place"}:
+    elif answer_kind in {"person", "place"}:
         if correct_answer_label and _prompt_contains_label(prompt, correct_answer_label):
             issues.append(ISSUE_PROMPT_LEAK_LOCATION if answer_kind == "place" else ISSUE_WEAK_DISTRACTOR_PLAUSIBILITY)
         if answer_kind == "place" and _prompt_location_leak(prompt, correct_answer_label):
@@ -205,6 +204,8 @@ def _detect_history_factoid_issues(payload: dict[str, Any]) -> list[str]:
             issues.append(ISSUE_WEAK_DISTRACTOR_PLAUSIBILITY)
             if ISSUE_MIXED_ENTITY_TYPES not in issues:
                 issues.append(ISSUE_MIXED_ENTITY_TYPES)
+    elif correct_answer_label and _prompt_contains_label(prompt, correct_answer_label):
+        issues.append(ISSUE_WEAK_DISTRACTOR_PLAUSIBILITY)
 
     return issues
 
@@ -228,6 +229,8 @@ class QualityRunStats:
     ai_quality_rejection_count: int = 0
     typed_candidate_rejections: dict[str, int] = field(default_factory=dict)
     ai_distractor_rejection_lints: dict[str, int] = field(default_factory=dict)
+    ai_stage_failures: dict[str, int] = field(default_factory=dict)
+    page_context_fetch_count: int = 0
 
     def add_issues(self, issues: tuple[str, ...]) -> None:
         for issue in issues:
@@ -249,6 +252,12 @@ class QualityRunStats:
         for issue in issues:
             self.ai_distractor_rejection_lints[issue] = self.ai_distractor_rejection_lints.get(issue, 0) + 1
 
+    def add_ai_stage_failure(self, reason: str) -> None:
+        self.ai_stage_failures[reason] = self.ai_stage_failures.get(reason, 0) + 1
+
+    def add_page_context_fetches(self, count: int) -> None:
+        self.page_context_fetch_count += max(0, count)
+
     def to_report_payload(self) -> dict[str, Any]:
         return {
             "lint_failure_count": sum(self.lint_failures.values()),
@@ -265,4 +274,6 @@ class QualityRunStats:
             "ai_distractor_rejection_lints": [
                 f"{code}:{count}" for code, count in sorted(self.ai_distractor_rejection_lints.items())
             ],
+            "ai_stage_failures": [f"{code}:{count}" for code, count in sorted(self.ai_stage_failures.items())],
+            "page_context_fetch_count": self.page_context_fetch_count,
         }

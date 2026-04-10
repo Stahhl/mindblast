@@ -146,6 +146,48 @@ def _place_factoid_embedded_candidates() -> list[dict[str, object]]:
     ]
 
 
+def _page_summary_payload_for_url(page_url: str) -> dict[str, str]:
+    payloads = {
+        "https://example.com/neil-armstrong": {
+            "title": "Neil Armstrong",
+            "extract": "Neil Armstrong walks on the Moon during Apollo 11.",
+        },
+        "https://example.com/napoleon": {
+            "title": "Napoleon Bonaparte",
+            "extract": "Napoleon Bonaparte abdicates as Emperor of the French.",
+        },
+        "https://example.com/mlk": {
+            "title": "Martin Luther King Jr.",
+            "extract": "Martin Luther King Jr. delivers his I've Been to the Mountaintop speech.",
+        },
+        "https://example.com/amelia": {
+            "title": "Amelia Earhart",
+            "extract": "Amelia Earhart departs from Honolulu in her attempt to fly around the world.",
+        },
+        "https://example.com/caesar": {
+            "title": "Julius Caesar",
+            "extract": "Julius Caesar is assassinated by Roman senators in the Theatre of Pompey.",
+        },
+        "https://example.com/a": {
+            "title": "The Beatles",
+            "extract": "The Beatles were an English rock band formed in Liverpool in 1960.",
+        },
+        "https://example.com/b": {
+            "title": "Wings",
+            "extract": "Wings were a rock band formed by Paul McCartney, Linda McCartney, and Denny Laine.",
+        },
+        "https://example.com/c": {
+            "title": "The Quarrymen",
+            "extract": "The Quarrymen were the skiffle group joined by Paul McCartney in 1957.",
+        },
+        "https://example.com/d": {
+            "title": "The Who",
+            "extract": "The Who are an English rock band formed in London in 1964.",
+        },
+    }
+    return payloads[page_url]
+
+
 def _mixed_factoid_candidates() -> list[dict[str, object]]:
     return [*_person_factoid_candidates(), *_place_factoid_candidates()]
 
@@ -939,6 +981,10 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
 
     monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
     monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setattr(
+        "quiz_forge.factoid_pipeline.fetch_wikipedia_page_summary",
+        lambda page_url, **_kwargs: _page_summary_payload_for_url(page_url),
+    )
     monkeypatch.setenv("AI_MODE", "on")
     monkeypatch.setenv("AI_PROVIDER", "openai")
     monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
@@ -950,18 +996,34 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task == "factoid_question_generation":
-            payload = {"candidates": [{"question": "When was this event officially recognized?", "score": 0.95}]}
-        elif task == "factoid_question_rank":
-            payload = {"best_index": 0, "best_score": 0.95}
-        elif task == "factoid_distractor_label_generation":
-            choices = user_payload.get("choices", [])
-            labels_by_id = {
-                choice["id"]: ("1901" if choice.get("is_correct") else f"Distractor {idx + 1}")
-                for idx, choice in enumerate(choices)
-                if isinstance(choice, dict) and isinstance(choice.get("id"), str)
+        if task == "factoid_page_candidate_generate":
+            prompts = {
+                "The Beatles": "Which band made Paul McCartney famous worldwide?",
+                "Wings": "Which band did Paul McCartney form after the Beatles together with Linda McCartney and Denny Laine?",
+                "The Quarrymen": "Which skiffle group did Paul McCartney join in 1957 before it evolved into the Beatles?",
+                "The Who": "Which English rock band released the rock opera Tommy?",
             }
-            payload = {"choice_labels_by_id": labels_by_id}
+            payload = {
+                "candidates": [
+                    {
+                        "page_context_id": page_context["page_context_id"],
+                        "question": prompts[page_context["page_title"]],
+                        "correct_answer": page_context["page_title"],
+                        "answer_kind": "organization",
+                        "answer_subtype": "band",
+                        "prompt_style": "which",
+                        "evidence_text": page_context["page_extract"],
+                        "score": 0.95,
+                    }
+                    for page_context in user_payload["page_contexts"]
+                ]
+            }
+        elif task == "factoid_distractor_select":
+            payload = {
+                "selected_distractor_ids": [
+                    candidate["candidate_id"] for candidate in user_payload["distractor_candidates"][:3]
+                ]
+            }
         elif task == "factoid_final_judge":
             payload = {"final_score": 0.99, "publishable": True}
         else:
@@ -991,7 +1053,7 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
-    assert run_json_mock.call_count == 4
+    assert run_json_mock.call_count == 3
 
     records = list_quiz_records_for_date_type(
         output_dir=output_dir,
@@ -999,8 +1061,11 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
         quiz_type="history_factoid_mcq_4",
     )
     payload = records[0].payload
-    assert payload["question"] == "When was this event officially recognized?"
+    assert payload["question"].startswith("Which ")
     assert payload["metadata"]["generation_method"] == "ai_native_factoid_v1"
+    assert payload["questions"][0]["facets"]["answer_kind"] == "organization"
+    assert payload["questions"][0]["facets"]["answer_subtype"] == "band"
+    assert len(payload["source"]["page_sources"]) == 4
 
 
 def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_path, mocker) -> None:
@@ -1011,6 +1076,10 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
 
     monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
     monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setattr(
+        "quiz_forge.factoid_pipeline.fetch_wikipedia_page_summary",
+        lambda page_url, **_kwargs: _page_summary_payload_for_url(page_url),
+    )
     monkeypatch.setenv("AI_MODE", "on")
     monkeypatch.setenv("AI_PROVIDER", "openai")
     monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
@@ -1022,31 +1091,39 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task == "factoid_typed_candidate_review":
+        if task == "factoid_page_candidate_generate":
+            prompts = {
+                "Neil Armstrong": "Who walked on the Moon during Apollo 11?",
+                "Napoleon Bonaparte": "Who abdicated as Emperor of the French?",
+                "Martin Luther King Jr.": "Who delivered the I've Been to the Mountaintop speech?",
+                "Amelia Earhart": "Who departed from Honolulu in an attempt to fly around the world?",
+                "Julius Caesar": "Who was assassinated by Roman senators in the Theatre of Pompey?",
+            }
             payload = {
-                "candidate_reviews": [
+                "candidates": [
                     {
-                        "candidate_id": candidate["candidate_id"],
-                        "answer_kind": candidate["answer_kind"],
-                        "normalized_answer_label": candidate["answer_label"],
-                        "prompt_style": candidate["prompt_style"],
-                        "supported": True,
-                        "rejection_reason": "",
+                        "page_context_id": page_context["page_context_id"],
+                        "question": prompts[page_context["page_title"]],
+                        "correct_answer": page_context["page_title"],
+                        "answer_kind": "person",
+                        "answer_subtype": "historical_figure",
+                        "prompt_style": "who",
+                        "evidence_text": page_context["page_extract"],
+                        "score": 0.95,
                     }
-                    for candidate in user_payload["candidates"]
+                    for page_context in user_payload["page_contexts"]
                 ]
             }
             model = "gpt-5.2"
-        elif task == "factoid_typed_distractor_select":
-            correct_candidate_id = user_payload["correct_candidate"]["candidate_id"]
+        elif task == "factoid_distractor_select":
             payload = {
                 "selected_distractor_ids": [
-                    candidate["candidate_id"]
-                    for candidate in user_payload["distractor_candidates"]
-                    if candidate["candidate_id"] != correct_candidate_id
-                ][:3],
-                "reason_codes": [],
+                    candidate["candidate_id"] for candidate in user_payload["distractor_candidates"][:3]
+                ]
             }
+            model = "gpt-5.2"
+        elif task == "factoid_final_judge":
+            payload = {"final_score": 0.99, "publishable": True}
             model = "gpt-5.2"
         else:
             raise AssertionError(f"Unexpected task: {task}")
@@ -1074,7 +1151,7 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
     )
     monkeypatch.setattr(cli, "parse_args", lambda: args)
     assert cli.main() == 0
-    assert run_json_mock.call_count == 2
+    assert run_json_mock.call_count == 3
 
     records = list_quiz_records_for_date_type(
         output_dir=output_dir,
@@ -1083,6 +1160,7 @@ def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_p
     )
     payload = records[0].payload
     assert payload["questions"][0]["facets"]["answer_kind"] == "person"
+    assert payload["questions"][0]["facets"]["answer_subtype"] == "historical_figure"
     assert payload["questions"][0]["facets"]["prompt_style"] == "who"
     assert lint_quiz_payload(payload) == ()
     assert len(payload["choices"]) == 4
@@ -1105,6 +1183,10 @@ def test_cli_falls_back_when_ai_typed_distractor_selection_is_invalid(monkeypatc
 
     monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
     monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setattr(
+        "quiz_forge.factoid_pipeline.fetch_wikipedia_page_summary",
+        lambda page_url, **_kwargs: _page_summary_payload_for_url(page_url),
+    )
     monkeypatch.setenv("AI_MODE", "on")
     monkeypatch.setenv("AI_PROVIDER", "openai")
     monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
@@ -1116,25 +1198,24 @@ def test_cli_falls_back_when_ai_typed_distractor_selection_is_invalid(monkeypatc
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task == "factoid_typed_candidate_review":
+        if task == "factoid_page_candidate_generate":
             payload = {
-                "candidate_reviews": [
+                "candidates": [
                     {
-                        "candidate_id": candidate["candidate_id"],
-                        "answer_kind": candidate["answer_kind"],
-                        "normalized_answer_label": candidate["answer_label"],
-                        "prompt_style": candidate["prompt_style"],
-                        "supported": True,
-                        "rejection_reason": "",
+                        "page_context_id": page_context["page_context_id"],
+                        "question": "Who is featured in this historical event?",
+                        "correct_answer": page_context["page_title"],
+                        "answer_kind": "person",
+                        "answer_subtype": "historical_figure",
+                        "prompt_style": "who",
+                        "evidence_text": page_context["page_extract"],
+                        "score": 0.95,
                     }
-                    for candidate in user_payload["candidates"]
+                    for page_context in user_payload["page_contexts"]
                 ]
             }
-        elif task == "factoid_typed_distractor_select":
-            payload = {
-                "selected_distractor_ids": ["not-a-real-candidate-id", "still-invalid", "also-invalid"],
-                "reason_codes": ["bad_ids"],
-            }
+        elif task == "factoid_distractor_select":
+            payload = {"selected_distractor_ids": ["not-a-real-candidate-id", "still-invalid", "also-invalid"]}
         else:
             raise AssertionError(f"Unexpected task: {task}")
         return AIJsonTaskResponse(
@@ -1170,7 +1251,8 @@ def test_cli_falls_back_when_ai_typed_distractor_selection_is_invalid(monkeypatc
     assert lint_quiz_payload(payload) == ()
 
     report_payload = json.loads(report_path.read_text(encoding="utf-8"))
-    assert "history_factoid_mcq_4:ai_distractor_invalid:1" in report_payload["quality"]["fallback_paths"]
+    assert "history_factoid_mcq_4:ai_native_fallback:1" in report_payload["quality"]["fallback_paths"]
+    assert "factoid_distractor_select_invalid_ids:1" in report_payload["quality"]["ai_stage_failures"]
 
 
 def test_cli_counts_ai_typed_candidate_review_rejections(monkeypatch, tmp_path, mocker) -> None:
@@ -1182,6 +1264,10 @@ def test_cli_counts_ai_typed_candidate_review_rejections(monkeypatch, tmp_path, 
 
     monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
     monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _person_factoid_candidates())
+    monkeypatch.setattr(
+        "quiz_forge.factoid_pipeline.fetch_wikipedia_page_summary",
+        lambda page_url, **_kwargs: _page_summary_payload_for_url(page_url),
+    )
     monkeypatch.setenv("AI_MODE", "on")
     monkeypatch.setenv("AI_PROVIDER", "openai")
     monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
@@ -1193,20 +1279,22 @@ def test_cli_counts_ai_typed_candidate_review_rejections(monkeypatch, tmp_path, 
         del args
         user_payload = kwargs["user_payload"]
         task = user_payload.get("task")
-        if task != "factoid_typed_candidate_review":
+        if task != "factoid_page_candidate_generate":
             raise AssertionError(f"Unexpected task: {task}")
         return AIJsonTaskResponse(
             payload={
-                "candidate_reviews": [
+                "candidates": [
                     {
-                        "candidate_id": candidate["candidate_id"],
-                        "answer_kind": candidate["answer_kind"],
-                        "normalized_answer_label": candidate["answer_label"],
-                        "prompt_style": candidate["prompt_style"],
-                        "supported": False,
-                        "rejection_reason": "not_publishable",
+                        "page_context_id": page_context["page_context_id"],
+                        "question": f"Who is featured on {page_context['page_title']}?",
+                        "correct_answer": "Someone Else",
+                        "answer_kind": "person",
+                        "answer_subtype": "historical_figure",
+                        "prompt_style": "who",
+                        "evidence_text": "Ungrounded evidence text",
+                        "score": 0.95,
                     }
-                    for candidate in user_payload["candidates"]
+                    for page_context in user_payload["page_contexts"]
                 ]
             },
             provider="openai",
@@ -1240,10 +1328,7 @@ def test_cli_counts_ai_typed_candidate_review_rejections(monkeypatch, tmp_path, 
     assert lint_quiz_payload(payload) == ()
 
     report_payload = json.loads(report_path.read_text(encoding="utf-8"))
-    assert (
-        "factoid_typed_candidate_review_no_supported_candidates:1"
-        in report_payload["quality"]["typed_candidate_rejections"]
-    )
+    assert "candidate_ungrounded:1" in report_payload["quality"]["ai_stage_failures"]
 
 
 def test_ai_factoid_distractors_exclude_same_source_event_value_copies() -> None:
@@ -1519,7 +1604,9 @@ def test_cli_discards_ai_time_factoid_update_when_quality_lint_fails(monkeypatch
 
     monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
     monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
-    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("AI_MODE", "on")
+    monkeypatch.setenv("AI_PROVIDER", "openai")
+    monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
     monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
 
     class _Settings:
@@ -1531,18 +1618,108 @@ def test_cli_discards_ai_time_factoid_update_when_quality_lint_fails(monkeypatch
         max_stage_tokens = 200
         min_question_score = 0.5
         min_final_score = 0.5
+        max_page_contexts = 4
+        max_page_extract_chars = 500
 
     monkeypatch.setattr(cli, "load_factoid_pipeline_settings", lambda _model: _Settings())
-    monkeypatch.setattr(cli, "propose_ai_factoid_candidate", lambda **_kwargs: (None, None, "not_used"))
 
-    def _bad_ai_update(*, quiz, **_kwargs):
-        updated = json.loads(json.dumps(quiz))
-        correct_choice = next(choice for choice in updated["choices"] if choice["id"] == updated["correct_choice_id"])
-        updated["question"] = f"When did this happen in {correct_choice['label']}?"
-        updated["questions"][0]["prompt"] = updated["question"]
-        return updated, None
+    def _bad_ai_quiz(**_kwargs):
+        quiz = {
+            "date": target_date,
+            "topics": ["history"],
+            "type": "history_factoid_mcq_4",
+            "questions": [
+                {
+                    "id": "q1",
+                    "type": "history_factoid_mcq_4",
+                    "prompt": "Who is Neil Armstrong?",
+                    "answer_fact_ids": ["a", "b", "c", "d"],
+                    "correct_answer_fact_id": "a",
+                    "tags": ["history", "history_factoid_mcq_4"],
+                    "facets": {
+                        "topic": "history",
+                        "difficulty_band": "baseline",
+                        "question_format": "factoid",
+                        "answer_kind": "person",
+                        "answer_subtype": "historical_figure",
+                        "prompt_style": "who",
+                    },
+                    "selection_rules": {"distractor_same_year_allowed": False},
+                }
+            ],
+            "answer_facts": [
+                {
+                    "id": "a",
+                    "label": "Neil Armstrong",
+                    "year": 1969,
+                    "tags": ["history"],
+                    "facets": {"topic": "history", "entity_type": "person", "entity_subtype": "historical_figure"},
+                    "match": {"distractor_profile": {"year": 1969}},
+                    "vector_metadata": {"text_for_embedding": "Neil Armstrong", "embedding_status": "not_generated"},
+                },
+                {
+                    "id": "b",
+                    "label": "Buzz Aldrin",
+                    "year": 1969,
+                    "tags": ["history"],
+                    "facets": {"topic": "history", "entity_type": "person", "entity_subtype": "historical_figure"},
+                    "match": {"distractor_profile": {"year": 1969}},
+                    "vector_metadata": {"text_for_embedding": "Buzz Aldrin", "embedding_status": "not_generated"},
+                },
+                {
+                    "id": "c",
+                    "label": "Yuri Gagarin",
+                    "year": 1961,
+                    "tags": ["history"],
+                    "facets": {"topic": "history", "entity_type": "person", "entity_subtype": "historical_figure"},
+                    "match": {"distractor_profile": {"year": 1961}},
+                    "vector_metadata": {"text_for_embedding": "Yuri Gagarin", "embedding_status": "not_generated"},
+                },
+                {
+                    "id": "d",
+                    "label": "Michael Collins",
+                    "year": 1969,
+                    "tags": ["history"],
+                    "facets": {"topic": "history", "entity_type": "person", "entity_subtype": "historical_figure"},
+                    "match": {"distractor_profile": {"year": 1969}},
+                    "vector_metadata": {"text_for_embedding": "Michael Collins", "embedding_status": "not_generated"},
+                },
+            ],
+            "question": "Who is Neil Armstrong?",
+            "choices": [
+                {"id": "A", "label": "Neil Armstrong", "answer_fact_id": "a"},
+                {"id": "B", "label": "Buzz Aldrin", "answer_fact_id": "b"},
+                {"id": "C", "label": "Yuri Gagarin", "answer_fact_id": "c"},
+                {"id": "D", "label": "Michael Collins", "answer_fact_id": "d"},
+            ],
+            "correct_choice_id": "A",
+            "source": {
+                "name": "Wikipedia On This Day",
+                "url": "https://example.com/source",
+                "retrieved_at": "2026-03-17T06:00:00Z",
+                "events_used": [
+                    {"event_id": "a", "text": "Neil Armstrong walks on the Moon during Apollo 11.", "year": 1969, "wikipedia_url": "https://example.com/neil-armstrong"},
+                    {"event_id": "b", "text": "Buzz Aldrin walks on the Moon during Apollo 11.", "year": 1969, "wikipedia_url": "https://example.com/buzz"},
+                    {"event_id": "c", "text": "Yuri Gagarin becomes the first human in space.", "year": 1961, "wikipedia_url": "https://example.com/yuri"},
+                    {"event_id": "d", "text": "Michael Collins pilots the Apollo 11 command module.", "year": 1969, "wikipedia_url": "https://example.com/collins"},
+                ],
+                "page_sources": [
+                    {"answer_fact_id": "a", "page_url": "https://example.com/neil-armstrong", "page_title": "Neil Armstrong", "retrieved_at": "2026-03-17T06:00:00Z"},
+                    {"answer_fact_id": "b", "page_url": "https://example.com/buzz", "page_title": "Buzz Aldrin", "retrieved_at": "2026-03-17T06:00:00Z"},
+                    {"answer_fact_id": "c", "page_url": "https://example.com/yuri", "page_title": "Yuri Gagarin", "retrieved_at": "2026-03-17T06:00:00Z"},
+                    {"answer_fact_id": "d", "page_url": "https://example.com/collins", "page_title": "Michael Collins", "retrieved_at": "2026-03-17T06:00:00Z"},
+                ],
+            },
+            "generation": {"mode": "daily", "edition": 1, "generated_at": "2026-03-17T06:00:00Z"},
+            "metadata": {
+                "version": 2,
+                "normalized_model": "question_answer_facts_v1",
+                "generation_method": "ai_native_factoid_v1",
+            },
+        }
+        return quiz, None
 
-    monkeypatch.setattr(cli, "apply_factoid_ai_pipeline", _bad_ai_update)
+    monkeypatch.setattr(cli, "generate_ai_native_factoid_quiz", _bad_ai_quiz)
 
     args = argparse.Namespace(
         date=target_date,
@@ -1564,11 +1741,7 @@ def test_cli_discards_ai_time_factoid_update_when_quality_lint_fails(monkeypatch
     )
     payload = records[0].payload
     assert lint_quiz_payload(payload) == ()
-    assert payload["question"] != next(
-        f"When did this happen in {choice['label']}?"
-        for choice in payload["choices"]
-        if choice["id"] == payload["correct_choice_id"]
-    )
+    assert payload["question"] != "Who is Neil Armstrong?"
 
     report_payload = json.loads((tmp_path / "ai-report.json").read_text(encoding="utf-8"))
     assert report_payload["quality"]["ai_quality_rejection_count"] == 1

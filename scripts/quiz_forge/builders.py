@@ -66,6 +66,7 @@ def _build_history_factoid_typed_quiz(
         ).hexdigest()
     )
     answer_kind = correct_factoid["answer_kind"]
+    answer_subtype = str(correct_factoid.get("answer_subtype") or answer_kind)
     prompt_style = correct_factoid["prompt_style"]
     question_text = correct_factoid["question_text"]
     factoid_option_ids = [
@@ -73,6 +74,7 @@ def _build_history_factoid_typed_quiz(
             option["source_event"],
             answer_label=option["answer_label"],
             entity_type=answer_kind,
+            entity_subtype=answer_subtype,
         )
         for option in factoid_options
     ]
@@ -91,6 +93,7 @@ def _build_history_factoid_typed_quiz(
             source_event,
             answer_label=option["answer_label"],
             entity_type=answer_kind,
+            entity_subtype=answer_subtype,
         )
         role = "correct" if option is correct_factoid else "distractor"
         fact = build_answer_fact(
@@ -100,6 +103,7 @@ def _build_history_factoid_typed_quiz(
             fact_id=fact_id,
             label=option["answer_label"],
             entity_type=answer_kind,
+            entity_subtype=answer_subtype,
             embedding_text=f"{option['answer_label']} -- {source_event['text']}",
         )
         answer_facts.append(fact)
@@ -129,6 +133,7 @@ def _build_history_factoid_typed_quiz(
         extra_facets={
             "question_format": "factoid",
             "answer_kind": answer_kind,
+            "answer_subtype": answer_subtype,
             "prompt_style": prompt_style,
         },
     )
@@ -173,12 +178,33 @@ def build_source(
             "wikipedia_url": source_payload["wikipedia_url"],
         }
 
-    return {
+    def normalize_page_source(event: dict[str, Any]) -> dict[str, Any] | None:
+        page_context = event.get("page_context")
+        if not isinstance(page_context, dict):
+            return None
+        answer_fact_id = event.get("answer_fact_id")
+        page_url = page_context.get("page_url")
+        page_title = page_context.get("page_title")
+        retrieved_at = page_context.get("retrieved_at")
+        if not all(isinstance(value, str) and value.strip() for value in (answer_fact_id, page_url, page_title, retrieved_at)):
+            return None
+        return {
+            "answer_fact_id": answer_fact_id,
+            "page_url": page_url,
+            "page_title": page_title,
+            "retrieved_at": retrieved_at,
+        }
+
+    payload = {
         "name": "Wikipedia On This Day",
         "url": source_url,
         "retrieved_at": retrieval_time.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "events_used": [normalize_source_event(event) for event in events],
     }
+    page_sources = [page_source for event in events if (page_source := normalize_page_source(event)) is not None]
+    if page_sources:
+        payload["page_sources"] = page_sources
+    return payload
 
 
 def _build_geography_answer_fact(record: dict[str, Any], *, role: str) -> dict[str, Any]:
@@ -338,6 +364,7 @@ def _build_history_factoid_time_quiz(
             quiz_type=QUIZ_TYPE_HISTORY_FACTOID_MCQ_4,
             role=role,
             entity_type="time",
+            entity_subtype="year",
         )
         answer_facts.append(fact)
         choices.append(
@@ -364,6 +391,7 @@ def _build_history_factoid_time_quiz(
         extra_facets={
             "question_format": "factoid",
             "answer_kind": "time",
+            "answer_subtype": "year",
             "prompt_style": "when",
         },
     )

@@ -63,6 +63,7 @@ Common fields for all types:
 - `correct_choice_id`: one of the choice ids (legacy compatibility view).
 - `source.name`, `source.url`, `source.retrieved_at`: non-empty strings.
 - `source.events_used`: array of source events (`event_id`, `text`, `year`, `wikipedia_url`).
+- `source.page_sources` (optional): array of page provenance entries for AI-native factoids (`answer_fact_id`, `page_url`, `page_title`, `retrieved_at`).
 - `generation.mode`: `daily` for any edition inside the configured daily range for the quiz type.
 - `generation.edition`: integer `>= 1`.
 - `generation.generated_at`: UTC ISO-8601 timestamp (`Z`).
@@ -79,6 +80,7 @@ Common fields for all types:
 - `tags`: non-empty list of strings.
 - `facets`: object.
 - `selection_rules`: object.
+- For `history_factoid_mcq_4`, `facets.answer_subtype` is required and must be a non-empty string.
 
 `answer_facts` requirements:
 - Each fact includes `id`, `label`, integer `year`, `tags`, `facets`, `match`, `vector_metadata`.
@@ -86,6 +88,7 @@ Common fields for all types:
 - `vector_metadata.text_for_embedding` and `vector_metadata.embedding_status` must be non-empty strings.
 - Fact ids must be unique.
 - `questions[0].answer_fact_ids` must reference existing fact ids.
+- For AI-native `history_factoid_mcq_4`, `answer_facts[*].facets.entity_subtype` is required and must align with the question subtype.
 
 ### JSON Contract Example (v2)
 ```json
@@ -215,6 +218,18 @@ Migration note:
 - `question` must follow: `Which event happened in <year>?`
 - `source.events_used` must contain exactly 4 entries.
 
+`history_factoid_mcq_4` requirements:
+- Exactly 4 choices.
+- Each choice includes `id`, `label`, and `answer_fact_id`; optional `human_id` uses `A<integer>`.
+- Choices must not include `year`.
+- `question` must end with `?`.
+- `questions[0].facets.question_format` must be `factoid`.
+- `questions[0].facets.answer_kind` must be one of `person|place|organization|work|object|time`.
+- `questions[0].facets.answer_subtype` must be a non-empty string.
+- `questions[0].facets.prompt_style` must be one of `who|where|when|what|which` and align with `answer_kind`.
+- `source.events_used` must contain exactly 4 entries.
+- If present, `source.page_sources` must contain exactly 4 entries aligned by `answer_fact_id` with `source.events_used`.
+
 ## Validation Rules
 - `date` must match the target UTC generation date (`YYYY-MM-DD`).
 - `topics` must equal `['history']`.
@@ -227,6 +242,7 @@ Migration note:
 - If present, `choices[*].human_id` and `answer_facts[*].human_id` must match `A<integer>` and align per `answer_fact_id`.
 - Source attribution must be present and non-empty.
 - `source.events_used` entries must include non-empty `event_id`, `text`, integer `year`, and non-empty `wikipedia_url`.
+- If present, `source.page_sources` entries must include non-empty `answer_fact_id`, `page_url`, `page_title`, and `retrieved_at`.
 - `generation.mode` must be `daily` when `generation.edition` is `1`.
 - `generation.edition` must be integer `>= 1`.
 - `generation.generated_at` must be UTC ISO-8601 with `Z`.

@@ -46,6 +46,21 @@ def _validate_history_source(source: dict[str, Any]) -> None:
         if not isinstance(wikipedia_url, str) or not wikipedia_url.strip():
             raise ValueError("source.events_used.wikipedia_url must be a non-empty string.")
 
+    page_sources = source.get("page_sources")
+    if page_sources is None:
+        return
+    if not isinstance(page_sources, list):
+        raise ValueError("source.page_sources must be a list when present.")
+    if len(page_sources) != len(events_used):
+        raise ValueError("source.page_sources must align 1:1 with source.events_used when present.")
+    for page_source in page_sources:
+        if not isinstance(page_source, dict):
+            raise ValueError("source.page_sources entries must be objects.")
+        for key in ("answer_fact_id", "page_url", "page_title", "retrieved_at"):
+            value = page_source.get(key)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"source.page_sources.{key} must be a non-empty string.")
+
 
 def _validate_geography_source(source: dict[str, Any]) -> None:
     records_used = source.get("records_used")
@@ -254,6 +269,13 @@ def _validate_questions(
     source_reference_ids = _source_reference_ids(quiz_type, source)
     if any(reference_id not in facts_by_id for reference_id in source_reference_ids):
         raise ValueError("source reference ids must reference existing answer_facts.")
+    page_sources = source.get("page_sources")
+    if isinstance(page_sources, list):
+        page_source_ids = [item.get("answer_fact_id") for item in page_sources if isinstance(item, dict)]
+        if any(not isinstance(item, str) or item not in facts_by_id for item in page_source_ids):
+            raise ValueError("source.page_sources answer_fact_id values must reference existing answer_facts.")
+        if page_source_ids != source_reference_ids:
+            raise ValueError("source.page_sources must align with source reference order.")
 
     questions = quiz.get("questions")
     if not isinstance(questions, list) or len(questions) != 1:
@@ -395,15 +417,23 @@ def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dic
     if facets.get("question_format") != "factoid":
         raise ValueError("history_factoid_mcq_4 facets.question_format must be 'factoid'.")
     answer_kind = facets.get("answer_kind")
+    answer_subtype = facets.get("answer_subtype")
     prompt_style = facets.get("prompt_style")
     allowed_pairs = {
-        "person": "who",
-        "place": "where",
-        "time": "when",
+        "person": {"who"},
+        "place": {"where"},
+        "organization": {"what", "which"},
+        "work": {"what", "which"},
+        "object": {"what", "which"},
+        "time": {"when", "what"},
     }
     if answer_kind not in allowed_pairs:
-        raise ValueError("history_factoid_mcq_4 facets.answer_kind must be one of person/place/time.")
-    if prompt_style != allowed_pairs[answer_kind]:
+        raise ValueError(
+            "history_factoid_mcq_4 facets.answer_kind must be one of person/place/organization/work/object/time."
+        )
+    if not isinstance(answer_subtype, str) or not answer_subtype.strip():
+        raise ValueError("history_factoid_mcq_4 facets.answer_subtype must be a non-empty string.")
+    if prompt_style not in allowed_pairs[answer_kind]:
         raise ValueError("history_factoid_mcq_4 facets.prompt_style must align with answer_kind.")
     if not question.strip().lower().startswith(prompt_style):
         raise ValueError("history_factoid_mcq_4 question text must align with facets.prompt_style.")
@@ -423,6 +453,8 @@ def validate_history_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dic
             raise ValueError("history_factoid_mcq_4 answer_facts facets must be objects.")
         if fact_facets.get("entity_type") != answer_kind:
             raise ValueError("history_factoid_mcq_4 answer_facts entity_type must align with answer_kind.")
+        if fact_facets.get("entity_subtype") != answer_subtype:
+            raise ValueError("history_factoid_mcq_4 answer_facts entity_subtype must align with answer_subtype.")
 
 
 def validate_geography_factoid_mcq_4_quiz(choices: list[dict[str, Any]], quiz: dict[str, Any]) -> None:

@@ -38,10 +38,11 @@ def build_factoid_answer_fact_id(
     *,
     answer_label: str,
     entity_type: str,
+    entity_subtype: str | None = None,
 ) -> str:
     key = (
         f"{source_event['year']}|{source_event['text']}|{source_event['wikipedia_url']}|"
-        f"{entity_type}|{answer_label.strip()}"
+        f"{entity_type}|{entity_subtype or ''}|{answer_label.strip()}"
     )
     return str(uuid.uuid5(ANSWER_FACT_NAMESPACE, key))
 
@@ -59,6 +60,7 @@ def build_answer_fact(
     fact_id: str | None = None,
     label: str | None = None,
     entity_type: str | None = None,
+    entity_subtype: str | None = None,
     embedding_text: str | None = None,
 ) -> dict[str, Any]:
     fact_id = fact_id or build_answer_fact_id(event)
@@ -73,6 +75,8 @@ def build_answer_fact(
     }
     if entity_type:
         facets["entity_type"] = entity_type
+    if entity_subtype:
+        facets["entity_subtype"] = entity_subtype
     return {
         "id": fact_id,
         "label": fact_label,
