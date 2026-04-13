@@ -29,6 +29,7 @@ from .constants import (
 from .discovery import write_discovery_artifacts
 from .factoid_pipeline import generate_ai_native_factoid_quiz, load_factoid_pipeline_settings
 from .geography import GEOGRAPHY_SOURCE_URL, load_geography_records
+from .popularity import enrich_history_candidates_with_popularity
 from .selection import build_seed, pick_history_mcq_distractor_pool
 from .source import build_api_url, extract_candidates, fetch_json
 from .quality import QualityRunStats, lint_quiz_payload
@@ -184,6 +185,50 @@ def _preferred_factoid_answer_kind(recent_kinds: list[str]) -> str | None:
     return "person"
 
 
+def _event_selection_key(event: dict[str, Any]) -> tuple[str, int, str] | None:
+    text = event.get("text")
+    year = event.get("year")
+    wikipedia_url = event.get("wikipedia_url")
+    if not isinstance(text, str) or not isinstance(year, int) or not isinstance(wikipedia_url, str):
+        return None
+    return (text, year, wikipedia_url)
+
+
+def _record_selected_popularity_scores(
+    *,
+    quiz: dict[str, Any],
+    candidates: list[dict[str, Any]],
+    quality_stats: QualityRunStats,
+) -> None:
+    by_key = {
+        key: candidate
+        for candidate in candidates
+        if (key := _event_selection_key(candidate)) is not None
+    }
+    source = quiz.get("source")
+    if not isinstance(source, dict):
+        return
+    events_used = source.get("events_used")
+    if not isinstance(events_used, list):
+        return
+
+    for event in events_used:
+        if not isinstance(event, dict):
+            continue
+        key = _event_selection_key(event)
+        if key is None:
+            continue
+        candidate = by_key.get(key)
+        if not isinstance(candidate, dict):
+            continue
+        popularity = candidate.get("popularity_signals")
+        if not isinstance(popularity, dict):
+            continue
+        score = popularity.get("popularity_score")
+        if isinstance(score, (int, float)):
+            quality_stats.add_selected_popularity_score(float(score))
+
+
 def _write_quality_report(report_path: str | None, *, quality_stats: QualityRunStats, date_utc: str) -> None:
     if not report_path:
         return
@@ -236,6 +281,32 @@ def main() -> int:
             history_source_url = build_api_url(target_date)
             source_payload = fetch_json(history_source_url, timeout=args.timeout, retries=args.retries)
             history_candidates = extract_candidates(source_payload)
+            try:
+                history_candidates, popularity_report = enrich_history_candidates_with_popularity(
+                    candidates=history_candidates,
+                    target_date=target_date,
+                    timeout=args.timeout,
+                    retries=args.retries,
+                )
+            except Exception as exc:  # noqa: BLE001
+                quality_stats.add_popularity_enrichment(
+                    enriched_count=0,
+                    neutral_count=len(history_candidates),
+                )
+                quality_stats.add_popularity_fallback_reason(f"enrichment_failed:{type(exc).__name__}")
+                print(f"Popularity enrichment fallback for history candidates: {type(exc).__name__}")
+            else:
+                quality_stats.add_popularity_enrichment(
+                    enriched_count=int(popularity_report.get("enriched_count", 0)),
+                    neutral_count=int(popularity_report.get("neutral_count", 0)),
+                )
+                fallback_reasons = popularity_report.get("fallback_reasons")
+                if isinstance(fallback_reasons, dict):
+                    for reason, count in fallback_reasons.items():
+                        if not isinstance(reason, str):
+                            continue
+                        for _ in range(max(0, int(count))):
+                            quality_stats.add_popularity_fallback_reason(reason)
         if any(quiz_type == QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4 for quiz_type, _, _ in pending):
             geography_source_url = GEOGRAPHY_SOURCE_URL
             geography_candidates = load_geography_records()
@@ -369,6 +440,12 @@ def main() -> int:
 
             validate_quiz(quiz, target_date)
             generated.append((quiz_type, edition, output_path, quiz))
+            if quiz_type != QUIZ_TYPE_GEOGRAPHY_FACTOID_MCQ_4 and history_candidates is not None:
+                _record_selected_popularity_scores(
+                    quiz=quiz,
+                    candidates=history_candidates,
+                    quality_stats=quality_stats,
+                )
 
             questions = quiz.get("questions")
             answer_facts = quiz.get("answer_facts")

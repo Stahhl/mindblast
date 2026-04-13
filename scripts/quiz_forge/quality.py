@@ -231,6 +231,11 @@ class QualityRunStats:
     ai_distractor_rejection_lints: dict[str, int] = field(default_factory=dict)
     ai_stage_failures: dict[str, int] = field(default_factory=dict)
     page_context_fetch_count: int = 0
+    popularity_enriched_count: int = 0
+    popularity_neutral_count: int = 0
+    popularity_fallback_reasons: dict[str, int] = field(default_factory=dict)
+    selected_popularity_score_total: float = 0.0
+    selected_popularity_score_count: int = 0
 
     def add_issues(self, issues: tuple[str, ...]) -> None:
         for issue in issues:
@@ -258,7 +263,24 @@ class QualityRunStats:
     def add_page_context_fetches(self, count: int) -> None:
         self.page_context_fetch_count += max(0, count)
 
+    def add_popularity_enrichment(self, *, enriched_count: int, neutral_count: int) -> None:
+        self.popularity_enriched_count += max(0, enriched_count)
+        self.popularity_neutral_count += max(0, neutral_count)
+
+    def add_popularity_fallback_reason(self, reason: str) -> None:
+        self.popularity_fallback_reasons[reason] = self.popularity_fallback_reasons.get(reason, 0) + 1
+
+    def add_selected_popularity_score(self, score: float) -> None:
+        bounded = max(0.0, min(1.0, float(score)))
+        self.selected_popularity_score_total += bounded
+        self.selected_popularity_score_count += 1
+
     def to_report_payload(self) -> dict[str, Any]:
+        average_selected_popularity_score = (
+            self.selected_popularity_score_total / self.selected_popularity_score_count
+            if self.selected_popularity_score_count
+            else None
+        )
         return {
             "lint_failure_count": sum(self.lint_failures.values()),
             "lint_failures": [f"{code}:{count}" for code, count in sorted(self.lint_failures.items())],
@@ -276,4 +298,10 @@ class QualityRunStats:
             ],
             "ai_stage_failures": [f"{code}:{count}" for code, count in sorted(self.ai_stage_failures.items())],
             "page_context_fetch_count": self.page_context_fetch_count,
+            "popularity_enriched_count": self.popularity_enriched_count,
+            "popularity_neutral_count": self.popularity_neutral_count,
+            "popularity_fallback_reasons": [
+                f"{code}:{count}" for code, count in sorted(self.popularity_fallback_reasons.items())
+            ],
+            "selected_popularity_score_avg": average_selected_popularity_score,
         }

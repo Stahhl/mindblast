@@ -14,6 +14,7 @@ from .builders import _build_history_factoid_typed_quiz
 from .constants import AI_MODE_ON, AI_MODE_SHADOW
 from .model import build_answer_fact_id, build_factoid_answer_fact_id
 from .quality import QualityRunStats
+from .selection import candidate_selection_score, order_history_candidates_for_selection
 from .source import fetch_wikipedia_page_summary
 
 _ALNUM_TOKEN_RE = re.compile(r"[a-z0-9]+")
@@ -143,12 +144,6 @@ def load_factoid_pipeline_settings(default_model: str) -> FactoidPipelineSetting
     )
 
 
-def _page_context_sort_key(seed: int, event: dict[str, Any]) -> str:
-    return hashlib.sha256(
-        f"{seed}:{event['year']}:{event['text']}:{event['wikipedia_url']}".encode("utf-8")
-    ).hexdigest()
-
-
 def _build_page_contexts(
     *,
     candidates: list[dict[str, Any]],
@@ -159,7 +154,7 @@ def _build_page_contexts(
     retries: int,
     quality_stats: QualityRunStats | None,
 ) -> tuple[list[dict[str, Any]], str | None]:
-    ordered = sorted(candidates, key=lambda item: _page_context_sort_key(seed, item))
+    ordered = order_history_candidates_for_selection(candidates, seed)
     page_contexts: list[dict[str, Any]] = []
 
     for event in ordered:
@@ -416,9 +411,22 @@ def _eligible_groups(
     return eligible
 
 
-def _candidate_rank_key(seed: int, candidate: dict[str, Any]) -> tuple[float, str]:
+def _candidate_rank_key(seed: int, candidate: dict[str, Any]) -> tuple[float, float, str]:
     tie_break = hashlib.sha256(f"{seed}:{candidate['candidate_id']}".encode("utf-8")).hexdigest()
-    return (-float(candidate["quality_score"]), tie_break)
+    source_event = candidate.get("source_event")
+    selection_score = 0.5
+    if isinstance(source_event, dict):
+        selection_score = candidate_selection_score(seed, source_event)
+    return (-float(candidate["quality_score"]), -selection_score, tie_break)
+
+
+def _group_rank_key(
+    seed: int,
+    item: tuple[tuple[str, str], list[dict[str, Any]]],
+) -> tuple[tuple[float, float, str], tuple[str, str]]:
+    group_key, group = item
+    best_candidate = min(group, key=lambda candidate: _candidate_rank_key(seed, candidate))
+    return _candidate_rank_key(seed, best_candidate), group_key
 
 
 def _select_candidate_group(
@@ -436,12 +444,14 @@ def _select_candidate_group(
     else:
         preferred_groups = []
     candidate_groups = preferred_groups or eligible
-    selected_key, group = candidate_groups[seed % len(candidate_groups)]
-    del selected_key
+    ordered_groups = sorted(candidate_groups, key=lambda item: _group_rank_key(seed, item))
+    group = ordered_groups[0][1]
 
     ordered_group = sorted(group, key=lambda item: _candidate_rank_key(seed, item))
     correct_candidate = ordered_group[0]
-    distractor_pool = [candidate for candidate in ordered_group[1:] if candidate["candidate_id"] != correct_candidate["candidate_id"]]
+    distractor_pool = [
+        candidate for candidate in ordered_group[1:] if candidate["candidate_id"] != correct_candidate["candidate_id"]
+    ]
     return correct_candidate, distractor_pool
 
 

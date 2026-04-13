@@ -882,6 +882,114 @@ def test_cli_reuses_existing_human_ids_on_rerun(monkeypatch, tmp_path) -> None:
     assert second_lookup["question_uuid_to_human_id"][first_question_id] == first_question_human_id
 
 
+def test_cli_records_popularity_metrics_for_all_history_types(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+    report_path = tmp_path / "ai-report.json"
+
+    def fake_enrich(*, candidates, **_kwargs):  # noqa: ANN001
+        enriched = []
+        scores = [0.95, 0.82, 0.68, 0.54, 0.4, 0.28, 0.16, 0.08]
+        for candidate, score in zip(candidates, scores):
+            enriched.append(
+                dict(candidate)
+                | {
+                    "page_title": candidate["text"].replace(" ", "_"),
+                    "popularity_signals": {
+                        "page_title": candidate["text"].replace(" ", "_"),
+                        "pageviews_total_365d": int(score * 1000),
+                        "pageviews_median_90d": score * 10,
+                        "edits_total_365d": int(score * 100),
+                        "pageviews_percentile": score,
+                        "edits_percentile": score,
+                        "popularity_score": score,
+                        "popularity_status": "ok",
+                    },
+                }
+            )
+        return enriched, {"enriched_count": len(enriched), "neutral_count": 0, "fallback_reasons": {}}
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setattr(cli, "enrich_history_candidates_with_popularity", fake_enrich)
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", report_path.as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="which_came_first,history_mcq_4,history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    for quiz_type in ("which_came_first", "history_mcq_4", "history_factoid_mcq_4"):
+        records = list_quiz_records_for_date_type(
+            output_dir=output_dir,
+            target_date=dt.date.fromisoformat(target_date),
+            quiz_type=quiz_type,
+        )
+        assert len(records) == 1
+        assert any(event["text"] == "Event A" for event in records[0].payload["source"]["events_used"])
+
+    report_payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report_payload["quality"]["popularity_enriched_count"] == 8
+    assert report_payload["quality"]["popularity_neutral_count"] == 0
+    assert report_payload["quality"]["popularity_fallback_reasons"] == []
+    assert isinstance(report_payload["quality"]["selected_popularity_score_avg"], float)
+    assert report_payload["quality"]["selected_popularity_score_avg"] > 0.0
+
+
+def test_cli_popularity_enrichment_failure_falls_back_cleanly(monkeypatch, tmp_path) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+    report_path = tmp_path / "ai-report.json"
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setattr(
+        cli,
+        "enrich_history_candidates_with_popularity",
+        lambda **_kwargs: (_ for _ in ()).throw(TimeoutError("metadata timeout")),
+    )
+    monkeypatch.setenv("AI_MODE", "off")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", report_path.as_posix())
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    records = list_quiz_records_for_date_type(
+        output_dir=output_dir,
+        target_date=dt.date.fromisoformat(target_date),
+        quiz_type="history_mcq_4",
+    )
+    assert len(records) == 1
+
+    report_payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report_payload["quality"]["popularity_enriched_count"] == 0
+    assert report_payload["quality"]["popularity_neutral_count"] == len(_sample_candidates())
+    assert "enrichment_failed:TimeoutError:1" in report_payload["quality"]["popularity_fallback_reasons"]
+
+
 def test_cli_backfills_human_ids_for_existing_quizzes(monkeypatch, tmp_path) -> None:
     from quiz_forge import cli
 
@@ -1066,6 +1174,125 @@ def test_cli_applies_factoid_ai_pipeline_when_enabled(monkeypatch, tmp_path, moc
     assert payload["questions"][0]["facets"]["answer_kind"] == "organization"
     assert payload["questions"][0]["facets"]["answer_subtype"] == "band"
     assert len(payload["source"]["page_sources"]) == 4
+
+
+def test_ai_native_factoid_page_contexts_prefer_more_popular_pages(monkeypatch, tmp_path, mocker) -> None:
+    from quiz_forge import cli
+
+    target_date = "2026-02-26"
+    output_dir = (tmp_path / "quizzes").as_posix()
+    first_page_title: list[str] = []
+
+    def fake_enrich(*, candidates, **_kwargs):  # noqa: ANN001
+        scores_by_url = {
+            "https://example.com/a": 0.95,
+            "https://example.com/b": 0.45,
+            "https://example.com/c": 0.35,
+            "https://example.com/d": 0.25,
+            "https://example.com/e": 0.15,
+            "https://example.com/f": 0.1,
+            "https://example.com/g": 0.05,
+            "https://example.com/h": 0.02,
+        }
+        enriched = []
+        for candidate in candidates:
+            score = scores_by_url[candidate["wikipedia_url"]]
+            enriched.append(
+                dict(candidate)
+                | {
+                    "popularity_signals": {
+                        "page_title": candidate["text"].replace(" ", "_"),
+                        "pageviews_total_365d": int(score * 1000),
+                        "pageviews_median_90d": score * 10,
+                        "edits_total_365d": int(score * 100),
+                        "pageviews_percentile": score,
+                        "edits_percentile": score,
+                        "popularity_score": score,
+                        "popularity_status": "ok",
+                    }
+                }
+            )
+        return enriched, {"enriched_count": len(enriched), "neutral_count": 0, "fallback_reasons": {}}
+
+    monkeypatch.setattr(cli, "fetch_json", lambda *_args, **_kwargs: {"events": []})
+    monkeypatch.setattr(cli, "extract_candidates", lambda _payload: _sample_candidates())
+    monkeypatch.setattr(cli, "enrich_history_candidates_with_popularity", fake_enrich)
+    monkeypatch.setattr(
+        "quiz_forge.factoid_pipeline.fetch_wikipedia_page_summary",
+        lambda page_url, **_kwargs: _page_summary_payload_for_url(page_url),
+    )
+    monkeypatch.setenv("AI_MODE", "on")
+    monkeypatch.setenv("AI_PROVIDER", "openai")
+    monkeypatch.setenv("AI_MODEL", "gpt-5-mini")
+    monkeypatch.setenv("AI_MAX_CALLS_PER_RUN", "8")
+    monkeypatch.setenv("FACTOID_AI_PIPELINE_ENABLED", "true")
+    monkeypatch.setenv("QUIZ_FORGE_AI_REPORT_PATH", (tmp_path / "ai-report.json").as_posix())
+
+    def fake_run_json_task(*args, **kwargs) -> AIJsonTaskResponse:  # noqa: ANN002,ANN003
+        del args
+        user_payload = kwargs["user_payload"]
+        task = user_payload.get("task")
+        if task == "factoid_page_candidate_generate":
+            first_page_title.append(user_payload["page_contexts"][0]["page_title"])
+            prompts = {
+                "The Beatles": "Which band made Paul McCartney famous worldwide?",
+                "Wings": "Which band did Paul McCartney form after the Beatles together with Linda McCartney and Denny Laine?",
+                "The Quarrymen": "Which skiffle group did Paul McCartney join in 1957 before it evolved into the Beatles?",
+                "The Who": "Which English rock band released the rock opera Tommy?",
+            }
+            payload = {
+                "candidates": [
+                    {
+                        "page_context_id": page_context["page_context_id"],
+                        "question": prompts[page_context["page_title"]],
+                        "correct_answer": page_context["page_title"],
+                        "answer_kind": "organization",
+                        "answer_subtype": "band",
+                        "prompt_style": "which",
+                        "evidence_text": page_context["page_extract"],
+                        "score": 0.95,
+                    }
+                    for page_context in user_payload["page_contexts"]
+                    if page_context["page_title"] in prompts
+                ]
+            }
+        elif task == "factoid_distractor_select":
+            payload = {
+                "selected_distractor_ids": [
+                    candidate["candidate_id"] for candidate in user_payload["distractor_candidates"][:3]
+                ]
+            }
+        elif task == "factoid_final_judge":
+            payload = {"final_score": 0.99, "publishable": True}
+        else:
+            raise AssertionError(f"Unexpected task: {task}")
+
+        return AIJsonTaskResponse(
+            payload=payload,
+            provider="openai",
+            model="gpt-5-mini",
+            usage=AIUsage(input_tokens=20, output_tokens=10, estimated_cost_usd=0.0),
+        )
+
+    mocker.patch(
+        "quiz_forge.ai.providers.openai.OpenAIProvider.run_json_task",
+        side_effect=fake_run_json_task,
+    )
+
+    args = argparse.Namespace(
+        date=target_date,
+        quiz_types="history_factoid_mcq_4",
+        output_dir=output_dir,
+        timeout=1,
+        retries=1,
+        mode="daily",
+        count=1,
+        daily_editions_by_type="which_came_first=1,history_mcq_4=1,history_factoid_mcq_4=1",
+    )
+    monkeypatch.setattr(cli, "parse_args", lambda: args)
+    assert cli.main() == 0
+
+    assert first_page_title == ["The Beatles"]
 
 
 def test_cli_applies_ai_factoid_candidate_for_person_question(monkeypatch, tmp_path, mocker) -> None:
@@ -1495,26 +1722,31 @@ def test_build_history_mcq_4_quiz_retries_when_first_correct_choice_leaks_target
             "text": "Economist is sworn in during the 2010 earthquake ceremony.",
             "year": 2010,
             "wikipedia_url": "https://example.com/leaky-2010",
+            "popularity_signals": {"popularity_score": 0.95, "popularity_status": "ok"},
         },
         {
             "text": "A constitution is signed after months of negotiations.",
             "year": 1919,
             "wikipedia_url": "https://example.com/1919",
+            "popularity_signals": {"popularity_score": 0.55, "popularity_status": "ok"},
         },
         {
             "text": "A fleet reaches port after a long voyage.",
             "year": 1888,
             "wikipedia_url": "https://example.com/1888",
+            "popularity_signals": {"popularity_score": 0.4, "popularity_status": "ok"},
         },
         {
             "text": "A treaty is ratified by the senate.",
             "year": 1935,
             "wikipedia_url": "https://example.com/1935",
+            "popularity_signals": {"popularity_score": 0.3, "popularity_status": "ok"},
         },
         {
             "text": "A republic declares independence from a neighboring empire.",
             "year": 1991,
             "wikipedia_url": "https://example.com/1991",
+            "popularity_signals": {"popularity_score": 0.2, "popularity_status": "ok"},
         },
     ]
     quality_stats = QualityRunStats()

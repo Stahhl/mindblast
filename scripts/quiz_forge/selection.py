@@ -15,20 +15,62 @@ def build_seed(target_date: dt.date, quiz_type: str, edition: int) -> int:
     return int(hashlib.sha256(key.encode("utf-8")).hexdigest(), 16)
 
 
+def _candidate_key(event: dict[str, Any]) -> tuple[str, int, str]:
+    return (str(event["text"]), int(event["year"]), str(event["wikipedia_url"]))
+
+
+def _candidate_popularity_payload(event: dict[str, Any]) -> dict[str, Any]:
+    payload = event.get("popularity_signals")
+    if isinstance(payload, dict):
+        return payload
+    return {}
+
+
+def _has_non_neutral_popularity(candidates: list[dict[str, Any]]) -> bool:
+    for candidate in candidates:
+        status = _candidate_popularity_payload(candidate).get("popularity_status")
+        if status == "ok":
+            return True
+    return False
+
+
+def _seeded_random_score(seed: int, event: dict[str, Any]) -> float:
+    digest = hashlib.sha256(
+        f"{seed}:{event['year']}:{event['text']}:{event['wikipedia_url']}".encode("utf-8")
+    ).digest()
+    value = int.from_bytes(digest[:8], byteorder="big", signed=False)
+    return value / ((1 << 64) - 1)
+
+
+def candidate_selection_score(seed: int, event: dict[str, Any]) -> float:
+    popularity = _candidate_popularity_payload(event)
+    popularity_score = popularity.get("popularity_score")
+    if not isinstance(popularity_score, (int, float)):
+        popularity_score = 0.5
+    return (0.7 * float(popularity_score)) + (0.3 * _seeded_random_score(seed, event))
+
+
+def order_history_candidates_for_selection(candidates: list[dict[str, Any]], seed: int) -> list[dict[str, Any]]:
+    if not _has_non_neutral_popularity(candidates):
+        return sorted(candidates, key=lambda item: (item["year"], item["text"]))
+    return sorted(
+        candidates,
+        key=lambda item: (
+            -candidate_selection_score(seed, item),
+            item["year"],
+            item["text"],
+            item["wikipedia_url"],
+        ),
+    )
+
+
 def pick_two_events(candidates: list[dict[str, Any]], seed: int) -> tuple[dict[str, Any], dict[str, Any]]:
     if len(candidates) < 2:
         raise ValueError("Not enough valid events to build a question.")
 
-    ordered = sorted(candidates, key=lambda item: (item["year"], item["text"]))
-    first_idx = seed % len(ordered)
-    step = (seed % (len(ordered) - 1)) + 1
-
-    for offset in range(len(ordered) - 1):
-        second_idx = (first_idx + step + offset) % len(ordered)
-        if second_idx == first_idx:
-            continue
-        first = ordered[first_idx]
-        second = ordered[second_idx]
+    ordered = order_history_candidates_for_selection(candidates, seed)
+    first = ordered[0]
+    for second in ordered[1:]:
         if first["year"] != second["year"]:
             return first, second
 
@@ -72,10 +114,10 @@ def pick_history_mcq_distractor_pool(
     if len(candidates) < 4:
         raise ValueError("Not enough valid events to build a 4-option history MCQ.")
 
-    ordered = sorted(candidates, key=lambda item: (item["year"], item["text"]))
+    ordered = order_history_candidates_for_selection(candidates, seed)
     if correct_event is None:
-        correct_idx = seed % len(ordered)
-        correct = ordered[correct_idx]
+        correct_idx = 0
+        correct = ordered[0]
     else:
         key = (correct_event["text"], correct_event["year"], correct_event["wikipedia_url"])
         indexed_ordered = {
@@ -87,7 +129,6 @@ def pick_history_mcq_distractor_pool(
             raise ValueError("Requested correct event is not present in candidate pool.")
         correct_idx, correct = match
 
-    step = (seed % (len(ordered) - 1)) + 1
     distractors: list[dict[str, Any]] = []
     distractor_years: set[int] = set()
     by_key = {
@@ -116,12 +157,9 @@ def pick_history_mcq_distractor_pool(
             if len(distractors) == max_distractors:
                 break
 
-    for offset in range(len(ordered)):
-        idx = (correct_idx + step + offset) % len(ordered)
-        if idx == correct_idx:
+    for idx, event in enumerate(ordered):
+        if event is correct or idx == correct_idx:
             continue
-
-        event = ordered[idx]
         if event in distractors:
             continue
         if event["year"] == correct["year"]:
@@ -146,16 +184,7 @@ def iter_history_mcq_correct_events(
 ) -> list[dict[str, Any]]:
     if len(candidates) < 4:
         raise ValueError("Not enough valid events to build a 4-option history MCQ.")
-    ordered = sorted(candidates, key=lambda item: (item["year"], item["text"]))
-    first_idx = seed % len(ordered)
-    step = (seed % (len(ordered) - 1)) + 1
-    indices = [first_idx]
-    for offset in range(len(ordered) - 1):
-        idx = (first_idx + step + offset) % len(ordered)
-        if idx in indices:
-            continue
-        indices.append(idx)
-    return [ordered[index] for index in indices]
+    return order_history_candidates_for_selection(candidates, seed)
 
 
 _PERSON_CONNECTORS = {
@@ -589,24 +618,32 @@ def _pick_factoid_candidates_of_kind(
     *,
     correct_index_offset: int = 0,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    ordered = _unique_factoid_candidates(extracted_candidates)
+    unique_candidates = _unique_factoid_candidates(extracted_candidates)
+    if _has_non_neutral_popularity([candidate["source_event"] for candidate in unique_candidates]):
+        ordered = sorted(
+            unique_candidates,
+            key=lambda candidate: (
+                -candidate_selection_score(seed, candidate["source_event"]),
+                candidate["answer_label"].casefold(),
+                candidate["source_event"]["year"],
+                candidate["source_event"]["text"],
+            ),
+        )
+    else:
+        ordered = unique_candidates
 
     if not ordered:
         raise ValueError("No eligible factoid candidates found.")
 
-    correct_idx = (seed + correct_index_offset) % len(ordered)
+    correct_idx = min(correct_index_offset, len(ordered) - 1)
     correct = ordered[correct_idx]
-
-    step = (seed % (len(ordered) - 1)) + 1
     distractors: list[dict[str, Any]] = []
     seen_labels = {correct["answer_label"].casefold()}
     seen_candidate_ids = {_factoid_candidate_id(correct)}
 
-    for offset in range(len(ordered)):
-        idx = (correct_idx + step + offset) % len(ordered)
+    for idx, candidate in enumerate(ordered):
         if idx == correct_idx:
             continue
-        candidate = ordered[idx]
         candidate_id = _factoid_candidate_id(candidate)
         answer_label = candidate["answer_label"].casefold()
         if answer_label in seen_labels or candidate_id in seen_candidate_ids:
@@ -687,11 +724,23 @@ def build_history_factoid_distractors_for_candidate(
     )
     if len({candidate["answer_label"].casefold() for candidate in distractor_pool}) < 3:
         raise ValueError(f"Not enough valid {answer_kind} distractors for history_factoid_mcq_4.")
-
-    _, distractors = _pick_factoid_candidates_of_kind([correct_candidate, *distractor_pool], seed)
+    unique_pool = _unique_factoid_candidates(distractor_pool)
+    if _has_non_neutral_popularity([candidate["source_event"] for candidate in unique_pool]):
+        ordered_pool = sorted(
+            unique_pool,
+            key=lambda candidate: (
+                -candidate_selection_score(seed, candidate["source_event"]),
+                candidate["answer_label"].casefold(),
+                candidate["source_event"]["year"],
+                candidate["source_event"]["text"],
+            ),
+        )
+    else:
+        ordered_pool = unique_pool
+    distractors = ordered_pool[:3]
     if len(distractors) < 3:
         raise ValueError(f"Could not pick three distinct {answer_kind} distractors for history_factoid_mcq_4.")
-    return distractors[:3]
+    return distractors
 
 
 def pick_history_factoid_typed_candidates(

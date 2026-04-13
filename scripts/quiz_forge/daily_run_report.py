@@ -21,6 +21,10 @@ _EMPTY_QUALITY_PAYLOAD: dict[str, Any] = {
     "ai_distractor_rejection_lints": [],
     "ai_stage_failures": [],
     "page_context_fetch_count": 0,
+    "popularity_enriched_count": 0,
+    "popularity_neutral_count": 0,
+    "popularity_fallback_reasons": [],
+    "selected_popularity_score_avg": None,
 }
 
 _EMPTY_AI_PAYLOAD: dict[str, Any] = {
@@ -151,6 +155,14 @@ def render_daily_run_discord_message(report: dict[str, Any]) -> str:
                 f"  ai distractor rejection lints: {', '.join(quality.get('ai_distractor_rejection_lints') or []) or 'none'}",
                 f"  ai stage failures: {', '.join(quality.get('ai_stage_failures') or []) or 'none'}",
                 f"  page contexts fetched: {quality.get('page_context_fetch_count', 0)}",
+                f"  popularity enriched/neutral: {quality.get('popularity_enriched_count', 0)}/{quality.get('popularity_neutral_count', 0)}",
+                f"  popularity fallbacks: {', '.join(quality.get('popularity_fallback_reasons') or []) or 'none'}",
+                "  selected popularity avg: "
+                + (
+                    f"{quality.get('selected_popularity_score_avg'):.3f}"
+                    if isinstance(quality.get("selected_popularity_score_avg"), (int, float))
+                    else "n/a"
+                ),
                 f"  ai quality rejections: {quality.get('ai_quality_rejection_count', 0)}",
             ]
         )

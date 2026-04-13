@@ -69,6 +69,12 @@ def test_build_daily_run_report_uses_raw_ai_payload_and_renders_discord_text(tmp
                     "ai_quality_rejection_count": 1,
                     "typed_candidate_rejections": ["factoid_typed_candidate_review_no_supported_candidates:1"],
                     "ai_distractor_rejection_lints": ["mixed_entity_types:1"],
+                    "ai_stage_failures": ["page_context_fetch_failed:1"],
+                    "page_context_fetch_count": 4,
+                    "popularity_enriched_count": 7,
+                    "popularity_neutral_count": 1,
+                    "popularity_fallback_reasons": ["TimeoutError:1"],
+                    "selected_popularity_score_avg": 0.812,
                 },
             }
         )
@@ -117,6 +123,9 @@ def test_build_daily_run_report_uses_raw_ai_payload_and_renders_discord_text(tmp
     assert "quality:" in report["discord_message_text"]
     assert "typed candidate rejections: factoid_typed_candidate_review_no_supported_candidates:1" in report["discord_message_text"]
     assert "ai distractor rejection lints: mixed_entity_types:1" in report["discord_message_text"]
+    assert "popularity enriched/neutral: 7/1" in report["discord_message_text"]
+    assert "popularity fallbacks: TimeoutError:1" in report["discord_message_text"]
+    assert "selected popularity avg: 0.812" in report["discord_message_text"]
     assert "artifacts:" in report["discord_message_text"]
     assert "mode/count: extra/2" in report["discord_message_text"]
     assert (
