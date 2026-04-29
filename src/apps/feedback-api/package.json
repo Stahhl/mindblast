@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@google-cloud/functions-framework": "^5.0.2",
     "firebase-admin": "^13.8.0",
     "firebase-functions": "^7.2.5"
   },
@@ -25,6 +26,7 @@
       "fast-xml-parser": "5.7.0",
       "node-forge": "1.4.0",
       "path-to-regexp@<0.1.13": "0.1.13",
+      "router>path-to-regexp": "8.4.0",
       "protobufjs": "7.5.5",
       "uuid": "14.0.0"
     }
