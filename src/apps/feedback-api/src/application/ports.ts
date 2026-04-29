@@ -1,4 +1,9 @@
 import type { FeedbackRecord, SubmitFeedbackMode } from "../domain/feedback";
+import type {
+  UserFeedbackDraftRecord,
+  UserFeedbackSubmissionState,
+  UserQuizAnswerRecord,
+} from "../domain/user_state";
 
 export interface ClockPort {
   nowIsoUtc(): string;
@@ -11,6 +16,14 @@ export interface IdGeneratorPort {
 
 export interface FeedbackRepositoryPort {
   upsertById(feedbackId: string, record: FeedbackRecord): Promise<{ mode: SubmitFeedbackMode }>;
+}
+
+export interface UserStateRepositoryPort {
+  listQuizAnswers(input: { authUid: string; date: string }): Promise<UserQuizAnswerRecord[]>;
+  upsertQuizAnswer(record: UserQuizAnswerRecord): Promise<void>;
+  listFeedbackDrafts(input: { authUid: string; questionIds: string[] }): Promise<UserFeedbackDraftRecord[]>;
+  upsertFeedbackDraft(record: UserFeedbackDraftRecord): Promise<void>;
+  listFeedbackSubmissions(input: { authUid: string; questionIds: string[] }): Promise<UserFeedbackSubmissionState[]>;
 }
 
 export interface RateLimitCheck {

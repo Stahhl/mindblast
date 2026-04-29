@@ -64,6 +64,16 @@ Minimum guardrails for both environments:
 4. Emergency kill-switch documented and tested.
 5. No long-lived secrets committed to git.
 
+## Signed-In Persistence Posture
+
+Phase 10 cross-device persistence reuses the existing `/api/**` Hosting rewrite and `quizFeedbackApi` Firebase Function. This does not add a new public backend surface, but it does add authenticated `GET`/`PUT` routes under the same billable function and therefore inherits the current Auth, App Check, origin, rate-limit, and kill-switch requirements.
+
+Firestore direct client reads/writes remain denied for:
+- `user_quiz_state`
+- `user_feedback_drafts`
+
+These collections store only minimal identifiers and user state. They must not duplicate quiz/source text or attribution payloads.
+
 ## Change Management Rules
 
 When changing environment exposure, IAM, or routing:

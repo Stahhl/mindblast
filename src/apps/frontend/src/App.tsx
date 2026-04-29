@@ -5,6 +5,12 @@ import { createFeedbackAuthClient } from "./lib/auth/createAuthClient";
 import type { FeedbackAuthSnapshot } from "./lib/auth/types";
 import { loadDailyQuizzes } from "./lib/quizApi";
 import type { LoadedQuiz } from "./lib/types";
+import {
+  loadUserQuizState,
+  persistUserQuizState,
+  type UserFeedbackDraftState,
+  type UserFeedbackSubmissionState,
+} from "./lib/userStateApi";
 
 type Status = "loading" | "ready" | "error";
 type AnswerMap = Record<string, string>;
@@ -86,6 +92,9 @@ export default function App() {
   const [errorsByType, setErrorsByType] = useState<Map<string, string>>(new Map());
   const [fatalError, setFatalError] = useState<string>("");
   const [answers, setAnswers] = useState<AnswerMap>({});
+  const [feedbackDrafts, setFeedbackDrafts] = useState<Record<string, UserFeedbackDraftState>>({});
+  const [feedbackSubmissions, setFeedbackSubmissions] = useState<Record<string, UserFeedbackSubmissionState>>({});
+  const [persistenceMessage, setPersistenceMessage] = useState<string>("");
   const feedbackAuthClient = useMemo(() => createFeedbackAuthClient(), []);
   const [feedbackAuthSnapshot, setFeedbackAuthSnapshot] = useState<FeedbackAuthSnapshot>(() =>
     feedbackAuthClient.getSnapshot(),
@@ -159,6 +168,57 @@ export default function App() {
     localStorage.setItem(makeStorageKey(date), JSON.stringify(answers));
   }, [answers, date]);
 
+  useEffect(() => {
+    if (!date || !quizzes.length || feedbackAuthSnapshot.status !== "authenticated") {
+      setFeedbackDrafts({});
+      setFeedbackSubmissions({});
+      return;
+    }
+
+    let cancelled = false;
+    const questionIds = quizzes
+      .map((quiz) => quiz.payload.questions?.[0]?.id)
+      .filter((questionId): questionId is string => Boolean(questionId));
+
+    async function syncRemoteState(): Promise<void> {
+      try {
+        const headers = await feedbackAuthClient.getFeedbackRequestHeaders();
+        const remoteState = await loadUserQuizState(date, questionIds, headers);
+        if (cancelled) {
+          return;
+        }
+
+        const answersByQuestionId = new Map(remoteState.answers.map((answer) => [answer.question_id, answer]));
+        setAnswers((previous) => {
+          const next = { ...previous };
+          quizzes.forEach((quiz) => {
+            const questionId = quiz.payload.questions?.[0]?.id;
+            const remoteAnswer = questionId ? answersByQuestionId.get(questionId) : undefined;
+            if (remoteAnswer?.selected_choice_id) {
+              next[quiz.key] = remoteAnswer.selected_choice_id;
+            }
+          });
+          return next;
+        });
+        setFeedbackDrafts(Object.fromEntries(remoteState.feedback_drafts.map((draft) => [draft.question_id, draft])));
+        setFeedbackSubmissions(
+          Object.fromEntries(remoteState.feedback_submissions.map((submission) => [submission.question_id, submission])),
+        );
+        setPersistenceMessage("");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (!cancelled) {
+          setPersistenceMessage(`Could not sync saved progress: ${message}`);
+        }
+      }
+    }
+
+    void syncRemoteState();
+    return () => {
+      cancelled = true;
+    };
+  }, [date, feedbackAuthClient, feedbackAuthSnapshot.status, quizzes]);
+
   async function refresh(targetDate?: string): Promise<void> {
     setStatus("loading");
     setFatalError("");
@@ -229,12 +289,88 @@ export default function App() {
   }, []);
 
   function onSelectChoice(quizKey: string, choiceId: string): void {
+    const selectedQuiz = quizzes.find((quiz) => quiz.key === quizKey);
     setAnswers((previous) => {
       if (previous[quizKey]) {
         return previous;
       }
       return { ...previous, [quizKey]: choiceId };
     });
+    if (feedbackAuthSnapshot.status !== "authenticated" || !selectedQuiz) {
+      return;
+    }
+    const question = selectedQuiz.payload.questions?.[0];
+    if (!question?.id || !question.human_id) {
+      return;
+    }
+    void (async () => {
+      try {
+        const headers = await feedbackAuthClient.getFeedbackRequestHeaders();
+        await persistUserQuizState(
+          {
+            quiz_file: selectedQuiz.sourcePath,
+            date: selectedQuiz.payload.date,
+            quiz_type: selectedQuiz.payload.type,
+            edition: selectedQuiz.edition,
+            question_id: question.id,
+            question_human_id: question.human_id,
+            selected_choice_id: choiceId,
+          },
+          headers,
+        );
+        setPersistenceMessage("");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setPersistenceMessage(`Could not save progress: ${message}`);
+      }
+    })();
+  }
+
+  function onFeedbackDraftChange(input: {
+    quiz: LoadedQuiz["payload"];
+    quizFile: string;
+    edition: number;
+    questionId: string;
+    questionHumanId: string;
+    rating?: number;
+    comment: string;
+  }): void {
+    if (feedbackAuthSnapshot.status !== "authenticated") {
+      return;
+    }
+    setFeedbackDrafts((previous) => ({
+      ...previous,
+      [input.questionId]: {
+        question_id: input.questionId,
+        ...(input.rating !== undefined ? { rating: input.rating } : {}),
+        ...(input.comment.trim() ? { comment: input.comment.trim() } : {}),
+        updated_at: new Date().toISOString(),
+      },
+    }));
+    void (async () => {
+      try {
+        const headers = await feedbackAuthClient.getFeedbackRequestHeaders();
+        await persistUserQuizState(
+          {
+            quiz_file: input.quizFile,
+            date: input.quiz.date,
+            quiz_type: input.quiz.type,
+            edition: input.edition,
+            question_id: input.questionId,
+            question_human_id: input.questionHumanId,
+            feedback_draft: {
+              ...(input.rating !== undefined ? { rating: input.rating } : {}),
+              comment: input.comment,
+            },
+          },
+          headers,
+        );
+        setPersistenceMessage("");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setPersistenceMessage(`Could not save feedback draft: ${message}`);
+      }
+    })();
   }
 
   function onLoadDate(): void {
@@ -396,6 +532,11 @@ export default function App() {
               Editions: <strong>{quizzes.length}</strong> quizzes across {quizzesByTypeCount.size} type(s)
             </p>
           ) : null}
+          {persistenceMessage ? (
+            <p>
+              Sync: <strong>{persistenceMessage}</strong>
+            </p>
+          ) : null}
         </section>
       ) : null}
 
@@ -459,6 +600,11 @@ export default function App() {
               feedbackEnabled={feedbackEnabled}
               feedbackBlockedMessage={feedbackBlockedMessage}
               getFeedbackRequestHeaders={() => feedbackAuthClient.getFeedbackRequestHeaders()}
+              initialFeedbackDraft={quiz.payload.questions?.[0]?.id ? feedbackDrafts[quiz.payload.questions[0].id] : undefined}
+              initialFeedbackSubmission={
+                quiz.payload.questions?.[0]?.id ? feedbackSubmissions[quiz.payload.questions[0].id] : undefined
+              }
+              onFeedbackDraftChange={feedbackEnabled ? onFeedbackDraftChange : undefined}
               selectedChoiceId={answers[quiz.key]}
               onSelectChoice={onSelectChoice}
             />

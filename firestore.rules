@@ -10,6 +10,16 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Signed-in progress and draft feedback are backend-only. Clients must use
+    // the authenticated API so Auth, App Check, validation, and rate limits apply.
+    match /user_quiz_state/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /user_feedback_drafts/{document=**} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

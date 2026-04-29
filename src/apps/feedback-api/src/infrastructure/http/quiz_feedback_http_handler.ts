@@ -4,6 +4,11 @@ import {
   submitFeedbackUseCase,
   type SubmitFeedbackUseCaseDependencies,
 } from "../../application/submit_feedback_use_case";
+import {
+  getUserQuizStateUseCase,
+  putUserQuizStateUseCase,
+  type UserStateUseCaseDependencies,
+} from "../../application/user_state_use_case";
 import type {
   AuditLoggerPort,
   AuthIdentityVerifierPort,
@@ -13,12 +18,15 @@ import type {
 } from "../../application/ports";
 
 const QUIZ_FEEDBACK_PATHS = new Set(["/api/quiz-feedback", "/quiz-feedback"]);
-const ALLOWED_METHODS = "POST, OPTIONS";
+const USER_QUIZ_STATE_PATHS = new Set(["/api/user-quiz-state", "/user-quiz-state"]);
+const ALLOWED_METHODS = "GET, PUT, POST, OPTIONS";
 const ALLOWED_HEADERS = "Content-Type, Authorization, X-Firebase-ID-Token, X-Firebase-AppCheck";
 
 interface RequestLike {
   method: string;
   path: string;
+  url?: string;
+  originalUrl?: string;
   body: unknown;
   headers: Record<string, string | string[] | undefined>;
   get(name: string): string | undefined;
@@ -32,6 +40,7 @@ interface ResponseLike {
 
 export interface QuizFeedbackHttpHandlerDependencies {
   useCase: SubmitFeedbackUseCaseDependencies;
+  userStateUseCase: UserStateUseCaseDependencies;
   rateLimiter: RateLimiterPort;
   authVerifier: AuthIdentityVerifierPort;
   appCheckVerifier: RequestAttestationVerifierPort;
@@ -48,6 +57,13 @@ function normalizePath(path: string): string {
     return path.slice(0, -1);
   }
   return path;
+}
+
+function readQueryParam(request: RequestLike, name: string): string | undefined {
+  const rawUrl = request.originalUrl || request.url || request.path;
+  const url = new URL(rawUrl, "https://mindblast.local");
+  const value = url.searchParams.get(name);
+  return value === null ? undefined : value;
 }
 
 function normalizeHeader(value: string | string[] | undefined): string | undefined {
@@ -205,7 +221,10 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
     const path = normalizePath(request.path);
     const origin = normalizeHeader(request.headers.origin);
 
-    if (!QUIZ_FEEDBACK_PATHS.has(path)) {
+    const isFeedbackPath = QUIZ_FEEDBACK_PATHS.has(path);
+    const isUserQuizStatePath = USER_QUIZ_STATE_PATHS.has(path);
+
+    if (!isFeedbackPath && !isUserQuizStatePath) {
       response.status(404).json({ ok: false, error: "not_found" });
       return;
     }
@@ -220,7 +239,10 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
       return;
     }
 
-    if (request.method !== "POST") {
+    const methodAllowed =
+      (isFeedbackPath && request.method === "POST") ||
+      (isUserQuizStatePath && (request.method === "GET" || request.method === "PUT"));
+    if (!methodAllowed) {
       reject(response, deps.auditLogger, 405, "method_not_allowed", { ok: false, error: "method_not_allowed" }, { method: request.method });
       return;
     }
@@ -279,7 +301,7 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
       return;
     }
 
-    if (!isJsonContentType(request.get("content-type"))) {
+    if ((isFeedbackPath || request.method === "PUT") && !isJsonContentType(request.get("content-type"))) {
       reject(
         response,
         deps.auditLogger,
@@ -291,9 +313,6 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
     }
 
     try {
-      const payload = extractBody(request);
-      const legacyClientId = readLegacyClientIdFromCookie(request);
-
       const rateLimitDecision = await checkRateLimits(request, deps, authDecision.identity.uid);
       if (!rateLimitDecision.allowed) {
         if (rateLimitDecision.retryAfterSeconds) {
@@ -313,6 +332,33 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
         return;
       }
 
+      if (isUserQuizStatePath && request.method === "GET") {
+        const result = await getUserQuizStateUseCase(
+          {
+            authUid: authDecision.identity.uid,
+            date: readQueryParam(request, "date") || "",
+            questionIdsRaw: readQueryParam(request, "question_ids"),
+          },
+          deps.userStateUseCase,
+        );
+        response.status(200).json(result);
+        return;
+      }
+
+      if (isUserQuizStatePath && request.method === "PUT") {
+        const result = await putUserQuizStateUseCase(
+          {
+            authUid: authDecision.identity.uid,
+            payload: extractBody(request),
+          },
+          deps.userStateUseCase,
+        );
+        response.status(200).json(result);
+        return;
+      }
+
+      const payload = extractBody(request);
+      const legacyClientId = readLegacyClientIdFromCookie(request);
       const result = await submitFeedbackUseCase(
         {
           payload,
@@ -346,7 +392,7 @@ export function createQuizFeedbackHttpHandler(deps: QuizFeedbackHttpHandlerDepen
         return;
       }
 
-      console.error("quiz feedback write failed", error);
+      console.error("quiz feedback api request failed", error);
       response.status(500).json({ ok: false, error: "storage_error" });
     }
   };

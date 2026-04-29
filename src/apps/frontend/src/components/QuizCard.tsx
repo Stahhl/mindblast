@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { submitQuizFeedback } from "../lib/feedbackApi";
+import type { UserFeedbackDraftState, UserFeedbackSubmissionState } from "../lib/userStateApi";
 import type { QuizPayload, QuizType } from "../lib/types";
 
 interface QuizCardProps {
@@ -11,6 +12,17 @@ interface QuizCardProps {
   feedbackEnabled: boolean;
   feedbackBlockedMessage?: string;
   getFeedbackRequestHeaders: () => Promise<Record<string, string>>;
+  initialFeedbackDraft?: UserFeedbackDraftState;
+  initialFeedbackSubmission?: UserFeedbackSubmissionState;
+  onFeedbackDraftChange?: (input: {
+    quiz: QuizPayload;
+    quizFile: string;
+    edition: number;
+    questionId: string;
+    questionHumanId: string;
+    rating?: number;
+    comment: string;
+  }) => void;
   selectedChoiceId: string | undefined;
   onSelectChoice: (quizKey: string, choiceId: string) => void;
 }
@@ -98,6 +110,9 @@ export default function QuizCard({
   feedbackEnabled,
   feedbackBlockedMessage,
   getFeedbackRequestHeaders,
+  initialFeedbackDraft,
+  initialFeedbackSubmission,
+  onFeedbackDraftChange,
   selectedChoiceId,
   onSelectChoice,
 }: QuizCardProps) {
@@ -112,23 +127,55 @@ export default function QuizCard({
   const [comment, setComment] = useState<string>("");
   const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("idle");
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
+  const [draftEdited, setDraftEdited] = useState(false);
 
   useEffect(() => {
     const draft = readDraft(questionId);
-    setRating(draft.rating);
-    setComment(draft.comment ?? "");
-    setFeedbackStatus("idle");
-    setFeedbackMessage("");
-  }, [questionId]);
+    const remoteDraft = initialFeedbackDraft ?? initialFeedbackSubmission;
+    setRating(remoteDraft?.rating ?? draft.rating);
+    setComment(remoteDraft?.comment ?? draft.comment ?? "");
+    if (initialFeedbackSubmission) {
+      setFeedbackStatus("updated");
+      setFeedbackMessage("Feedback previously saved.");
+    } else {
+      setFeedbackStatus("idle");
+      setFeedbackMessage("");
+    }
+    setDraftEdited(false);
+  }, [initialFeedbackDraft, initialFeedbackSubmission, questionId]);
 
   useEffect(() => {
     writeDraft(questionId, { rating, comment });
   }, [questionId, rating, comment]);
 
+  useEffect(() => {
+    if (!draftEdited || !onFeedbackDraftChange || !questionId || !questionHumanId) {
+      return;
+    }
+    if (rating === undefined && !comment.trim()) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      onFeedbackDraftChange({
+        quiz,
+        quizFile,
+        edition,
+        questionId,
+        questionHumanId,
+        rating,
+        comment,
+      });
+    }, 600);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [comment, draftEdited, edition, onFeedbackDraftChange, questionHumanId, questionId, quiz, quizFile, rating]);
+
   const remainingCommentCharacters = useMemo(() => COMMENT_MAX_LENGTH - comment.length, [comment.length]);
 
   function onRatingSelect(nextRating: number): void {
     setRating(nextRating);
+    setDraftEdited(true);
     if (feedbackStatus !== "saving") {
       setFeedbackStatus("idle");
       setFeedbackMessage("");
@@ -137,6 +184,7 @@ export default function QuizCard({
 
   function onCommentChange(value: string): void {
     setComment(value);
+    setDraftEdited(true);
     if (feedbackStatus !== "saving") {
       setFeedbackStatus("idle");
       setFeedbackMessage("");
@@ -185,6 +233,16 @@ export default function QuizCard({
         setFeedbackStatus("updated");
         setFeedbackMessage("Feedback updated.");
       }
+      onFeedbackDraftChange?.({
+        quiz,
+        quizFile,
+        edition,
+        questionId,
+        questionHumanId: questionHumanId as string,
+        rating,
+        comment,
+      });
+      setDraftEdited(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setFeedbackStatus("error");

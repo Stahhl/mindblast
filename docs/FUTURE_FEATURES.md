@@ -35,6 +35,7 @@ Track potential future quiz formats and product features after Phase 1.
 - Optional synthetic distractors for experiments only after explicit provenance/labeling contract is implemented.
 - Ratings on each generated question.
 - Improvement loop using ratings to tune generation quality.
+- Signed-in cross-device quiz progress and feedback draft persistence (Phase 10).
 - Category expansion beyond history.
 - Music quiz mode (blocked until rights-cleared catalog and platform-compliant playback model are documented in `docs/CONTENT_COMPLIANCE_POLICY.md`).
 - Difficulty levels.

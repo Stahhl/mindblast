@@ -13,6 +13,11 @@ import type {
 import type { FeedbackRuntimeConfig } from "../src/application/runtime_config";
 import type { FeedbackRepositoryPort } from "../src/application/ports";
 import type { FeedbackRecord, SubmitFeedbackMode } from "../src/domain/feedback";
+import type {
+  UserFeedbackDraftRecord,
+  UserFeedbackSubmissionState,
+  UserQuizAnswerRecord,
+} from "../src/domain/user_state";
 import { createQuizFeedbackHttpHandler } from "../src/infrastructure/http/quiz_feedback_http_handler";
 
 class FixedClock {
@@ -45,6 +50,38 @@ class InMemoryFeedbackRepository implements FeedbackRepositoryPort {
       created_at: existing.created_at,
     });
     return { mode: "updated" };
+  }
+}
+
+class InMemoryUserStateRepository {
+  answers = new Map<string, UserQuizAnswerRecord>();
+  drafts = new Map<string, UserFeedbackDraftRecord>();
+  submissions: UserFeedbackSubmissionState[] = [];
+
+  async listQuizAnswers(input: { authUid: string; date: string }): Promise<UserQuizAnswerRecord[]> {
+    return Array.from(this.answers.values()).filter(
+      (record) => record.auth_uid === input.authUid && record.date === input.date,
+    );
+  }
+
+  async upsertQuizAnswer(record: UserQuizAnswerRecord): Promise<void> {
+    this.answers.set(`${record.auth_uid}:${record.date}:${record.question_id}`, record);
+  }
+
+  async listFeedbackDrafts(input: { authUid: string; questionIds: string[] }): Promise<UserFeedbackDraftRecord[]> {
+    const allowed = new Set(input.questionIds);
+    return Array.from(this.drafts.values()).filter(
+      (record) => record.auth_uid === input.authUid && allowed.has(record.question_id),
+    );
+  }
+
+  async upsertFeedbackDraft(record: UserFeedbackDraftRecord): Promise<void> {
+    this.drafts.set(`${record.auth_uid}:${record.question_id}`, record);
+  }
+
+  async listFeedbackSubmissions(input: { authUid: string; questionIds: string[] }): Promise<UserFeedbackSubmissionState[]> {
+    const allowed = new Set(input.questionIds);
+    return this.submissions.filter((record) => allowed.has(record.question_id) && input.authUid === "uid-1");
   }
 }
 
@@ -197,6 +234,7 @@ function buildRequest(overrides: Partial<FakeRequest> = {}): FakeRequest {
 
 function createHandlerDeps(runtimeConfig: FeedbackRuntimeConfig) {
   const repository = new InMemoryFeedbackRepository();
+  const userStateRepository = new InMemoryUserStateRepository();
   const rateLimiter = new StubRateLimiter();
   const authVerifier = new StubAuthVerifier();
   const appCheckVerifier = new StubAppCheckVerifier();
@@ -211,6 +249,13 @@ function createHandlerDeps(runtimeConfig: FeedbackRuntimeConfig) {
         commentsEnabled: runtimeConfig.featureFlags.commentsEnabled,
       },
     },
+    userStateUseCase: {
+      repository: userStateRepository,
+      clock: new FixedClock(),
+      featureFlags: {
+        commentsEnabled: runtimeConfig.featureFlags.commentsEnabled,
+      },
+    },
     rateLimiter,
     authVerifier,
     appCheckVerifier,
@@ -221,6 +266,7 @@ function createHandlerDeps(runtimeConfig: FeedbackRuntimeConfig) {
   return {
     handler,
     repository,
+    userStateRepository,
     rateLimiter,
     authVerifier,
     appCheckVerifier,
@@ -346,7 +392,7 @@ describe("quiz feedback HTTP handler hardening", () => {
 
     expect(response.statusCode).toBe(204);
     expect(response.headers["access-control-allow-origin"]).toBe("https://mindblast.app");
-    expect(response.headers["access-control-allow-methods"]).toBe("POST, OPTIONS");
+    expect(response.headers["access-control-allow-methods"]).toBe("GET, PUT, POST, OPTIONS");
   });
 
   test("stores rating while dropping comment when comments are disabled", async () => {
@@ -425,5 +471,94 @@ describe("quiz feedback HTTP handler hardening", () => {
     expect(response.statusCode).toBe(400);
     expect(response.body).toEqual({ ok: false, error: "invalid_payload", details: "body must be valid JSON" });
     expect(deps.auditLogger.events[0]?.reason).toBe("invalid_payload");
+  });
+
+  test("stores and reads signed-in user quiz state", async () => {
+    const runtimeConfig = buildRuntimeConfig();
+    const deps = createHandlerDeps(runtimeConfig);
+    const putRequest = buildRequest({
+      method: "PUT",
+      path: "/api/user-quiz-state",
+      body: {
+        quiz_file: "quizzes/abc123.json",
+        date: "2026-03-04",
+        quiz_type: "history_mcq_4",
+        edition: 1,
+        question_id: "123e4567-e89b-42d3-a456-426614174000",
+        question_human_id: "Q42",
+        selected_choice_id: "A",
+        feedback_draft: {
+          rating: 5,
+          comment: "Draft note",
+        },
+      },
+    });
+    const putResponse = new FakeResponse();
+
+    await deps.handler(putRequest, putResponse);
+
+    expect(putResponse.statusCode).toBe(200);
+    expect(putResponse.body).toEqual({ ok: true });
+
+    const getRequest = buildRequest({
+      method: "GET",
+      path: "/api/user-quiz-state",
+      url: "/api/user-quiz-state?date=2026-03-04&question_ids=123e4567-e89b-42d3-a456-426614174000",
+      body: {},
+    });
+    const getResponse = new FakeResponse();
+
+    await deps.handler(getRequest, getResponse);
+
+    expect(getResponse.statusCode).toBe(200);
+    expect(getResponse.body).toMatchObject({
+      ok: true,
+      date: "2026-03-04",
+      answers: [
+        {
+          auth_uid: "uid-1",
+          question_id: "123e4567-e89b-42d3-a456-426614174000",
+          selected_choice_id: "A",
+        },
+      ],
+      feedback_drafts: [
+        {
+          auth_uid: "uid-1",
+          question_id: "123e4567-e89b-42d3-a456-426614174000",
+          rating: 5,
+          comment: "Draft note",
+        },
+      ],
+    });
+  });
+
+  test("rejects oversized user feedback draft comment", async () => {
+    const runtimeConfig = buildRuntimeConfig();
+    const deps = createHandlerDeps(runtimeConfig);
+    const request = buildRequest({
+      method: "PUT",
+      path: "/api/user-quiz-state",
+      body: {
+        quiz_file: "quizzes/abc123.json",
+        date: "2026-03-04",
+        quiz_type: "history_mcq_4",
+        edition: 1,
+        question_id: "123e4567-e89b-42d3-a456-426614174000",
+        question_human_id: "Q42",
+        feedback_draft: {
+          comment: "x".repeat(501),
+        },
+      },
+    });
+    const response = new FakeResponse();
+
+    await deps.handler(request, response);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toEqual({
+      ok: false,
+      error: "invalid_payload",
+      details: "feedback_draft.comment must be at most 500 characters",
+    });
   });
 });
